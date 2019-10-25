@@ -13,15 +13,6 @@ export default new Router({
     path: '/login',
     component: require('views/Login.vue')
   }, {
-    path: '/siteList/:id',
-    component: require('views/SiteList.vue')
-  }, {
-    path: '/siteDetail/:id',
-    component: require('views/SiteDetail.vue')
-  }, {
-    path: '/factor/:id',
-    component: require('views/Factor.vue')
-  }, {
     path: '*',
     redirect: '/home'
   }]

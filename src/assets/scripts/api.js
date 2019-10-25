@@ -65,5 +65,4 @@ api.login = (params) => {
   store.set('token', 2)
   return Promise.resolve({params})
 }
-console.log(api)
 export default api

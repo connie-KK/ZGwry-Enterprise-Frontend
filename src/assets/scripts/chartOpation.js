@@ -1,5 +1,5 @@
 export default {
-    lineOpation: {
+    lineOpation: {  //zhexiantu
         chart: {
             type: 'line',
             zoomType: 'x',

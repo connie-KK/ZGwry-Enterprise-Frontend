@@ -41,6 +41,11 @@ export default {
     customBack: {
       type: Function
     },
+    //搜索框搜索
+    serachFun: {
+      type: Function,
+      default: function() {}
+    },
     //是否显示搜索框
     isShowSearch: {
       type: Boolean,
@@ -66,7 +71,7 @@ export default {
       }
     },
     loadSearchData() {
-      console.log(this.searchValue);
+      this.serachFun(this.searchValue)
     }
   }
 };
@@ -122,7 +127,7 @@ export default {
   text-align: right;
 }
 .header-title {
-  @include flex(1);
+  @include flex(1.5);
   text-align: center;
   font-size: 0.34rem;
   font-weight: 500;

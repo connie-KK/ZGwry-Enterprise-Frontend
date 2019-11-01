@@ -11,13 +11,16 @@ import './icons'
 import './assets/scss/style.scss'
 import './assets/scss/animate.scss'
 
+import map from "./assets/scripts/map";
+Vue.prototype.$map = map;
+
 import HeaderBar from './components/HeaderBar.vue'
 Vue.component('HeaderBar', HeaderBar)
 
 Vue.use(Navigation, {router, store})
 // 导入api接口
 import api from './assets/scripts/api'
-Vue.$api = Vue.prototype.$api = api
+Vue.prototype.$api = api
 
 /* eslint-disable no-new */
 new Vue({

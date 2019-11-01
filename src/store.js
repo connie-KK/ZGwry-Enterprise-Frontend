@@ -4,8 +4,32 @@ import Vuex from 'vuex'
 // import store from 'store'
 Vue.use(Vuex)
 export default new Vuex.Store({
-  state: {},
-  actions: {},
-  mutations: {},
-  getters: {}
+  state: {
+    siteList: [],
+    factorList: [],
+    siteId:"",
+    factorData:{},
+    ariLoaction:[]
+  },
+  mutations: {
+    set_siteList: (state, data) => {
+      state.siteList = data
+    },
+    set_factorList: (state, data) => {
+      state.factorList = data
+    },
+    set_siteId: (state, data) => {
+      state.siteId = data
+    },
+    set_factorData: (state, data) => {
+      state.factorData = data
+    },
+    set_ariLoaction: (state, data) => {
+      state.ariLoaction = data
+    }
+  },
+  actions: {
+
+  }
+
 })

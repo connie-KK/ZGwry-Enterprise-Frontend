@@ -1,6 +1,7 @@
 import axios from 'axios'
-import store from 'store'
 import router from '@/router'
+import Cookies from 'js-cookie'
+const TokenKey = 'aepToken'
 
 // http request 拦截器
 let requestInstance = null
@@ -19,13 +20,13 @@ const service = axios.create({
 })
 
 // 请求前缀
-const prefix = 'api/Option/'
+const prefix = 'Api/'
 
 // request拦截器
 service.interceptors.request.use(
   config => {
-    if (getToken()) {
-      config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    if (Cookies.get(TokenKey)) {
+      config.headers['Authorization'] = 'Bearer ' + Cookies.get(TokenKey) // 让每个请求携带自定义token 请根据实际情况自行修改
     }
     config.url = prefix + config.url
     return config
@@ -44,26 +45,30 @@ service.interceptors.response.use(
 )
 
 let api = {}
+
+//请求接口集合
 const interfaces = [
-  'api1', // 接口列表
-  'api2', // 接口列表
-  'api3' // 接口列表
+  { fun: "getLastAQIVals", interface: "FactorData/GetLastAQIValsForPhone", type: "get" }, //获取空气站列表最新质量及PM2.5
+  { fun: "getFactorList", interface: "location/GetFactorListSortedPost", type: "post" },  //获取站点相关联因子
+  { fun: "getFacVals", interface: "FactorData/GetLastFacValsPost", type: "post" },  //获取站点各关联因子最新数值
+  { fun: "getSiteList", interface: "location/PagedList", type: "post" },   //获取站点列表
+  { fun: "getFactVal", interface: "FactorData/GetFactValPost", type: "post" },   //获取单个站点时间段内单因子的数值
 ]
 
+
 interfaces.forEach(method => {
-  api[method] = payload => {
-    return service.post(method, payload)
+  api[method.fun] = payload => {
+    return service[method.type](method.interface, payload)
   }
 })
 
 api.logout = () => {
-  store.clearAll()
+  Cookies.remove(TokenKey)
   router.push('login')
 }
 
 api.login = (params) => {
-  store.set('token', 2)
-  return Promise.resolve({params})
+  Cookies.set(TokenKey, 2)
+  return Promise.resolve({ params })
 }
-console.log(api)
 export default api

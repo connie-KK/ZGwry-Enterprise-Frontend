@@ -33,6 +33,7 @@ export default {
             gridLineDashStyle: 'grid',
             gridLineColor: '#e9edf0',
             gridLineWidth: 1,
+            categories:[1, 2, 3, 4, 5, 6, 7, 8, 9],
             labels: {
                 align: 'left',
                 x: -15,
@@ -43,22 +44,13 @@ export default {
             }
         }],
 
-        plotOptions: {
-            series: {
-                label: {
-                    connectorAllowed: false
-                },
-                pointStart: 2010
-            }
-        },
-
         series: [{
             name: '',
             showInLegend: false,
             type: 'line',
             lineWidth: 1,
             color: '#5B8FF9',
-            data: [439, 1525, 571, 1696, 970, 1199, 1371, 1541, 541],
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
             marker: {
                 enabled: false
             }

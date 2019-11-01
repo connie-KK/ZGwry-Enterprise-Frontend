@@ -2,16 +2,26 @@
   <div class="content">
     <header-bar leftIcon="back" leftText="返回">{{moduleName}}</header-bar>
     <div class="main-content">
-      <div class="air-note" v-if="this.routeId==1">
-        <div class="level">{{airLevel}}</div>
-        <p class="tips">{{airTips}}</p>
+      <div class="air-note" v-if="this.pageType==1 && detailData.info">
+        <div
+          class="level"
+          :style="{background: detailData.info.AQIColor}"
+        >{{detailData.info.AQILevel}}</div>
+        <p>{{airInfo1}}</p>
+        <p>{{airInfo2}}</p>
+        <p>{{airInfo3}}</p>
       </div>
-      <div class="list-header" v-if="this.routeId!=1">
+      <div class="list-header" v-if="this.pageType!=1">
         <span>因子名</span>
         <span>最新值</span>
       </div>
-      <div v-for="(item, index) in list" class="list-content" :key="index" @click="toFactor(item)">
-        <span>{{item.factor}}</span>
+      <div
+        v-for="(item, index) in factorList"
+        class="list-content"
+        :key="index"
+        @click="toFactor(item)"
+      >
+        <span>{{item.name}}</span>
         <span>{{item.value}}</span>
       </div>
     </div>
@@ -19,41 +29,112 @@
 </template>
 
 <script>
+import store from "store";
 export default {
   name: "SiteDetail",
   data() {
     return {
-      moduleName: "金海岸",
-      list: [
-        { factor: "AQI", value: 58 },
-        { factor: "PM2.5", value: "65.0 μg/m³" },
-        { factor: "臭氧", value: "65.0 μg/m³" },
-        { factor: "臭氧8", value: "65.0 μg/m³" },
-        { factor: "二氧化硫", value: "65.0 μg/m³" },
-        { factor: "二氧化氮", value: "65.0 μg/m³" },
-        { factor: "一氧化碳", value: "65.0 μg/m³" },
-        { factor: "风速", value: "65.0 μg/m³" },
-        { factor: "二氧化硫", value: "65.0 μg/m³" },
-        { factor: "二氧化氮", value: "65.0 μg/m³" },
-        { factor: "一氧化碳", value: "65.0 μg/m³" },
-        { factor: "风速", value: "65.0 μg/m³" }
-      ],
+      factorList: [],
+      factorVals: [],
       routeId: 0,
-      airLevel: "二级",
-      airTips: `当前空气AQI为88，环境质量为良。 
-      空气质量可接受，单某些污染物可能对极少数异常敏感人群健康有较弱影响。 
-      建议：极少数异常敏感人群应减少户外活动`
+      pageType: 0
     };
   },
+  computed: {
+    detailData() {
+      const arr = this.$store.state.siteList;
+      let tempData;
+      arr.forEach(item => {
+        if (item.StationId && item.StationId == this.routeId) {
+          tempData = item;
+        }
+      });
+      if (tempData && tempData.info) {
+        tempData.info = tempData.info.AQIInfo;
+      }
+
+      return tempData;
+    },
+    moduleName() {
+      if (this.detailData && this.detailData.StationName) {
+        return this.detailData.StationName;
+      } else {
+        return "站点";
+      }
+    },
+    airInfo1() {
+      let info;
+      if (this.detailData && this.detailData.info) {
+        info = `当前空气AQI为${this.detailData.info.AQI}，环境质量为${this.detailData.info.AQIClass}。`;
+      }
+      return info;
+    },
+    airInfo2() {
+      let info;
+      if (this.detailData && this.detailData.info) {
+        info = this.detailData.info.Health;
+      }
+      return info;
+    },
+    airInfo3() {
+      let info;
+      if (this.detailData && this.detailData.info) {
+        info = `建议：${this.detailData.info.Suggestion}`;
+      }
+      return info;
+    }
+  },
   created() {
-    this.routeChange();
+    this.routeId = this.$route.params.id;
+    this.pageType = store.get("pageType");
+    this.getFactorList();
   },
   methods: {
-    routeChange() {
-      this.routeId = this.$route.params.id;
+    toFactor(item) {
+      this.$store.commit("set_siteId",  this.routeId)
+      this.$store.commit("set_factorData",  item)
+      this.$router.push(`/factor/${item.id}`);
     },
-    toFactor(item){
-        this.$router.push(`/factor/${item.factor}`)
+    getFactorList() {
+      const payload = {
+        id: this.routeId
+      };
+      this.$api.getFactorList(payload).then(res => {
+        this.factorList = res;
+        this.getFacVals();
+      });
+    },
+    getFacVals() {
+      const payload = {
+        refId: this.routeId,
+        fromType: 0,
+        dType: 0
+      };
+      this.$api.getFacVals(payload).then(res => {
+        this.factorVals = res;
+        this.factorList.forEach(factorItem => {
+          if (res instanceof Array && res.length > 0) {
+            res.forEach(valItem => {
+              if (factorItem.id === valItem.id) {
+                let newVal;
+                if (valItem.val == 0 || valItem.val > 0) {
+                  newVal = `${valItem.val} ${factorItem.unitName}`;
+                } else {
+                  newVal = 0;
+                }
+                this.$set(factorItem, "value", newVal);
+              }
+            });
+          } else {
+            this.$set(factorItem, "value", 0);
+          }
+        });
+        this.factorList.forEach(factorItem => {
+          if (!factorItem.value) {
+            this.$set(factorItem, "value", 0);
+          }
+        });
+      });
     }
   }
 };
@@ -69,18 +150,18 @@ export default {
     @include justify-content(center);
     width: 1rem;
     height: 0.4rem;
-    background: rgba(255, 164, 0, 1);
     border-radius: 2px;
-    border: 2px solid rgba(255, 164, 0, 1);
     font-size: 0.26rem;
+    margin-bottom: 0.2rem;
   }
-  .tips {
+  p {
     font-size: 0.24rem;
     color: rgba(48, 48, 48, 1);
-    margin: 0.13rem 0 0 0;
+    margin: 0;
   }
 }
-.list-header,.list-content {
+.list-header,
+.list-content {
   @include flexbox;
   @include align-items(center);
   @include justify-content(space-between);
@@ -100,7 +181,7 @@ export default {
 .list-content {
   height: 1.12rem;
   line-height: 0.48rem;
-  background:rgba(255,255,255,1);
+  background: rgba(255, 255, 255, 1);
   border-bottom: solid 1px #e0e0e0;
   .icon svg {
     width: 0.18rem;

@@ -1,6 +1,20 @@
-# vue-mobile
+# new
 
-说明地址：http://www.jianshu.com/p/d7587e81dbd8
+## Project setup
+```
+npm install
+```
 
+### Compiles and hot-reloads for development
+```
+npm run dev
+```
 
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
 

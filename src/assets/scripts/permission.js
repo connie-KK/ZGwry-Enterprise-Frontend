@@ -1,10 +1,11 @@
 import router from '../../router'
-import cache from 'store'
 import api from './api'
+import Cookies from 'js-cookie'
+const TokenKey = 'aepToken'
 
 const whiteList = ['/login'] // 不重定向白名单
 router.beforeEach((to, from, next) => {
-  if (cache.get('token')) {
+  if (Cookies.get(TokenKey)) {
     if (to.path === '/login') {
       next({ path: '/' })
     } else {

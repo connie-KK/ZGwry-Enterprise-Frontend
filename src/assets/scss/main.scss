@@ -1,0 +1,25 @@
+
+@import "./_flex.scss";
+.sample-popup {
+    .leaflet-popup-content-wrapper {
+      width:60px;
+      height:40px;
+      border-radius:3px;
+      background: rgba(208, 33, 33, 1);
+      border-radius: 3px;
+      color: rgba(255, 255, 255, 1);
+      font-size:14px;
+      .leaflet-popup-content{
+        @include flexbox;
+        @include align-items(center);
+        @include justify-content(space-around);
+        @include flex-direction(column);
+        width: 100% !important;
+        height: 100%;
+        margin:0;
+      }
+    }
+    .leaflet-popup-tip-container, .leaflet-popup-close-button{
+        display: none;
+    }
+  }

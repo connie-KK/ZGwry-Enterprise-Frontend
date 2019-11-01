@@ -13,7 +13,7 @@ export default new Router({
     path: '/login',
     component: require('views/Login.vue')
   }, {
-    path: '/siteList/:id',
+    path: '/siteList',
     component: require('views/SiteList.vue')
   }, {
     path: '/siteDetail/:id',
@@ -21,6 +21,9 @@ export default new Router({
   }, {
     path: '/factor/:id',
     component: require('views/Factor.vue')
+  }, {
+    path: '/map',
+    component: require('views/Map.vue')
   }, {
     path: '*',
     redirect: '/home'

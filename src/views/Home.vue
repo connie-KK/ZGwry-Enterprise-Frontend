@@ -14,6 +14,7 @@
 
 <script>
 import config from "assets/scripts/config";
+import store from "store";
 export default {
   name: "Home",
   data() {
@@ -25,7 +26,8 @@ export default {
   },
   methods: {
     toSiteList(index) {
-      this.$router.push(`/siteList/${index}`);
+      store.set("pageType", index);
+      this.$router.push(`/siteList`);
     }
   }
 };

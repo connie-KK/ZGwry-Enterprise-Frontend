@@ -1,11 +1,9 @@
 <template>
   <div class="content">
-    <header-bar align="left">
-      登录
-    </header-bar>
+    <header-bar align="left">登录</header-bar>
     <div class="main-content">
       <div class="padded">
-        <field placeholder="输入用户名" v-model="info.username">
+        <field placeholder="输入用户名" v-model="info.userid">
           <span class="iconfont icon-account"></span>
         </field>
         <field placeholder="输入6-18密码" v-model="info.password" type="password">
@@ -20,34 +18,34 @@
 <script>
 export default {
   components: {
-    HeaderBar: require('components/HeaderBar'),
-    Field: require('components/Field')
+    HeaderBar: require("components/HeaderBar"),
+    Field: require("components/Field")
   },
-  name: 'Login',
-  data () {
+  name: "Login",
+  data() {
     return {
       info: {
-        username: '',
-        password: ''
+        userid: "",
+        password: "",
+        grant_type: "password"
       }
-    }
+    };
   },
   methods: {
-    clickLoginBtn () {
+    clickLoginBtn() {
       this.$api.login(this.info).then(result => {
-        console.log(result)
-        this.$router.push('/home')
-      })
+        this.$router.push("/home");
+      });
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-  .padded{
-    margin: 0 16px;
-  }
-  button{
-    margin-top: 35px;
-  }
+.padded {
+  margin: 0 16px;
+}
+button {
+  margin-top: 35px;
+}
 </style>

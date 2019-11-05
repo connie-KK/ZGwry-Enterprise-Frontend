@@ -6,7 +6,7 @@
         :key="index"
         :class="selectedIndex == index?'selectedLi':''"
         @click="changeSelect(index)"
-      >{{item}}</li>
+      >{{item.name}}</li>
     </ul>
   </div>
 </template>
@@ -14,17 +14,30 @@
 <script>
 export default {
   name: "mapNavigation",
-  data() {
-    return {
-      list: ["AQI", "PM10", "PM2.5", "O3", "O3"],
-      selectedIndex: 0
+  props: {
+    changeMaker: {
+      type: Function,
+      default: function() {}
     }
   },
-   methods:{
-      changeSelect(index){
-        this.selectedIndex = index
-      }
+  data() {
+    return {
+      list:[
+        {name:"AQI",type:"AQI"},
+        {name:"PM10",type:"PM10"},
+        {name:"PM2.5",type:"PM2.5"},
+        {name:"O3",type:"臭氧"},
+        {name:"CO",type:"一氧化碳"},
+      ],
+      selectedIndex: 0
+    };
+  },
+  methods: {
+    changeSelect(index) {
+      this.selectedIndex = index;
+      this.changeMaker(this.list[index].type)
     }
+  }
 };
 </script>
 <style lang="scss" scoped>

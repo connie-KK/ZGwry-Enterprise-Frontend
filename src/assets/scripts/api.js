@@ -53,6 +53,8 @@ const interfaces = [
   { fun: "getFacVals", interface: "FactorData/GetLastFacValsPost", type: "post" },  //获取站点各关联因子最新数值
   { fun: "getSiteList", interface: "location/PagedList", type: "post" },   //获取站点列表
   { fun: "getFactVal", interface: "FactorData/GetFactValPost", type: "post" },   //获取单个站点时间段内单因子的数值
+  { fun: "getAirFactVals", interface: "FactorData/LastValIaqiInList", type: "post" },   //获取所有空气站点的6因子最新平均值Iaqi等
+  { fun: "getAriEvaluate", interface: "FactorData/GetLastAQIValPost", type: "post" }   //获取空气站点当前最新空气质量评价
 ]
 
 

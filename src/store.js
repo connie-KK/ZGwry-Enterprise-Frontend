@@ -9,6 +9,7 @@ export default new Vuex.Store({
     factorList: [],
     siteId:"",
     factorData:{},
+    airList:[],
     ariLoaction:[]
   },
   mutations: {
@@ -23,6 +24,9 @@ export default new Vuex.Store({
     },
     set_factorData: (state, data) => {
       state.factorData = data
+    },
+    set_airList: (state, data) => {
+      state.airList = data
     },
     set_ariLoaction: (state, data) => {
       state.ariLoaction = data

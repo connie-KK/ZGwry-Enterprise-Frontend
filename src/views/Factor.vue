@@ -143,7 +143,7 @@ export default {
           this.chartData = tempArr;
           this.drawChart();
         } else {
-          this.chartData = [0, 0, 0, 0, 0, 0, 0];
+          this.chartData = ['', '', '', '', '', '', '', '', '', '', '', ''];
         }
       });
     },
@@ -228,7 +228,7 @@ export default {
           type: "datetime",
           labels: {
             align: "left",
-            x: -30,
+            x: -29,
             y: 15,
             style: {
               color: "#999"

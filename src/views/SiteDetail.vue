@@ -2,14 +2,11 @@
   <div class="content">
     <header-bar leftIcon="back" leftText="返回">{{moduleName}}</header-bar>
     <div class="main-content">
-      <div class="air-note" v-if="this.pageType==1 && detailData.info">
-        <div
-          class="level"
-          :style="{background: detailData.info.AQIColor}"
-        >{{detailData.info.AQILevel}}</div>
-        <p>{{airInfo1}}</p>
-        <p>{{airInfo2}}</p>
-        <p>{{airInfo3}}</p>
+      <div class="air-note" v-if="this.pageType==1">
+        <div class="level" :style="{background: AQIColor}">{{AQILevel}}</div>
+        <p :class="pClass">{{airInfo1}}</p>
+        <p :class="pClass">{{airInfo2}}</p>
+        <p :class="pClass">{{airInfo3}}</p>
       </div>
       <div class="list-header" v-if="this.pageType!=1">
         <span>因子名</span>
@@ -21,8 +18,8 @@
         :key="index"
         @click="toFactor(item)"
       >
-        <span>{{item.name}}</span>
-        <span>{{item.value}}</span>
+        <span >{{item.name}}</span>
+        <span >{{item.value}}</span>
       </div>
     </div>
   </div>
@@ -37,7 +34,13 @@ export default {
       factorList: [],
       factorVals: [],
       routeId: 0,
-      pageType: 0
+      pageType: 0,
+      AQILevel: "",
+      AQIColor: "",
+      airInfo1: "",
+      airInfo2: "",
+      airInfo3: "",
+      nullValue:"--"
     };
   },
   computed: {
@@ -49,10 +52,6 @@ export default {
           tempData = item;
         }
       });
-      if (tempData && tempData.info) {
-        tempData.info = tempData.info.AQIInfo;
-      }
-
       return tempData;
     },
     moduleName() {
@@ -62,37 +61,38 @@ export default {
         return "站点";
       }
     },
-    airInfo1() {
-      let info;
-      if (this.detailData && this.detailData.info) {
-        info = `当前空气AQI为${this.detailData.info.AQI}，环境质量为${this.detailData.info.AQIClass}。`;
+    pClass(){
+      if(!this.airInfo1){
+        return 'loading'
       }
-      return info;
-    },
-    airInfo2() {
-      let info;
-      if (this.detailData && this.detailData.info) {
-        info = this.detailData.info.Health;
-      }
-      return info;
-    },
-    airInfo3() {
-      let info;
-      if (this.detailData && this.detailData.info) {
-        info = `建议：${this.detailData.info.Suggestion}`;
-      }
-      return info;
     }
   },
   created() {
     this.routeId = this.$route.params.id;
     this.pageType = store.get("pageType");
+    if (this.pageType == 1) {
+      //空气站点
+      this.getEvaluate();
+    }
     this.getFactorList();
   },
   methods: {
+    getEvaluate() {
+      const payload = {
+        refId: this.routeId,
+        fromType: 0
+      };
+      this.$api.getAriEvaluate(payload).then(res => {
+        this.AQILevel = res.AQIInfo.AQILevel;
+        this.AQIColor = res.AQIInfo.AQIColor;
+        this.airInfo1 = `当前空气AQI为${res.AQIInfo.Idx}，环境质量为${res.AQIInfo.AQIClass}。`;
+        this.airInfo2 = res.AQIInfo.Health;
+        this.airInfo3 = `建议：${res.AQIInfo.Suggestion}`;
+      });
+    },
     toFactor(item) {
-      this.$store.commit("set_siteId",  this.routeId)
-      this.$store.commit("set_factorData",  item)
+      this.$store.commit("set_siteId", this.routeId);
+      this.$store.commit("set_factorData", item);
       this.$router.push(`/factor/${item.id}`);
     },
     getFactorList() {
@@ -126,12 +126,12 @@ export default {
               }
             });
           } else {
-            this.$set(factorItem, "value", 0);
+            this.$set(factorItem, "value", this.nullValue);
           }
         });
         this.factorList.forEach(factorItem => {
           if (!factorItem.value) {
-            this.$set(factorItem, "value", 0);
+            this.$set(factorItem, "value", this.nullValue);
           }
         });
       });
@@ -148,16 +148,23 @@ export default {
   .level {
     @include flexbox;
     @include justify-content(center);
+    @include align-items(center);
     width: 1rem;
     height: 0.4rem;
     border-radius: 2px;
     font-size: 0.26rem;
     margin-bottom: 0.2rem;
+    background: #e9ebed;
   }
   p {
     font-size: 0.24rem;
     color: rgba(48, 48, 48, 1);
-    margin: 0;
+    margin: 0 0 0.1rem 0;
+  }
+  .loading {
+    height: 0.4rem;
+    line-height: 0.4rem;
+    background: #e9ebed;
   }
 }
 .list-header,
@@ -172,6 +179,12 @@ export default {
   }
   > span:last-child {
     margin-right: 0.32rem;
+  }
+  .loadingSpan{
+    display: inline-block;
+    width: 1rem;
+    height: 0.4rem;
+    background: #e9ebed;
   }
 }
 .list-header {

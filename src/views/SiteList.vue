@@ -16,6 +16,7 @@
       <div class="sort_box" v-if="this.pageType==AIRPage">
         <span @click="changeFilter" :class="span1">PM2.5排序</span>
         <span @click="changeFilter" :class="span2">AQI排序</span>
+        <span>{{LastDate}}</span>
       </div>
       <div class="list-header" v-if="this.pageType==AIRPage">
         <span>站点</span>
@@ -29,7 +30,7 @@
           :key="index"
           @click="toDetail(item)"
         >
-          <span>{{`${index+1}、${item.StationName}`}}</span>
+          <span>{{`${index+1}、${item.Locname}`}}</span>
           <span>{{item.mainEffect}}</span>
           <span class="icon">
             <span>{{item.mainEffectValue}}</span>
@@ -60,6 +61,7 @@
 <script>
 import config from "assets/scripts/config";
 import store from "store";
+import moment from "moment";
 export default {
   name: "SiteList",
   data() {
@@ -113,6 +115,13 @@ export default {
       } else if (this.pageType === this.VOCPage) {
         return this.VOCSubType;
       }
+    },
+    LastDate() {
+      if (this.airList instanceof Array && this.airList.length > 0) {
+        return moment(this.airList[0].LastDate).format("YYYY-MM-DD HH:MM:SS");
+      } else {
+        return "";
+      }
     }
   },
   created() {
@@ -136,7 +145,7 @@ export default {
     },
     getList() {
       if (this.pageType == this.AIRPage) {
-        this.$api.getLastAQIVals().then(res => {
+        this.$api.getAirFactVals().then(res => {
           if (res) {
             this.$store.commit("set_siteList", res);
             this.handleList(res);
@@ -166,28 +175,48 @@ export default {
       }
     },
     handleList(arr = this.airList) {
-      let tempArr = [];
       arr.forEach(item => {
-        if (this.type === "PM2.5") {
-          item.mainEffect = "PM2.5";
-          item.mainEffectValue = item.info.PM25;
-        } else if (this.type === "AQI") {
-          item.mainEffect = item.info.facName;
-          item.mainEffectValue = item.info.AQI;
+        debugger;
+        item.StationId = item.Locid;
+        item.StationName = item.Locname;
+        if (!item.AQI && typeof item.AQI !== "undefined" && item.AQI != 0) {
+          item.mainEffect = "--";
+          item.mainEffectValue = "";
+        } else {
+          if (this.type === "PM2.5") {
+            item.mainEffect = "PM2.5";
+            item.FactorVals.forEach(facItem => {
+              if (facItem.FacName === "PM2.5") {
+                item.mainEffectValue = facItem.IAqi;
+              }
+            });
+            item.FactorVals.sort((a, b) => b.IAqi - a.IAqi);
+            item.color = item.FactorVals[0].Color;
+          } else if (this.type === "AQI") {
+            item.FactorVals.sort((a, b) => b.IAqi - a.IAqi);
+            item.mainEffect = item.FactorVals[0].FacName;
+            item.mainEffectValue = item.AQI;
+            item.color = item.FactorVals[0].Color;
+          }
         }
-        tempArr.push([item.StationLat, item.StationLng]);
       });
       arr.sort((a, b) => b.mainEffectValue - a.mainEffectValue);
+      arr.forEach(item => {
+        if (item.mainEffect === "--") {
+          item.mainEffectValue = "--";
+        }
+      });
       this.airList = arr;
-      this.$store.commit("set_ariLoaction", tempArr)
-
+      this.$store.commit("set_airList", arr);
     },
     toSearchList(e) {
       this.filter = e;
       this.getList();
     },
     toDetail(item) {
-      this.$router.push(`/siteDetail/${item.StationId}`);
+      if (item.mainEffect !== "--") {
+        this.$router.push(`/siteDetail/${item.StationId}`);
+      }
     }
   }
 };
@@ -208,8 +237,11 @@ export default {
   > span:first-child {
     margin-left: 0.32rem;
   }
-  > span:last-child {
+  > span:nth-child(2) {
     margin-left: 0.6rem;
+  }
+  > span:last-child {
+    margin-left: 1.5rem;
   }
   .selected {
     color: rgba(50, 150, 250, 1);

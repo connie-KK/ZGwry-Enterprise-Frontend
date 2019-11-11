@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import local from '../../../config/local'
 import deploy from '../../../config/deploy'
 export default {
@@ -45,8 +44,3 @@ export default {
       : local.maintenanceUrl
 
 }
-=======
-export default {
-    list: ["地表水", "环境空气常规", "环境VOCs"]
-}
->>>>>>> 3892c33f04be79e469135a1248464f060f59e7cf

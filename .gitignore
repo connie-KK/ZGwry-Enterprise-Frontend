@@ -1,5 +1,4 @@
 .DS_Store
-<<<<<<< HEAD
 node_modules
 cache/*
 /dist
@@ -25,9 +24,3 @@ yarn-error.log*
 package-lock.json
 ysfe.tar
 
-=======
-node_modules/
-dist/
-npm-debug.log
-*.rar
->>>>>>> 3892c33f04be79e469135a1248464f060f59e7cf

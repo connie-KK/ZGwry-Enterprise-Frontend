@@ -1,0 +1,18 @@
+FROM devreg.azuratech.com/dysrv AS srv
+# FROM nginx:stable-alpine
+FROM nginx
+
+RUN set -ex; \
+    mkdir -p /var/www; \
+    mkdir -p /dysrv/cache; \
+    cd /dysrv;
+
+EXPOSE 30006
+COPY dist/ /var/www/
+COPY ./nginx.dev.conf /etc/nginx/nginx.conf
+COPY ./run.sh /dysrv/run.sh
+
+COPY --from=srv /dysrv /dysrv
+WORKDIR /dysrv
+
+CMD ["sh", "-c", "/dysrv/run.sh"]

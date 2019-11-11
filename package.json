@@ -1,0 +1,43 @@
+{
+  "name": "new",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "site": "cross-var node build/prebuild.js $npm_config_name && vue-cli-service build"
+  },
+  "dependencies": {
+    "core-js": "^2.6.5",
+    "highcharts": "^7.2.1",
+    "js-cookie": "^2.2.1",
+    "leaflet": "^1.5.1",
+    "mint-ui": "^2.2.13",
+    "moment": "^2.24.0",
+    "perfect-scrollbar": "^1.4.0",
+    "store": "^2.0.12",
+    "vue": "^2.6.10",
+    "vue-carousel": "^0.18.0",
+    "vue-navigation": "^1.1.4",
+    "vue-router": "^3.0.6",
+    "vuex": "^3.1.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.7.0",
+    "@vue/cli-plugin-eslint": "^3.7.0",
+    "@vue/cli-service": "^3.7.0",
+    "@vue/eslint-config-prettier": "^4.0.1",
+    "axios": "^0.18.0",
+    "babel-eslint": "^10.0.1",
+    "cors": "^2.8.5",
+    "cross-var": "^1.1.0",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "html-webpack-tags-plugin": "^2.0.12",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.1.0",
+    "vue-template-compiler": "^2.5.21",
+    "webpack-merge": "^4.2.1"
+  }
+}

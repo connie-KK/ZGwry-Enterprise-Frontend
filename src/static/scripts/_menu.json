@@ -1,0 +1,12 @@
+{
+  "moduleId": "MAINT",
+  "menuTree": [
+    {
+      "code": "MAINTENANCE_ROOT_ITEM",
+      "onMenu": "_MAIN",
+      "name": "运维管理模块",
+      "action": "/views/dashboard/dashboard.html"
+    }
+  ],
+  "menuItems":[]
+}

@@ -1,0 +1,16 @@
+{
+  "moduleId": "MAINT",
+  "moduleName": "环境质量监测运维管理子系统",
+  "majorVersion": 1,
+  "minorVersion": 0,
+  "revision": 0,
+  "frameworkMajorVersion": 1,
+  "frameworkMinorVersion": 0,
+  "frameworkRevision": 0,
+  "date": "2018-01-01",
+  "developer": "",
+  "url": "http://localhost:30028/",
+  "logoUrl": "/images/logo.png",
+  "logoWidth": 250,
+  "logoHeight": 53
+}

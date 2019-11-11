@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="33px" viewBox="0 0 18 33" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>返回</title>
+    <desc>Created with Sketch.</desc>
+    <g id="页面1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="空气质量" transform="translate(-23.000000, -70.000000)" fill-rule="nonzero">
+            <g id="标题栏/带搜索">
+                <g id="标题">
+                    <rect id="Background" fill="#FFFFFF" x="0" y="0" width="750" height="233"></rect>
+                    <rect id="Background" fill="#FFFFFF" x="0" y="0" width="750" height="129"></rect>
+                    <polygon id="iconfont-fanhui" fill="#3296FA" points="24.9979883 84.1091638 23 86.1264603 24.9979883 88.1407789 39.0020117 102.25 41 100.235624 26.9990234 86.1264603 41 72.0172965 39.0020117 70"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

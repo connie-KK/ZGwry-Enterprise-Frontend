@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 config/deploy.js
 node_modules/*
 src/static/scripts/*
+=======
+build/*.js
+config/*.js
+>>>>>>> 3892c33f04be79e469135a1248464f060f59e7cf

@@ -26,7 +26,7 @@ export default {
   methods: {
     toSiteList(index) {
       store.set("pageType", index);
-      this.$router.push(`/siteList`);
+      // this.$router.push(`/siteList`);
     },
     goBack(){}
   }

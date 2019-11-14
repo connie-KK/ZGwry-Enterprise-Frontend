@@ -1,6 +1,3 @@
-import "leaflet/dist/leaflet.css"
-import $L from "leaflet";
-
 // 解决 leaflet 默认 maker 无法显示的问题
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -8,7 +5,7 @@ import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
 const map = {}
 
-const Map2 = $L.Map.extend({
+const Map2 = L.Map.extend({
     // 覆盖源码
     openPopup: function (popup, latlng, options) {
         if (!(popup instanceof L.Popup)) {
@@ -21,7 +18,7 @@ const Map2 = $L.Map.extend({
             return this;
         }
         if (this._popup && this._popup.options.autoClose) {
-//                this.closePopup(); 修改了这块
+            // this.closePopup(); 修改了这块
         }
         this._popup = popup;
         return this.addLayer(popup);
@@ -29,27 +26,31 @@ const Map2 = $L.Map.extend({
 });
 
 
-$L.map = function (id, options) {
+L.map = function (id, options) {
     return new Map2(id, options);
 };
 
-const DefaultIcon = $L.icon({
+const DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow
 });
-$L.Marker.prototype.options.icon = DefaultIcon;
+L.Marker.prototype.options.icon = DefaultIcon;
 
 map.createMap = (divId, options) => {
-    const map = $L.map(divId, options);
+    const map = L.map(divId, options);
     return map;
 };
-map.createTileLayer = async (map, url, options) => {
-    let tileLayer = await $L.tileLayer(url, options);
+map.createTileLayer = async (map) => {
+    //加载高德地图
+    let tileLayer = await L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
+        maxZoom: 18,
+        minZoom: 5
+    });
     tileLayer.addTo(map);
     return tileLayer;
 };
 map.createIcon = options => {
-    return $L.icon(options);
+    return L.icon(options);
 };
 
 /**
@@ -61,20 +62,20 @@ map.createIcon = options => {
  * 
  */
 map.createMakerByXY = (map, coordinate, options = {}) => {
-    let marker = $L.marker($L.latLng(coordinate[0], coordinate[1]), options);
+    let marker = L.marker(L.latLng(coordinate[0], coordinate[1]), options);
     marker.addTo(map);
     return marker;
 };
 
 map.createPopup = (map, options,latlng) => {
-    let popup = $L.popup(options)
+    let popup = L.popup(options)
     .setLatLng(latlng)
     return popup;
 };
 
 // 通过数组创建 latlng
 map.createLatlonByArray = (coordinate) => {
-    let latLng = $L.latLng(coordinate[0], coordinate[1]);
+    let latLng = L.latLng(coordinate[0], coordinate[1]);
     return latLng;
 };
 export default map

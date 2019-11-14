@@ -6,24 +6,32 @@ import App from '@/views/dashboard/dashboard.vue'
 import router from '@/router/dashboard'
 import store from '@/store'
 import Navigation from 'vue-navigation'
+Vue.use(Navigation, {router, store})
 
+//leaflet地图
+import "leaflet"
+import "leaflet.chinatmsproviders"
+
+import map from "@/assets/scripts/map";
+Vue.prototype.$map = map;
+
+//移动端自适应
 import '@/assets/scss/base.scss';
+
+import 'mint-ui/lib/style.css'
+
+//icon
+import icon from "@/components/aepIcon.vue";
+Vue.component('icon', icon)
 import '@/assets/icons/back'
 import '@/assets/icons/right'
 import '@/assets/icons/location'
 import '@/assets/icons/search'
 
-import 'mint-ui/lib/style.css'
-import map from "@/assets/scripts/map";
-Vue.prototype.$map = map;
-
 import HeaderBar from '@/components/HeaderBar.vue'
-import icon from "@/components/aepIcon.vue";
 Vue.component('HeaderBar', HeaderBar)
-Vue.component('icon', icon)
 
-Vue.use(Navigation, {router, store})
-// 导入api接口
+// api接口
 import api from '@/assets/scripts/customAxios'
 Vue.prototype.$api = api
 

@@ -29,35 +29,5 @@ module.exports = {
     defaultCity: '宁波市',
     defaultArea: '鄞州区',
     serverUrl: 'http://localhost:30005/'
-  },
-  demo1: {
-    corsDomain: 'http://172.16.4.9',
-    corsMainPort: 50009, // 平台端口
-    sharePort: 51001, // 基础数据端口
-    samplePort: 31011, // 采样端口
-    simulatorPort: 31013, // 模拟端口
-    emergencyPort: 51005, // 应急端口
-    maintenanceApi: "http://172.16.4.9:50009", 
-    maintenanceUrl: "http://172.16.4.9:50008/", 
-    frameJS: '/Scripts/aepmod.js',
-    defaultProvince: '浙江省',
-    defaultCity: '宁波市',
-    defaultArea: '鄞州区',
-    serverUrl: 'http://localhost:30005/'
-  },
-  tjbh: {
-    corsDomain: 'https://tjbh.azuratech.com',
-    corsMainPort: 30000, // 平台端口
-    sharePort: 51001, // 基础数据端口
-    samplePort: 31011, // 采样端口
-    simulatorPort: 31013, // 模拟端口
-    emergencyPort: 51005, // 应急端口
-    maintenanceApi: "https://tjbh.azuratech.com:30010", 
-    maintenanceUrl: "https://tjbh.azuratech.com:30009/", 
-    frameJS: '/Scripts/aepmod.js',
-    defaultProvince: '浙江省',
-    defaultCity: '宁波市',
-    defaultArea: '鄞州区',
-    serverUrl: 'http://localhost:30005/'
   }
 }

@@ -4,8 +4,8 @@
     {
       "code": "MAINTENANCE_ROOT_ITEM",
       "onMenu": "_MAIN",
-      "name": "运维管理模块",
-      "action": "/views/dashboard/dashboard.html"
+      "name": "环境质量",
+      "action": "/dashboard"
     }
   ],
   "menuItems":[]

@@ -5,31 +5,6 @@ import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
 const map = {}
 
-const Map2 = L.Map.extend({
-    // 覆盖源码
-    openPopup: function (popup, latlng, options) {
-        if (!(popup instanceof L.Popup)) {
-            popup = new L.Popup(options).setContent(popup);
-        }
-        if (latlng) {
-            popup.setLatLng(latlng);
-        }
-        if (this.hasLayer(popup)) {
-            return this;
-        }
-        if (this._popup && this._popup.options.autoClose) {
-            // this.closePopup(); 修改了这块
-        }
-        this._popup = popup;
-        return this.addLayer(popup);
-    }
-});
-
-
-L.map = function (id, options) {
-    return new Map2(id, options);
-};
-
 const DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow

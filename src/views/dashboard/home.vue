@@ -28,7 +28,13 @@ export default {
       store.set("pageType", index);
       // this.$router.push(`/siteList`);
     },
-    goBack(){}
+    goBack(){
+       if (aepCloseContentPage) {
+        aepCloseContentPage();
+      } else {
+        console.error("框架未加载！");
+      }
+    }
   }
 };
 </script>

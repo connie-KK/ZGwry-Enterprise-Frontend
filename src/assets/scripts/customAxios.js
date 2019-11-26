@@ -25,6 +25,9 @@ const prefix = '/Api/'
 // request拦截器
 service.interceptors.request.use(
   config => {
+    if (!config.data || !config.data.loading) {
+      store.commit("set_loading", true)
+    }
     if (Cookies.get(TokenKey)) {
       config.headers['Authorization'] = 'Bearer ' + Cookies.get(TokenKey) // 让每个请求携带自定义token 请根据实际情况自行修改
     }
@@ -38,29 +41,14 @@ service.interceptors.request.use(
 )
 
 // response 拦截器
-service.interceptors.response.use(response => {
-  return response.data
-})
+service.interceptors.response.use(
+  response => {
+    store.commit("set_loading", false)
+    return response.data
+  },
+  error => {
+    store.commit("set_loading", false)
+    return Promise.reject(error)
+  })
 
-let api = {}
-
-//请求接口集合
-const interfaces = [
-  { fun: "getLastAQIVals", interface: "FactorData/GetLastAQIValsForPhone", type: "get" }, //获取空气站列表最新质量及PM2.5
-  { fun: "getFactorList", interface: "location/GetFactorListSortedPost", type: "post" },  //获取站点相关联因子
-  { fun: "getFacVals", interface: "FactorData/GetLastFacValsPost", type: "post" },  //获取站点各关联因子最新数值
-  { fun: "getSiteList", interface: "location/PagedList", type: "post" },   //获取站点列表
-  { fun: "getFactVal", interface: "FactorData/GetFactValPost", type: "post" },   //获取单个站点时间段内单因子的数值
-  { fun: "getAirFactVals", interface: "FactorData/LastValIaqiInList", type: "post" },   //获取所有空气站点的6因子最新平均值Iaqi等
-  { fun: "getAriEvaluate", interface: "FactorData/GetLastAQIValPost", type: "post" }   //获取空气站点当前最新空气质量评价
-]
-
-
-interfaces.forEach(method => {
-  api[method.fun] = payload => {
-    return service[method.type](method.interface, payload)
-  }
-})
-
-
-export default api
+export default service

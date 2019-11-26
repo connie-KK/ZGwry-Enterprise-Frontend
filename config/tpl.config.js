@@ -5,6 +5,6 @@ module.exports = {
   //   title:xxx, // 页面title，显示在浏览器tab上的
   // }
   dashboard: {
-    title: '沂水生态环保平台'
+    title: '浙政钉'
   }
 }

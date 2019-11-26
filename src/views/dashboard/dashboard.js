@@ -32,7 +32,7 @@ import HeaderBar from '@/components/HeaderBar.vue'
 Vue.component('HeaderBar', HeaderBar)
 
 // api接口
-import api from '@/assets/scripts/customAxios'
+import api from '@/assets/scripts/api'
 Vue.prototype.$api = api
 
 /* eslint-disable no-new */

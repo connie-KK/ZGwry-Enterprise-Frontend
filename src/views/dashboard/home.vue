@@ -113,9 +113,9 @@ export default {
       x: "1",
       y: "4",
       z: "5",
-      yJC: "2-0",
-      yNoise: "2-6",
-      yGWF: "2-7",
+      yJC: "4-0",
+      yNoise: "4-6",
+      yGWF: "4-7",
       moduleName: "企业信息",
       enterid: 0,
       selected: "1",
@@ -161,7 +161,7 @@ export default {
       }
     },
     selected2() {
-      if (this.selected2 === "2-0") {
+      if (this.selected2 === "4-0") {
         //获取监测数据列表
         this.getMonitorList();
       } else if (this.selected2) {
@@ -341,6 +341,7 @@ export default {
   overflow-x: auto;
   border-bottom: solid 1px #e0e0e0;
   height: 0.96rem;
+  margin-bottom: 0 !important;
   padding: 0 0.32rem;
   .mint-tab-item {
     display: inline-block;
@@ -351,13 +352,9 @@ export default {
       font-size: 0.3rem;
       line-height: 42px;
     }
-    .is-selected {
-      border-bottom: 0.04rem solid #3296fa !important;
-      margin: 0 5px !important;
-      .mint-tab-item-label {
-        color: rgba(50, 150, 250, 1);
-      }
-    }
+  }
+  .is-selected {
+    margin-bottom: 0 !important;
   }
 }
 .h-nav {
@@ -367,6 +364,7 @@ export default {
   .mint-navbar {
     display: block;
     width: max-content;
+    border: 0 !important;
   }
 }
 .second-tab {

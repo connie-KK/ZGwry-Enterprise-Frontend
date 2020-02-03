@@ -106,7 +106,7 @@ export default {
   @include align-items(center);
   width: 100%;
   height: $header-height;
-  color: #191f25;
+  color: rgba(25, 31, 37, 1);
   box-sizing: border-box;
   line-height: 1;
   padding: 0 10px;

@@ -17,15 +17,15 @@ const proConfig = merge(baseConfig, {
       //   moment: 'moment'
       // }),
       // 插入额外的aepmod.js
-      new HtmlWebpackTagsPlugin({
-        append: false,
-        publicPath: false,
-        tags: [
-          `${siteConfig.corsDomain}:${siteConfig.corsMainPort}${
-            siteConfig.frameJS
-          }`
-        ]
-      }),
+      // new HtmlWebpackTagsPlugin({
+      //   append: false,
+      //   publicPath: false,
+      //   tags: [
+      //     `${siteConfig.corsDomain}:${siteConfig.corsMainPort}${
+      //       siteConfig.frameJS
+      //     }`
+      //   ]
+      // }),
       // copy some json files to dist for nginx config in docker
       new CopyWebpackPlugin([{ from: 'src/static/scripts', to: 'aep' }])
     ],

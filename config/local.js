@@ -6,7 +6,7 @@ module.exports = {
   samplePort: 31006,
   simulatorPort: 31003,
   emergencyPort: 31021,
-  maintenanceApi: "https://tjbh.azuratech.com:30004", 
+  maintenanceApi: "", 
   maintenanceUrl: "http://localhost:9528", 
   frameJS: '/Scripts/aepmod.js',
   defaultProvince: '浙江省',

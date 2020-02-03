@@ -16,26 +16,11 @@ export default new Router({
       name: 'home',
       component: () => import('@/views/dashboard/home.vue')
     },
-    // {
-    //   path: '/siteList',
-    //   name: 'siteList',
-    //   component: () => import('@/views/dashboard/siteList.vue')
-    // },
-    // {
-    //   path: '/siteDetail/:id',
-    //   name: 'siteDetail',
-    //   component: () => import('@/views/dashboard/siteDetail.vue')
-    // },
-    // {
-    //   path: '/factor/:id',
-    //   name: 'factor',
-    //   component: () => import('@/views/dashboard/factor.vue')
-    // },
-    // {
-    //   path: '/map',
-    //   name: 'map',
-    //   component: () => import('@/views/dashboard/map.vue')
-    // },
+    {
+      path: '/detail/:id',
+      name: 'detail',
+      component: () => import('@/views/dashboard/detail.vue')
+    },
     {
       path: '*',
       redirect: '/home'

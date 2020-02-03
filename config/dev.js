@@ -24,7 +24,7 @@ const devConfig = merge(baseConfig, {
     // 代理地址
     proxy: {
       '/api': {
-        target: 'https://tjbh.azuratech.com:30010',
+        target: 'http://localhost:30016',
         pathRewrite: {
           '^/api': '/api'
         }
@@ -42,15 +42,14 @@ const devConfig = merge(baseConfig, {
   },
   configureWebpack: {
     devtool: 'source-map',
-    plugins: [
-      // 插入额外的aepmod.js
-      new HtmlWebpackTagsPlugin({
-        append: false,
-        publicPath: false,
-        tags: [`${local.corsDomain}:${local.corsMainPort}/scripts/aepmod.js`]
-      })
-    ]
+    // plugins: [
+    //   // 插入额外的aepmod.js
+    //   new HtmlWebpackTagsPlugin({
+    //     append: false,
+    //     publicPath: false,
+    //     tags: [`${local.corsDomain}:${local.corsMainPort}/scripts/aepmod.js`]
+    //   })
+    // ]
   }
 })
-
 module.exports = devConfig

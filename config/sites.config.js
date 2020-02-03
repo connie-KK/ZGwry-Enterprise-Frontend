@@ -22,9 +22,9 @@ module.exports = {
     samplePort: 31011, // 采样端口
     simulatorPort: 31013, // 模拟端口
     emergencyPort: 51005, // 应急端口
-    maintenanceApi: "http://demo.azuratech.com:30005", 
-    maintenanceUrl: "http://demo.azuratech.com:51008", 
-    frameJS: '/Scripts/aepmod.js',
+    maintenanceApi: "", 
+    maintenanceUrl: "", 
+    frameJS: '',
     defaultProvince: '浙江省',
     defaultCity: '宁波市',
     defaultArea: '鄞州区',

@@ -22,6 +22,11 @@ export default new Router({
       component: () => import('@/views/dashboard/detail.vue')
     },
     {
+      path: '/example',
+      name: 'example',
+      component: () => import('@/views/dashboard/example/index.vue')
+    },
+    {
       path: '*',
       redirect: '/home'
     }

@@ -1,7 +1,7 @@
 <template>
   <div class="navBar-box"
        ref="navbox">
-    <div :style="{width: myWidth + 'px'}">
+    <div :style="{ width: myWidth + 'px' }">
       <mt-navbar v-model="mySelected">
         <mt-tab-item v-for="item in list"
                      :ref="'item' + item.id"
@@ -30,11 +30,11 @@ export default {
       mySelected: this.selected,
       list: [
         { id: 1, name: '企业信息', router: '/home' },
-        { id: 2, name: '许可证/相关文件' },
+        { id: 2, name: '许可证/相关文件', router: '/license' },
         { id: 3, name: '环境属性' },
         { id: 4, name: '排放信息' },
         { id: 5, name: '污染治理设施' },
-        { id: 6, name: '业务信息' }
+        { id: 6, name: '业务信息', router: '/business' }
       ]
     }
   },
@@ -44,15 +44,16 @@ export default {
       this.list.forEach(item => {
         text += item.name
       })
-      return text.length * 20
+      return text.length * 24
     }
   },
   watch: {
     mySelected () {
       this.deFirFun()
-      let router = this.list.filter(item => {
-        return item.id === this.mySelected
-      })[0].router || '/home'
+      let router =
+        this.list.filter(item => {
+          return item.id === this.mySelected
+        })[0].router || '/home'
       this.$router.replace(router)
     }
   },
@@ -76,8 +77,7 @@ export default {
     margin-bottom: 0;
   }
   .mint-tab-item-label {
-    font-size: 0.24rem;
+    font-size: 0.3rem;
   }
 }
 </style>
-

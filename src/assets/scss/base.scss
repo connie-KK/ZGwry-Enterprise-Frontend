@@ -124,6 +124,8 @@ html {
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;//禁止选择文字
   outline: none;
+  padding: 0px;
+  margin: 0px;
 }
 
 // Use box sizing on all the things!
@@ -286,4 +288,8 @@ input[type="submit"],
 }
 .flex-item{
     @include flex;
+}
+.main-content-box {
+  height: calc(100% - 52px);
+  overflow-y: auto;
 }

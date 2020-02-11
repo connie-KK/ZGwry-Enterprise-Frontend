@@ -43,9 +43,13 @@ const customAxios = (prefix = '') => {
       store.commit("set_loading", false)
       return Promise.reject(error)
     })
-    return service
+  return service
 }
 
 const serviceApi = customAxios('/api')
+const serviceEnt = customAxios('/ent')
 
-export default{ serviceApi }
+export default {
+  serviceApi,
+  serviceEnt
+}

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 const originalPush = Router.prototype.push
-Router.prototype.push = function push (location, onResolve, onReject) {
+Router.prototype.push = function push(location, onResolve, onReject) {
   if (onResolve || onReject) {
     return originalPush.call(this, location, onResolve, onReject)
   }
@@ -12,8 +12,7 @@ Vue.use(Router)
 
 export default new Router({
   base: `${process.env.BASE_URL}/dashboard`,
-  routes: [
-    {
+  routes: [{
       path: '/home',
       name: 'home',
       component: () => import('@/views/dashboard/home.vue')
@@ -37,6 +36,11 @@ export default new Router({
       path: '/license',
       name: 'license',
       component: () => import('@/views/dashboard/license/index.vue')
+    },
+    {
+      path: '/envParams',
+      name: 'envParams',
+      component: () => import('@/views/dashboard/envParams/index.vue')
     },
     {
       path: '*',

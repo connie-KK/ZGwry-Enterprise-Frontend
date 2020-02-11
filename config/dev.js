@@ -23,10 +23,10 @@ const devConfig = merge(baseConfig, {
     port: 30027,
     // 代理地址
     proxy: {
-      '/api': {
+      '/ent': {
         target: 'http://localhost:30016',
         pathRewrite: {
-          '^/api': '/api'
+          '^/ent': ''
         }
       }
     },
@@ -35,7 +35,7 @@ const devConfig = merge(baseConfig, {
       alias: {
         'vue$': 'vue/dist/vue.esm.js',
         'views': path.resolve(__dirname, '../src/views'),
-        '@':  path.resolve(__dirname, '../src')
+        '@': path.resolve(__dirname, '../src')
       },
       rewrites
     }

@@ -31,7 +31,7 @@ export default {
       list: [
         { id: 1, name: '企业信息', router: '/home' },
         { id: 2, name: '许可证/相关文件', router: '/license' },
-        { id: 3, name: '环境属性' },
+        { id: 3, name: '环境属性', router: '/envParams' },
         { id: 4, name: '排放信息' },
         { id: 5, name: '污染治理设施' },
         { id: 6, name: '业务信息', router: '/business' }

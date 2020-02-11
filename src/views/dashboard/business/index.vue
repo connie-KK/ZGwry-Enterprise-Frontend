@@ -11,11 +11,13 @@
             <span>执法人</span>
             <span>现场检查编号</span>
           </li>
-          <li v-for="item in 10"
-              :key="item">
-            <span>2020-01-15 10:04</span>
-            <span>李翠岗</span>
-            <span>236985245963</span>
+          <li
+            v-for="item in list1"
+            :key="item.id"
+          >
+            <span>{{ moment(item.date).format('YYYY-MM-DD HH:mm') }}</span>
+            <span>{{ item.staff }}</span>
+            <span>{{ item.title }}</span>
           </li>
         </ul>
         <p class="m-title">信访记录：</p>
@@ -26,11 +28,14 @@
             <span>投诉时间</span>
             <span>现场检查编号</span>
           </li>
-          <li v-for="item in 10">
-            <span>张某某乱扔垃圾</span>
-            <span>李翠岗</span>
-            <span>2020-01-15 10:04</span>
-            <span>236985245963</span>
+          <li
+            v-for="item in list2"
+            :key="item.id"
+          >
+            <span>{{ item.content }}</span>
+            <span>{{ item.staff }}</span>
+            <span>{{ moment(item.date).format('YYYY-MM-DD HH:mm') }}</span>
+            <span>{{ item.title }}</span>
           </li>
         </ul>
       </div>
@@ -40,6 +45,7 @@
 
 <script>
 import navBar from '@/components/navBar.vue'
+import moment from 'moment'
 export default {
   name: 'business',
   components: {
@@ -47,10 +53,28 @@ export default {
   },
   data () {
     return {
-      moduleName: '企业信息'
+      moduleName: '企业信息',
+      moment: moment,
+      list1: [],
+      list2: []
     }
   },
-  methods: {}
+  mounted () {
+    this.getZGTaskList('list1', 1)
+    this.getZGTaskList('list2', 4)
+  },
+  methods: {
+    getZGTaskList (key, type) {
+      this.$api.getZGTaskList({
+        enterid: this.$store.state.enterId,
+        type: type,
+        pageIndex: -1,
+        pageSize: 0
+      }).then(res => {
+        this[key] = JSON.parse(JSON.stringify(res.list))
+      })
+    }
+  }
 }
 </script>
 

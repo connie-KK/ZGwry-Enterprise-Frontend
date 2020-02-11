@@ -5,6 +5,7 @@
       <mt-navbar v-model="mySelected">
         <mt-tab-item v-for="item in list"
                      :ref="'item' + item.id"
+                     :key="item.id"
                      :id="item.id">{{ item.name }}</mt-tab-item>
       </mt-navbar>
     </div>
@@ -32,9 +33,15 @@ export default {
         { id: 1, name: '企业信息', router: '/home' },
         { id: 2, name: '许可证/相关文件', router: '/license' },
         { id: 3, name: '环境属性' },
+<<<<<<< Updated upstream
         { id: 4, name: '排放信息' },
         { id: 5, name: '污染治理设施' },
         { id: 6, name: '业务信息', router: '/business' }
+=======
+        { id: 4, name: '排放信息',router:"/emissions" },
+        { id: 5, name: '污染治理设施', router:"/pollution" },
+        { id: 6, name: '业务信息' }
+>>>>>>> Stashed changes
       ]
     }
   },

@@ -1,15 +1,4 @@
-// 解决 leaflet 默认 maker 无法显示的问题
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-
-
 const map = {}
-
-const DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow
-});
-L.Marker.prototype.options.icon = DefaultIcon;
 
 map.createMap = (divId, options) => {
     const map = L.map(divId, options);
@@ -42,9 +31,9 @@ map.createMakerByXY = (map, coordinate, options = {}) => {
     return marker;
 };
 
-map.createPopup = (map, options,latlng) => {
+map.createPopup = (map, options, latlng) => {
     let popup = L.popup(options)
-    .setLatLng(latlng)
+        .setLatLng(latlng)
     return popup;
 };
 
@@ -53,4 +42,17 @@ map.createLatlonByArray = (coordinate) => {
     let latLng = L.latLng(coordinate[0], coordinate[1]);
     return latLng;
 };
+
+map.loadScript = () => {
+    return new Promise(function (resolve, reject) {
+        window.init = function () {
+            resolve(AMap)
+        };
+        var script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=0c5aa2ad6ab0649af472b35b539fcd26&plugin=AMap.Geocoder&callback=init'
+        script.onerror = reject
+        document.head.appendChild(script)
+    })
+}
 export default map

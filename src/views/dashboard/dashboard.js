@@ -6,14 +6,15 @@ import App from '@/views/dashboard/dashboard.vue'
 import router from '@/router/dashboard'
 import store from '@/store'
 import Navigation from 'vue-navigation'
-Vue.use(Navigation, {router, store})
+Vue.use(Navigation, { router, store })
 
 //leaflet地图
-import "leaflet"
-import "leaflet.chinatmsproviders"
+import 'leaflet'
+import 'leaflet.chinatmsproviders'
+import 'leaflet/dist/leaflet.css'
 
-import map from "@/assets/scripts/map";
-Vue.prototype.$map = map;
+import map from '@/assets/scripts/map';
+Vue.prototype.$map = map
 
 //移动端自适应
 import '@/assets/scss/base.scss';

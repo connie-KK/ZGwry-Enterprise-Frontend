@@ -200,6 +200,41 @@ export default new Vuex.Store({
         label: "控制级别"
       }
     ],
+    outputRes: {
+      id: "",
+      enterpriseid: "",
+      name: "",
+      isonlinemonitoring: "",
+      address: "",
+      lng: "",
+      lat: "",
+      category: "",
+      destinationcategory: "",
+      inriverlng: "",
+      inriverlat: "",
+      wastedischargelaw: "",
+      height: "",
+      fueltypes: "",
+      processingmode: "",
+      isidentificationmark: "",
+      isstored: "",
+      isdangerorwaste: "",
+      protectionmeasures: "",
+      standardid: "",
+      remark: ""
+    },
+    treatRes: {
+      id: "",
+      enterpriseid: "",
+      outputid: "",
+      treatmentprocess: "",
+      wastewatercategory: "",
+      iselectricitymeter: "",
+      isreusewatermeter: "",
+      category: "",
+      number: "",
+      remark: ""
+    },
     wasteWaterHeader: [
       {
         key: "name",
@@ -211,27 +246,33 @@ export default new Vuex.Store({
       },
       {
         key: "isonlinemonitoring",
-        label: "是否安装在线监控设备"
+        label: "是否安装在线监控设备",
+        type: "boolean"
       },
       {
-        key: "standard",
-        label: "废水排放标准"
+        key: "standardid",
+        label: "废水排放标准",
+        icon: "select"
       },
       {
         key: "destinationcategory",
-        label: "废水排放去向"
+        label: "废水排放去向",
+        icon: "select"
       },
       {
         key: "lat-lng",
-        label: "排放口经纬度"
+        label: "排放口经纬度",
+        icon: "map"
       },
       {
-        key: "inriverlng-lat",
-        label: "入河口经纬度"
+        key: "inriverlng-inriverlat",
+        label: "入河口经纬度",
+        icon: "map"
       },
       {
         key: "wastedischargelaw",
-        label: "废水排放规律"
+        label: "废水排放规律",
+        icon: "select"
       },
       {
         key: "remark",
@@ -252,7 +293,7 @@ export default new Vuex.Store({
         label: "是否安装在线监控设备"
       },
       {
-        key: "standard",
+        key: "standardid",
         label: "废气排放标准"
       },
       {
@@ -282,7 +323,7 @@ export default new Vuex.Store({
         label: "噪声源名称"
       },
       {
-        key: "standard",
+        key: "standardid",
         label: "排放标准"
       },
       {
@@ -361,18 +402,20 @@ export default new Vuex.Store({
       },
       {
         key: "iselectricitymeter",
-        label: "是否安装专用电表"
+        label: "是否安装专用电表",
+        type: "boolean"
       },
       {
         key: "isreusewatermeter",
-        label: "是否安装回用电水表"
+        label: "是否安装回用电水表",
+        type: "boolean"
       },
       {
         key: "remark",
         label: "备注"
       }
     ],
-    controExhaustGasHeader:[
+    controExhaustGasHeader: [
       {
         key: "facilityname",
         label: "设施名称"
@@ -387,14 +430,15 @@ export default new Vuex.Store({
       },
       {
         key: "iselectricitymeter",
-        label: "是否安装专用电表"
+        label: "是否安装专用电表",
+        type: "boolean"
       },
       {
         key: "remark",
         label: "备注"
       }
     ],
-    controSolidDangerHeader:[
+    controSolidDangerHeader: [
       {
         key: "facilityname",
         label: "设施名称"
@@ -407,12 +451,51 @@ export default new Vuex.Store({
         key: "remark",
         label: "备注"
       }
-    ]
-
+    ],
+    latLngArr: [],
+    addItem: {},
+    tempData: {},
+    reRequest: true,
+    waterFactor: [
+      {
+        key: "factorname",
+        label: "污染物"
+      },
+      {
+        key: "standardlimit",
+        label: "排放标准限值"
+      },
+      {
+        key: "unitname",
+        label: "排放标准单位"
+      }
+    ],
+    enterid: ""
   },
   mutations: {
     set_loading: (state, data) => {
       state.loading = data
+    },
+    set_latLng: (state, data) => {
+      state.latLngArr = data
+    },
+    set_addItem: (state, data) => {
+      state.addItem = data
+    },
+    set_wasteWaterHeader: (state, data) => {
+      state.wasteWaterHeader = data
+    },
+    set_tempData: (state, data) => {
+      state.tempData = data
+    },
+    set_reRequest: (state, data) => {
+      state.reRequest = data
+    },
+    set_waterFactors: (state, data) => {
+      state.waterFactors = data
+    },
+    set_enterpriseid: (state, data) => {
+      state.enterid = data
     }
   },
   actions: {

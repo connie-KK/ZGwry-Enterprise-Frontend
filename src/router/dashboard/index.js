@@ -15,7 +15,27 @@ export default new Router({
   routes: [{
       path: '/home',
       name: 'home',
-      component: () => import('@/views/dashboard/home.vue')
+      component: () => import('@/views/dashboard/home/index.vue')
+    },
+    {
+      path: '/emissions',
+      name: 'emissions',
+      component: () => import('@/views/dashboard/emissions/index.vue')
+    },
+    {
+      path: '/emissionsDetail/:id',
+      name: 'emissionsDetail',
+      component: () => import('@/views/dashboard/emissions/detail.vue')
+    },
+    {
+      path: '/emissionsMap/:id',
+      name: 'emissionsMap',
+      component: () => import('@/views/dashboard/emissions/map.vue')
+    },
+    {
+      path: '/pollution',
+      name: 'pollution',
+      component: () => import('@/views/dashboard/pollution/index.vue')
     },
     {
       path: '/detail/:id',

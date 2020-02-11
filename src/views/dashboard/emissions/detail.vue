@@ -1,0 +1,882 @@
+<template>
+  <div class="content">
+    <header-bar
+      leftIcon="back"
+      leftText="返回"
+      :showBorder="isShowBorder"
+      :customBack="backFun"
+    >{{moduleName}}</header-bar>
+    <div class="main-content">
+      <div class="list" v-for="(item,index) in list" :key="index">
+        <p class="label">
+          <span :class="item.type==='boolean'?'big-label':''">{{item.label}}</span>
+          <span v-if="item.type==='boolean'" class="switch">
+            <mt-switch v-model="item.value"></mt-switch>
+          </span>
+        </p>
+        <p class="info" v-if="item.icon && item.type!=='boolean'">
+          <span class="value">{{item.value}}</span>
+          <span class="icon" v-if="item.icon" @click="selectIcon(item)"></span>
+        </p>
+        <input
+          type="text"
+          v-model="item.value"
+          class="info"
+          v-if="!item.icon&& item.type!=='boolean'"
+        />
+      </div>
+      <div class="attachment" v-if="selectedTab===4">
+        <div class="header">
+          <div class="title">附件信息（ {{attachments.length}} ）</div>
+          <div class="add">
+            <span class="icon"></span>
+            <span @click="uploadFile">添加文件</span>
+          </div>
+        </div>
+        <div v-for="(item,index) in attachments" :key="index" class="attch-content">
+          <span @click="download(item)">
+            <icon name="attachment" scale="1"></icon>
+            {{item.title}}
+          </span>
+          <span @click="deleteFile(item)"></span>
+        </div>
+      </div>
+      <div class="factor-list" v-if="selectedTab===4">
+        <div class="list-header factor">
+          <span v-for="(item,index) in listHeader" :key="index">{{item}}</span>
+        </div>
+        <div
+          v-for="(item,index) in factors"
+          :key="index"
+          @click="selectItem(factors,index)"
+          :class="['list-content','factor',item.class]"
+        >
+          <span>
+            <input type="text" v-if="item.newAdd" v-model="item.factorname" />
+            <span v-else>{{item.factorname}}</span>
+          </span>
+          <span>
+            <input type="text" v-if="item.newAdd" v-model="item.standardlimit" />
+            <span v-else>{{item.standardlimit}}</span>
+          </span>
+          <span>
+            <input type="text" v-if="item.newAdd" v-model="item.unitname" />
+            <span v-else>{{item.unitname}}</span>
+          </span>
+        </div>
+        <div class="listBtnGroup">
+          <div class="addBtn listBtn" @click="addItem(listHeader,factors)">
+            <span></span>
+            <span>添加</span>
+          </div>
+          <div class="delBtn listBtn" @click="deleteItem(factors)">
+            <span></span>
+            <span>删除</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="submitBtn" @click="save">确定</div>
+    </div>
+    <input
+      style="float: left;  display: none;"
+      type="file"
+      name="Filedata"
+      id="uploadFile"
+      @change="readLocalFile()"
+    />
+    <mt-popup v-model="popupVisible" position="bottom">
+      <mt-picker :slots="slots" @change="setType" valueKey="valueKey"></mt-picker>
+    </mt-popup>
+  </div>
+</template>    
+<script>
+import store from "store";
+import moment from "moment";
+import { Popup, Picker, Switch } from "mint-ui";
+export default {
+  name: "detail",
+  components: {
+    "mt-popup": Popup,
+    "mt-picker": Picker,
+    "mt-switch": Switch
+  },
+  data() {
+    return {
+      moduleName: "",
+      isShowBorder: false,
+      id: "",
+      payload: {},
+      selectedTab: "",
+      selectedSubTab: "",
+      list: [],
+      attachments: [],
+      factors: [],
+      listHeader: ["污染物", "排放标准限值", "排放标准单位"],
+      processingmodeArr: ["填埋", "暂存", "自行处置", "转移给有资质单位处置"],
+      destinationcategoryArr: [
+        { id: 0, name: "直接进入海域" },
+        { id: 1, name: "直接进入江河湖库等水环境" },
+        { id: 2, name: "进入城市下水道（再入江河、湖、库）" },
+        { id: 3, name: "进入城市下水道（再入沿海海域）" },
+        { id: 4, name: "进入城市污水处理厂或工业废水集中处理厂" },
+        { id: 5, name: "直接污灌农田" },
+        { id: 6, name: "进入低渗或蒸发地" },
+        { id: 7, name: "进入其他单位" }
+      ],
+      wastedischargelawArr: [
+        { id: 0, name: "稳定连续排放" },
+        { id: 1, name: "有规律间段排放" },
+        { id: 2, name: "不规律间段排放" }
+      ],
+      outputStandardArr: [],
+      protectionmeasuresArr: ["防流失", "防渗漏", "防扬散"],
+      popupVisible: false,
+      slots: [
+        {
+          values: [
+            { valueKey: "添加时间", value: "date" },
+            { valueKey: "最新执行时间", value: "taskhandletime" }
+          ],
+          textAlign: "center"
+        }
+      ],
+      detailData: {},
+      selectKey: "",
+      latLngArr: []
+    };
+  },
+  computed: {
+    reRequest() {
+      return this.$store.state.reRequest;
+    },
+    enterid() {
+      return this.$store.state.enterid;
+    },
+    resDetail() {
+      if (this.selectedTab === 4) {
+        return this.$store.state.outputRes;
+      } else {
+        return this.$store.state.treatRes;
+      }
+    }
+  },
+  watch: {
+    selectedSubTab() {
+      if (this.selectedTab === 4) {
+        if (this.selectedSubTab === 0) {
+          //根据id获取监测数据详情
+          this.moduleName = "监测数据";
+          this.list = JSON.parse(
+            JSON.stringify(this.$store.state.monitorHeader)
+          );
+          if (this.id !== "0") {
+            this.getZGDataDetail();
+          }
+        } else {
+          //根据id获取排放口信息
+          if (this.selectedSubTab === 2) {
+            this.moduleName = "废水";
+            this.list = JSON.parse(
+              JSON.stringify(this.$store.state.wasteWaterHeader)
+            );
+          } else if (this.selectedSubTab === 1) {
+            this.moduleName = "废气";
+            this.list = JSON.parse(
+              JSON.stringify(this.$store.state.exhaustGasHeader)
+            );
+          } else if (this.selectedSubTab === 6) {
+            this.moduleName = "噪声";
+            this.list = JSON.parse(
+              JSON.stringify(this.$store.state.noiseHeader)
+            );
+          } else if (this.selectedSubTab === 7) {
+            this.moduleName = "固危废堆场点";
+            this.list = JSON.parse(
+              JSON.stringify(this.$store.state.solidDangerHeader)
+            );
+          }
+          if (this.id !== "0" && this.reRequest) {
+            this.getZGOutputDetail();
+          } else {
+            const tempData = this.$store.state.tempData;
+            if (tempData.attachments) {
+              this.attachments = tempData.attachments;
+            }
+            if (tempData.factors) {
+              this.factors = tempData.factors;
+            }
+            this.setLatLng();
+          }
+        }
+        if (this.id === "0") {
+          this.setLatLng();
+        }
+      } else if (this.selectedTab === 5) {
+        //根据id获取企业污染治理设施详情
+        //根据id获取排放口信息
+        if (this.selectedSubTab === 2) {
+          this.moduleName = "废水";
+          this.list = JSON.parse(
+            JSON.stringify(this.$store.state.controWaterHeader)
+          );
+        } else if (this.selectedSubTab === 1) {
+          this.moduleName = "废气";
+          this.list = JSON.parse(
+            JSON.stringify(this.$store.state.controExhaustGasHeader)
+          );
+        } else if (this.selectedSubTab === 7) {
+          this.moduleName = "固危废堆场点";
+          this.list = JSON.parse(
+            JSON.stringify(this.$store.state.controSolidDangerHeader)
+          );
+        }
+        if (this.id !== "0") {
+          this.getZGTreatFacilityDetail();
+        }
+      }
+    }
+  },
+  mounted() {
+    this.id = this.$route.params.id;
+    this.handleRequest();
+    this.getZGStandardList();
+  },
+  methods: {
+    handleContent() {
+      if (this.selectedTab === 4) {
+        if (this.selectedSubTab === 0) {
+          //根据id获取监测数据详情
+          this.moduleName = "监测数据";
+          this.list = JSON.parse(
+            JSON.stringify(this.$store.state.monitorHeader)
+          );
+          if (this.id !== "0") {
+            this.getZGDataDetail();
+          }
+        } else {
+          //根据id获取排放口信息
+          if (this.selectedSubTab === 2) {
+            this.moduleName = "废水";
+            this.list = JSON.parse(
+              JSON.stringify(this.$store.state.wasteWaterHeader)
+            );
+          } else if (this.selectedSubTab === 1) {
+            this.moduleName = "废气";
+            this.list = JSON.parse(
+              JSON.stringify(this.$store.state.exhaustGasHeader)
+            );
+          } else if (this.selectedSubTab === 6) {
+            this.moduleName = "噪声";
+            this.list = JSON.parse(
+              JSON.stringify(this.$store.state.noiseHeader)
+            );
+          } else if (this.selectedSubTab === 7) {
+            this.moduleName = "固危废堆场点";
+            this.list = JSON.parse(
+              JSON.stringify(this.$store.state.solidDangerHeader)
+            );
+          }
+          if (this.id !== "0" && this.reRequest) {
+            this.getZGOutputDetail();
+          } else {
+            const tempData = this.$store.state.tempData;
+            if (tempData.attachments) {
+              this.attachments = tempData.attachments;
+            }
+            if (tempData.factors) {
+              this.factors = tempData.factors;
+            }
+            this.setLatLng();
+          }
+        }
+        if (this.id === "0") {
+          this.setLatLng();
+        }
+      } else if (this.selectedTab === 5) {
+        //根据id获取企业污染治理设施详情
+        //根据id获取排放口信息
+        if (this.selectedSubTab === 2) {
+          this.moduleName = "废水";
+          this.list = JSON.parse(
+            JSON.stringify(this.$store.state.controWaterHeader)
+          );
+        } else if (this.selectedSubTab === 1) {
+          this.moduleName = "废气";
+          this.list = JSON.parse(
+            JSON.stringify(this.$store.state.controExhaustGasHeader)
+          );
+        } else if (this.selectedSubTab === 7) {
+          this.moduleName = "固危废堆场点";
+          this.list = JSON.parse(
+            JSON.stringify(this.$store.state.controSolidDangerHeader)
+          );
+        }
+        if (this.id !== "0") {
+          this.getZGTreatFacilityDetail();
+        }
+      }
+    },
+    handleRequest() {
+      this.payload = {
+        id: this.id
+      };
+      const pageType = store.get("pageType");
+      const pageTypeArr = pageType.split("-");
+      if (Array.isArray(pageTypeArr) && pageTypeArr.length === 2) {
+        this.selectedTab = JSON.parse(pageTypeArr[0]);
+        this.selectedSubTab = JSON.parse(pageTypeArr[1]);
+      }
+    },
+    getZGOutputDetail() {
+      this.$api.getZGOutputDetail(this.payload).then(res => {
+        if (res) {
+          // this.detailData = res;
+          this.list.forEach((item, index) => {
+            if (
+              item.key === "isonlinemonitoring" ||
+              item.key === "isidentificationmark" ||
+              item.key === "isstored"
+            ) {
+              // item.value = res[item.key] ? "是" : "否";
+            } else if (item.key.includes("standard")) {
+              item.value = res["standard"] ? res["standard"].name : "";
+              item.keyValue = res["standard"].id;
+            } else if (item.key === "destinationcategory") {
+              item.value = this.destinationcategoryArr[res[item.key]].name;
+              item.keyValue = res[item.key];
+            } else if (item.key === "wastedischargelaw") {
+              item.value = this.wastedischargelawArr[res[item.key]].name;
+              item.keyValue = res[item.key];
+            } else if (item.key === "lat-lng") {
+              item.value = `${res["lat"]} E,${res["lng"]} N`;
+            } else if (item.key === "inriverlng-inriverlat") {
+              item.value = `${res["inriverlat"]} E,${res["inriverlng"]} N`;
+            } else if (item.key === "processingmode") {
+              if (typeof res[item.key] === "string") {
+                item.value = "";
+                let tempArr = res[item.key].split(",");
+                tempArr.forEach((it, idx) => {
+                  item.value +=
+                    idx === 0
+                      ? this.processingmodeArr[it]
+                      : `,${this.processingmodeArr[it]}`;
+                });
+              } else {
+                item.value = this.processingmodeArr[res[item.key]];
+              }
+            } else if (item.key === "protectionmeasures") {
+              if (typeof res[item.key] === "string") {
+                item.value = "";
+                let tempArr = res[item.key].split(",");
+                tempArr.forEach((it, idx) => {
+                  item.value +=
+                    idx === 0
+                      ? this.protectionmeasuresArr[it]
+                      : `,${this.protectionmeasuresArr[it]}`;
+                });
+              } else {
+                item.value = this.protectionmeasuresArr[res[item.key]];
+              }
+            } else {
+              item.value = res[item.key];
+            }
+            this.$set(this.list, index, item);
+          });
+          this.attachments = res.attachments;
+          this.factors = res.factors;
+          this.setLatLng();
+        }
+      });
+    },
+    //设置经纬度
+    setLatLng() {
+      this.latLngArr = JSON.parse(JSON.stringify(this.$store.state.latLngArr));
+      if (Array.isArray(this.latLngArr)) {
+        if (this.latLngArr.length) {
+          this.latLngArr.forEach(laItem => {
+            this.list.forEach((item, index) => {
+              if (item.key === laItem.key) {
+                let tempObj = item;
+                item.value = laItem.value;
+                this.$set(this.list, index, item);
+              }
+            });
+          });
+        } else {
+          this.list.forEach(liItem => {
+            if (liItem.icon && liItem.icon === "map") {
+              this.latLngArr.push(liItem);
+            }
+          });
+        }
+      }
+    },
+    getZGDataDetail() {
+      this.$api.getZGDataDetail(this.payload).then(res => {
+        if (res) {
+          this.list.forEach((item, index) => {
+            if (item.key.includes("date") || item.key.includes("Time")) {
+              item.value = moment(res[item.key]).format("YYYY-MM-DD");
+            } else {
+              item.value = res[item.key];
+            }
+            this.$set(this.list, index, item);
+          });
+        }
+      });
+    },
+    getZGTreatFacilityDetail() {
+      this.$api.getZGTreatFacilityDetail(this.payload).then(res => {
+        if (res) {
+          this.list.forEach((item, index) => {
+            if (item.key.includes("date") || item.key.includes("Time")) {
+              item.value = moment(res[item.key]).format("YYYY-MM-DD");
+            } else if (item.key === "output") {
+              item.value = res[item.key] ? res[item.key].name : "";
+            } else if (item.key.includes("is")) {
+              // item.value = res[item.key] ? "是" : "否";
+            } else {
+              item.value = res[item.key];
+            }
+
+            this.$set(this.list, index, item);
+          });
+        }
+      });
+    },
+    getZGStandardList() {
+      const payload = {
+        category: this.selectedSubTab
+      };
+      this.$api.getZGStandardList(payload).then(res => {
+        this.outputStandardArr = res;
+      });
+    },
+    download(item) {
+      let a = document.createElement("a");
+      a.href = `/api/ZGEntExtend/DownAttachmentFiles?id=${item.id}`;
+      a.click();
+    },
+    selectIcon(item) {
+      if (item.icon === "select") {
+        let tempArr = [];
+        let arr = [];
+        if (item.key === "destinationcategory") {
+          arr = this.destinationcategoryArr;
+        } else if (item.key === "wastedischargelaw") {
+          arr = this.wastedischargelawArr;
+        } else if (item.key === "standard") {
+          arr = this.outputStandardArr;
+        }
+        arr.forEach((it, idx) => {
+          tempArr.push({ valueKey: it.name, value: it.id });
+        });
+        this.slots[0].values = tempArr;
+        this.selectKey = item.key;
+        this.popupVisible = true;
+      } else if (item.icon === "map") {
+        this.latLngArr.forEach(liItem => {
+          liItem.selected = false;
+        });
+        this.latLngArr.forEach(liItem => {
+          if (liItem.key === item.key) {
+            liItem.selected = true;
+          }
+        });
+
+        this.$store.commit("set_latLng", this.latLngArr);
+        this.$store.commit(
+          "set_wasteWaterHeader",
+          JSON.parse(JSON.stringify(this.list))
+        );
+        this.$store.commit("set_reRequest", false);
+        if (this.selectedTab === 4) {
+          if (this.selectedSubTab === 2) {
+            const tempData = {
+              id: this.id,
+              attachments: this.attachments,
+              factors: this.factors
+            };
+            console.log(tempData);
+            this.$store.commit("set_tempData", tempData);
+          }
+        }
+        this.$router.replace(`/emissionsMap/${this.id}`);
+      }
+    },
+    setType(picker) {
+      const selectedVal = picker.getValues();
+      if (selectedVal instanceof Array && selectedVal.length === 1) {
+        const keyValue = selectedVal[0].value;
+        this.list.forEach((item, index) => {
+          if (item.key === this.selectKey) {
+            if (item.key === "destinationcategory") {
+              item.value = this.destinationcategoryArr[keyValue].name;
+            } else if (item.key === "wastedischargelaw") {
+              item.value = this.wastedischargelawArr[keyValue].name;
+            } else if (item.key === "standard") {
+              this.outputStandardArr.forEach(outItem => {
+                if (outItem.id === keyValue) {
+                  item.value = outItem.name;
+                }
+              });
+            }
+            item.keyValue = keyValue;
+            this.$set(this.list, index, item);
+          }
+        });
+        // this.detailData[this.selectKey] = keyValue;
+      }
+    },
+    uploadFile() {
+      document.getElementById("uploadFile").click();
+    },
+    readLocalFile() {
+      const localFile = document.getElementById("uploadFile");
+      this.uploadData(localFile);
+    },
+    uploadData(e) {
+      let data = new FormData();
+      let files = e.files;
+      for (let i = 0; i < files.length; i++) {
+        data.append("file" + i, files[i]);
+      }
+      this.$api.uploadAttachment(data).then(res => {
+        this.attachments.push(...res);
+      });
+    },
+    deleteFile(e) {
+      this.attachments.forEach((item, index) => {
+        if (item.url === e.url) {
+          this.attachments.splice(index, 1);
+        }
+      });
+    },
+    deleteItem(arr) {
+      arr.forEach((item, index) => {
+        if (item.class === "selected") {
+          arr.splice(index, 1);
+        }
+      });
+    },
+    addItem() {
+      let item, header;
+      if (this.selectedTab === 4) {
+        if (this.selectedSubTab === 2) {
+          item = {
+            category: null,
+            factorname: "",
+            harmfulingredient: null,
+            id: this.createGuid(),
+            standardlimit: "",
+            unitname: "",
+            newAdd: true
+          };
+          header = this.$store.state.waterFactor;
+          this.factors.push(item);
+        }
+      }
+    },
+    selectItem(arr, index) {
+      let selecteItem = arr[index];
+      arr.forEach(item => {
+        item.class = "";
+      });
+      selecteItem.class = `selected`;
+      this.$set(arr, index, selecteItem);
+    },
+    backFun() {
+      this.resetData();
+      window.history.go(-1);
+    },
+    save() {
+      // let detailData = {};
+      this.resDetail.id = this.id;
+      this.resDetail.enterpriseid = this.enterid;
+      this.list.forEach(item => {
+        if (item.icon && item.icon === "select") {
+          this.resDetail[item.key] = item.keyValue;
+        } else if (item.icon && item.icon === "map") {
+          this.hanleLatlng(this.resDetail, item);
+        } else if (item.type && item.type === "boolean") {
+          this.resDetail[item.key] = item.value === "是" ? 0 : 1;
+        } else {
+          this.resDetail[item.key] = item.value;
+        }
+      });
+      this.resDetail.attachments = this.attachments;
+      this.resDetail.factors = this.factors;
+      this.resDetail.category = this.selectedSubTab;
+      console.log(this.resDetail);
+
+      let apiName;
+      if (this.selectedTab === 4) {
+        apiName = "updateZGOutput";
+      } else {
+        apiName = "updateZGTreatFacility";
+      }
+      this.$api[apiName](this.resDetail).then(res => {});
+    },
+    hanleLatlng(obj, item) {
+      debugger;
+      const keyArr = item.key.split("-");
+      if (Array.isArray(keyArr) && keyArr.length === 2) {
+        let valueArr = item.value.split(",");
+        if (Array.isArray(valueArr) && valueArr.length === 2) {
+          obj[keyArr[0]] = valueArr[1].split(" N")[0];
+          obj[keyArr[1]] = valueArr[0].split(" E")[0];
+        }
+      }
+    },
+    resetData() {
+      this.list.forEach(item => {
+        if (item.value) {
+          delete item.value;
+        }
+        if (item.selected) {
+          delete item.selected;
+        }
+      });
+      if (this.selectedTab === 4) {
+        if (this.selectedSubTab === 2) {
+          this.$store.commit(
+            "set_wasteWaterHeader",
+            JSON.parse(JSON.stringify(this.list))
+          );
+        }
+      }
+      this.$store.commit("set_latLng", []);
+      this.$store.commit("set_reRequest", true);
+    },
+    createGuid() {
+      let guid = "";
+      for (let i = 1; i <= 32; i++) {
+        const n = Math.floor(Math.random() * 16.0).toString(16);
+        guid += n;
+        if (i == 8 || i == 12 || i == 16 || i == 20) guid += "-";
+      }
+      return guid;
+    }
+  }
+};
+</script>>
+<style lang="scss">
+@import "@/assets/scss/_flex.scss";
+@import "@/assets/scss/variables.scss";
+.main-content {
+  height: calc(100% - #{$header-height} - 1.28rem);
+  overflow-y: scroll;
+}
+p {
+  margin: 0;
+}
+.list {
+  background: rgba(255, 255, 255, 1);
+  padding: 0 0.41rem 0 0.32rem;
+  border-bottom: solid 1px #e0e0e0;
+  .label {
+    line-height: 0.33rem;
+    font-size: 0.24rem;
+    color: #bebebe;
+    padding: 0.15rem 0 0.01rem 0;
+    @include flexbox;
+    span:first-child {
+      display: inline-block;
+      width: 90%;
+      line-height: 0.58rem;
+      vertical-align: middle;
+      height: 0.58rem;
+    }
+    .big-label {
+      font-size: 0.34rem;
+      color: rgba(48, 48, 48, 1);
+    }
+    .mint-switch-core {
+      width: 0.9rem;
+      height: 0.5rem;
+    }
+    .mint-switch-core::before {
+      width: 0.45rem;
+      height: 0.45rem;
+      background-color: #969696;
+    }
+    .mint-switch-core::after {
+      width: 0.45rem;
+      height: 0.45rem;
+    }
+  }
+  .info {
+    @include flexbox;
+    line-height: 0.48rem;
+    min-height: 0.48rem;
+    font-size: 0.34rem;
+    color: #3d3d3d;
+    padding: 0.01rem 0 0.14rem 0;
+    .value {
+      @include flex(5);
+    }
+    .icon {
+      display: inline-block;
+      width: 0.32rem;
+      height: 0.64rem;
+      background: url(../../../assets/images/right.png) no-repeat;
+    }
+  }
+  input.info {
+    width: 100%;
+    border: 0;
+  }
+}
+.list:last-child {
+  border: 0;
+}
+.attachment {
+  background: rgba(255, 255, 255, 1);
+  margin-top: 0.4rem;
+  padding: 0 0.24rem 0 0.32rem;
+  @include flexbox;
+  @include flex-direction(column);
+  .header {
+    @include flexbox;
+    @include flex-direction(row);
+    padding-top: 0.33rem;
+    .title {
+      flex: 2;
+      @include flexbox;
+      @include align-items(center);
+      font-size: 0.34rem;
+      line-height: 0.48rem;
+      color: rgba(48, 48, 48, 1);
+    }
+    .add {
+      flex: 1;
+      @include flexbox;
+      @include justify-content(center);
+      @include align-items(center);
+      width: 2.4rem;
+      height: 0.74rem;
+      border-radius: 3px;
+      border: 2px solid rgba(50, 150, 250, 1);
+      color: rgba(50, 150, 250, 1);
+      font-size: 0.3rem;
+      .icon {
+        width: 0.3rem;
+        height: 0.3rem;
+        background: url(../../../assets/images/add.png) no-repeat;
+      }
+    }
+  }
+  .attch-content {
+    width: 100%;
+    padding: 0.32rem 0.33rem 0 0.8rem;
+    background: rgba(255, 255, 255, 1);
+    @include flexbox;
+    span {
+      display: inline-block;
+      height: 0.42rem;
+      font-size: 0.3rem;
+    }
+    span:first-child {
+      flex: 5;
+      svg {
+        fill: #3296fa;
+      }
+    }
+    span:last-child {
+      width: 0.3rem;
+      height: 0.3rem;
+      background: url(../../../assets/images/delete.png) no-repeat;
+      background-size: 100% 100%;
+    }
+  }
+}
+.factor-list {
+  padding: 0.33rem 0;
+  .factor {
+    @include flexbox;
+    @include align-items(center);
+    @include justify-content(space-around);
+    padding-left: 0.32rem;
+    span {
+      @include flex(1);
+      color: rgba(48, 48, 48, 1);
+      text-align: left;
+      input {
+        width: 90%;
+      }
+    }
+    span:nth-child(2) {
+      @include flex(1.5);
+    }
+  }
+  .list-header {
+    height: 0.7rem;
+    background: rgba(229, 241, 244, 1);
+    span {
+      line-height: 0.37rem;
+      font-size: 0.26rem;
+    }
+  }
+  .list-content {
+    height: 0.6rem;
+    background: rgba(255, 255, 255, 1);
+    span {
+      line-height: 0.48rem;
+      font-size: 0.34rem;
+    }
+  }
+  .selected {
+    background: #edf0f4;
+  }
+}
+.listBtnGroup {
+  @include flexbox;
+  @include flex-direction(row);
+  padding: 0.18rem 0 0 0.32rem;
+  .listBtn {
+    @include flexbox;
+    @include align-items(center);
+    @include justify-content(center);
+    width: 1.36rem;
+    height: 0.6rem;
+    font-size: 0.3rem;
+    background: rgba(255, 255, 255, 1);
+    border-radius: 0.03rem;
+    border: 2px solid rgba(50, 150, 250, 1);
+  }
+  .addBtn {
+    color: rgba(255, 255, 255, 1);
+    background: rgba(50, 150, 250, 1);
+  }
+  .delBtn {
+    margin-left: 0.32rem;
+    color: #3296fa;
+  }
+}
+.footer {
+  @include flexbox;
+  @include align-items(center);
+  @include justify-content(center);
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 1.28rem;
+  background: rgba(255, 255, 255, 1);
+  .submitBtn {
+    @include flexbox;
+    @include align-items(center);
+    @include justify-content(center);
+    width: 6.86rem;
+    height: 0.96rem;
+    background: rgba(50, 150, 250, 1);
+    border-radius: 3px;
+    font-size: 0.34rem;
+    color: rgba(255, 255, 255, 1);
+  }
+}
+.mint-popup {
+  width: 100%;
+}
+</style>

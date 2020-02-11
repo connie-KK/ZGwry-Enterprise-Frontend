@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     loading: false,
-    enterId: '82bd35e2-acd5-4a66-86fd-f1d435eb12fe',
+    enterId: '',
+    enterid: '',
     tabData: [
       {
         id: "1",

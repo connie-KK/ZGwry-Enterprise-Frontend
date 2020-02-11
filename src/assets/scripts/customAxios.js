@@ -48,8 +48,10 @@ const customAxios = (prefix = '') => {
 
 const serviceApi = customAxios('/api')
 const serviceEnt = customAxios('/ent')
+const serviceStoken = customAxios('/stoken')
 
 export default {
   serviceApi,
-  serviceEnt
+  serviceEnt,
+  serviceStoken
 }

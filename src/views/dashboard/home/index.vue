@@ -5,22 +5,28 @@
       <nav-bar :selected="1"></nav-bar>
       <div class="main-content-box">
         <div>
-          <div :class="['list', item.class]" v-for="(item,index) in list" :key="index">
-            <p class="label">{{item.label}}</p>
+          <div
+            :class="['list', item.class]"
+            v-for="(item, index) in list"
+            :key="index"
+          >
+            <p class="label">{{ item.label }}</p>
             <input type="text" v-model="item.value" class="info" />
           </div>
         </div>
         <div class="lists list-header">
-          <span v-for="(item,index) in listHeader" :key="index">{{item}}</span>
+          <span v-for="(item, index) in listHeader" :key="index">{{
+            item
+          }}</span>
         </div>
         <div
-          v-for="(item,index) in productItems"
+          v-for="(item, index) in productItems"
           :key="item.id"
-          @click="selectItem(productItems,index)"
-          :class="['lists','list-content',item.class]"
+          @click="selectItem(productItems, index)"
+          :class="['lists', 'list-content', item.class]"
         >
-          <span>{{item.name}}</span>
-          <span>{{item.value}}{{item.unit}}</span>
+          <span>{{ item.name }}</span>
+          <span>{{ item.value }}{{ item.unit }}</span>
         </div>
         <div class="listBtnGroup">
           <div class="addBtn listBtn" @click="addItem(productItems)">
@@ -33,17 +39,19 @@
           </div>
         </div>
         <div class="lists list-header second-header">
-          <span v-for="(item,index) in listHeaderFactor" :key="index">{{item}}</span>
+          <span v-for="(item, index) in listHeaderFactor" :key="index">{{
+            item
+          }}</span>
         </div>
         <div
           class="lists list-content"
-          v-for="(item,index) in materialItmes"
+          v-for="(item, index) in materialItmes"
           :key="item.id"
-          @click="selectItem(materialItmes,index)"
+          @click="selectItem(materialItmes, index)"
           :class="item.class"
         >
-          <span>{{item.name}}</span>
-          <span>{{item.value}}{{item.unit}}</span>
+          <span>{{ item.name }}</span>
+          <span>{{ item.value }}{{ item.unit }}</span>
         </div>
         <div class="listBtnGroup">
           <div class="addBtn listBtn">
@@ -64,107 +72,109 @@
 </template>
 
 <script>
-import navBar from "@/components/navBar.vue";
-import moment from "moment";
+import navBar from '@/components/navBar.vue'
+import moment from 'moment'
 export default {
-  name: "home",
+  name: 'home',
   components: {
-    "nav-bar": navBar
+    'nav-bar': navBar
   },
   data() {
     return {
-      moduleName: "企业信息",
-      enterid: "",
-      listHeader: ["产品", "年产量"],
-      listHeaderFactor: ["原辅材料", "材料年使用量"],
-      levelArr: ["国控", "省控", "市控/重点", "区控/非重点"],
-      productionStateArr: ["正常营业", "停业", "关闭"],
+      moduleName: '企业信息',
+      enterid: '',
+      listHeader: ['产品', '年产量'],
+      listHeaderFactor: ['原辅材料', '材料年使用量'],
+      levelArr: ['国控', '省控', '市控/重点', '区控/非重点'],
+      productionStateArr: ['正常营业', '停业', '关闭'],
       productItems: [],
       materialItmes: []
-    };
+    }
   },
   computed: {
     list() {
-      return this.$store.state.pollSourceInfoHeader;
+      return this.$store.state.pollSourceInfoHeader
     }
   },
   created() {
-    this.enterid = "82bd35e2-acd5-4a66-86fd-f1d435eb12fe";
-    this.$store.commit("set_enterpriseid", this.enterid);
-    this.getPollSourceList();
+    this.enterid = this.$route.params.id
+    this.$store.state.enterId = this.enterid
+    this.$store.state.enterid = this.enterid
+    this.$store.commit('set_enterpriseid', this.enterid)
+    this.getPollSourceList()
   },
   methods: {
     getPollSourceList() {
       const payload = {
         id: this.enterid
-      };
+      }
       this.$api.getZGEnterpriseByid(payload).then(res => {
         if (res) {
           this.list.forEach((item, index) => {
             if (res[item.key] === 0 || res[item.key]) {
-              if (item.key.includes("date") || item.key.includes("Time")) {
-                item.value = moment(res[item.key]).format("YYYY-MM-DD");
-              } else if (item.key === "level") {
-                item.value = this.levelArr[res[item.key] - 1];
+              if (item.key.includes('date') || item.key.includes('Time')) {
+                item.value = moment(res[item.key]).format('YYYY-MM-DD')
+              } else if (item.key === 'level') {
+                item.value = this.levelArr[res[item.key] - 1]
               } else {
-                item.value = res[item.key];
+                item.value = res[item.key]
               }
-              this.$set(this.list, index, item);
-            } else if (item.key === "lat-lng") {
-              item.value = `${res["lng"]}E，${res["lat"]}N`;
-            } else if (item.key === "region") {
-              item.value = `${res["province"]} ${res["city"]} ${res["district"]}`;
+              this.$set(this.list, index, item)
+            } else if (item.key === 'lat-lng') {
+              item.value = `${res['lng']}E，${res['lat']}N`
+            } else if (item.key === 'region') {
+              item.value = `${res['province']} ${res['city']} ${res['district']}`
             }
-            if (item.value && typeof item.value === "string") {
-              item.value = item.value.replace(null, "");
-              item.value = item.value.replace(undefined, "");
+            if (item.value && typeof item.value === 'string') {
+              item.value = item.value.replace(null, '')
+              item.value = item.value.replace(undefined, '')
             }
-          });
-          this.productItems = res.productItems;
-          this.materialItmes = res.materialItmes;
+          })
+          this.productItems = res.productItems
+          this.materialItmes = res.materialItmes
         }
-      });
+      })
       this.$api.getZGEnterpriseExtendByid(payload).then(res => {
         if (res) {
           this.list.forEach((item, index) => {
             if (res[item.key] === 0 || res[item.key]) {
-              if (item.key.includes("date") || item.key.includes("Time")) {
-                item.value = moment(res[item.key]).format("YYYY-MM-DD");
-              } else if (item.key === "isMonitoring") {
-                item.value = res[item.key] ? "是" : "否";
-              } else if (item.key === "productionState") {
-                item.value = this.productionStateArr[res[item.key] - 1];
+              if (item.key.includes('date') || item.key.includes('Time')) {
+                item.value = moment(res[item.key]).format('YYYY-MM-DD')
+              } else if (item.key === 'isMonitoring') {
+                item.value = res[item.key] ? '是' : '否'
+              } else if (item.key === 'productionState') {
+                item.value = this.productionStateArr[res[item.key] - 1]
               } else {
-                item.value = res[item.key];
+                item.value = res[item.key]
               }
-              this.$set(this.list, index, item);
+              this.$set(this.list, index, item)
             }
-          });
+          })
         }
-      });
+      })
     },
     selectItem(arr, index) {
-      let selecteItem = arr[index];
+      let selecteItem = arr[index]
       arr.forEach(item => {
-        item.class = "";
-      });
-      selecteItem.class = "selected";
-      this.$set(arr, index, selecteItem);
+        item.class = ''
+      })
+      selecteItem.class = 'selected'
+      this.$set(arr, index, selecteItem)
     },
     deleteItem(arr) {
       arr.forEach((item, index) => {
-        if (item.class === "selected") {
-          arr.splice(index, 1);
+        if (item.class === 'selected') {
+          arr.splice(index, 1)
         }
-      });
+      })
     },
     addItem(arr) {}
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/_flex.scss";
+@import '@/assets/scss/_flex.scss';
 .main-content {
   height: calc(100% - 1.29rem);
   .main-content-box {

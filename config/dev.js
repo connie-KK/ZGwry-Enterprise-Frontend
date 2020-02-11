@@ -24,9 +24,15 @@ const devConfig = merge(baseConfig, {
     // 代理地址
     proxy: {
       '/ent': {
-        target: 'http://localhost:30016',
+        target: 'http://183.220.144.57:30002',
         pathRewrite: {
           '^/ent': ''
+        }
+      },
+      '/stoken': {
+        target: 'http://183.220.144.57:30000',
+        pathRewrite: {
+          '^/stoken': ''
         }
       }
     },

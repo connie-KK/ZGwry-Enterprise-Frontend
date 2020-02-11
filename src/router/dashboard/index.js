@@ -13,7 +13,7 @@ Vue.use(Router)
 export default new Router({
   base: `${process.env.BASE_URL}/dashboard`,
   routes: [{
-      path: '/home',
+      path: '/home/:id',
       name: 'home',
       component: () => import('@/views/dashboard/home/index.vue')
     },

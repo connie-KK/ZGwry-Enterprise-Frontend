@@ -9,19 +9,22 @@
             v-for="secondItem in tabList"
             :id="secondItem.id"
             :key="secondItem.id"
-          >{{secondItem.name}}</mt-tab-item>
+            >{{ secondItem.name }}</mt-tab-item
+          >
         </mt-navbar>
       </div>
       <div class="main-content-box">
-        <div class="list list2" v-for="(item,index) in list" :key="index">
+        <div class="list list2" v-for="(item, index) in list" :key="index">
           <div class="first-line">
-            <span>{{item.facilityname}}</span>
+            <span>{{ item.facilityname }}</span>
             <span @click="toDetail(item)">详情</span>
           </div>
-          <p>{{item.treatmentprocess}}</p>
-          <p v-if="item.output&&selectedSubTab!==7">{{item.output.name}}</p>
-          <p v-if="selectedSubTab===7">{{item.number}}</p>
-          <p>{{item.remark}}</p>
+          <p>{{ item.treatmentprocess }}</p>
+          <p v-if="item.output && selectedSubTab !== 7">
+            {{ item.output.name }}
+          </p>
+          <p v-if="selectedSubTab === 7">{{ item.number }}</p>
+          <p>{{ item.remark }}</p>
         </div>
       </div>
       <div class="footer">
@@ -35,42 +38,42 @@
 </template>
 
 <script>
-import moment from "moment";
-import store from "store";
-import navBar from "@/components/navBar.vue";
-import { Navbar, TabItem } from "mint-ui";
+import moment from 'moment'
+import store from 'store'
+import navBar from '@/components/navBar.vue'
+import { Navbar, TabItem } from 'mint-ui'
 export default {
-  name: "pollution",
+  name: 'pollution',
   components: {
-    "nav-bar": navBar,
-    "mt-navbar": Navbar,
-    "mt-tab-item": TabItem
+    'nav-bar': navBar,
+    'mt-navbar': Navbar,
+    'mt-tab-item': TabItem
   },
   watch: {
     selectedSubTab() {
-      this.getPollControlList();
+      this.getPollControlList()
     }
   },
   data() {
     return {
-      moduleName: "企业信息",
-      enterid: "",
+      moduleName: '企业信息',
+      enterid: '',
       selectedTab: 5,
       selectedSubTab: 2,
       tabList: [
-        { id: 2, name: "废水治理设施" },
-        { id: 1, name: "废气治理设施" },
-        { id: 7, name: "固废治理设施" }
+        { id: 2, name: '废水治理设施' },
+        { id: 1, name: '废气治理设施' },
+        { id: 7, name: '固废治理设施' }
       ],
       yJC: 0,
       yNoise: 6,
       yGWF: 7,
       list: []
-    };
+    }
   },
   created() {
-    this.enterid = "82bd35e2-acd5-4a66-86fd-f1d435eb12fe";
-    this.getPollControlList();
+    this.enterid = this.$store.state.enterId
+    this.getPollControlList()
   },
   methods: {
     getPollControlList() {
@@ -79,41 +82,41 @@ export default {
         category: this.selectedSubTab,
         pageIndex: 0,
         pageSize: 0
-      };
+      }
       this.$api.getZGTreatFacilityList(payload).then(res => {
         if (res) {
           res.items.forEach(item => {
             if (this.selectedSubTab === 2) {
               //废水
-              item.treatmentprocess = `废水净化方法：${item.treatmentprocess}`;
+              item.treatmentprocess = `废水净化方法：${item.treatmentprocess}`
             } else if (this.selectedSubTab === 1) {
               //废气
-              item.treatmentprocess = `废气净化方法：${item.treatmentprocess}`;
+              item.treatmentprocess = `废气净化方法：${item.treatmentprocess}`
             } else if (this.selectedSubTab === 7) {
               //固危废
-              item.treatmentprocess = `处理工艺：${item.treatmentprocess}`;
+              item.treatmentprocess = `处理工艺：${item.treatmentprocess}`
             }
             if (item.output) {
-              item.output.name = `排放口：${item.output.name}`;
+              item.output.name = `排放口：${item.output.name}`
             }
-            item.number = `数量：${item.number}`;
-            item.remark = `备注：${item.remark}`;
-          });
-          this.list = res.items;
+            item.number = `数量：${item.number}`
+            item.remark = `备注：${item.remark}`
+          })
+          this.list = res.items
         }
-      });
+      })
     },
     toDetail(e) {
-      const select = `${this.selectedTab}-${this.selectedSubTab}`;
-      store.set("pageType", select);
-      this.$router.push(`/emissionsDetail/${e.id}`);
+      const select = `${this.selectedTab}-${this.selectedSubTab}`
+      store.set('pageType', select)
+      this.$router.push(`/emissionsDetail/${e.id}`)
     }
   }
-};
+}
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/_flex.scss";
+@import '@/assets/scss/_flex.scss';
 .main-content {
   height: calc(100% - 1.29rem);
   .main-content-box {

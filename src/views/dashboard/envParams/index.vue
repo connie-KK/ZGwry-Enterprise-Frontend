@@ -323,7 +323,9 @@
           />
         </div>
         <div class="file-box">
-          <p class="file-box-title">附件信息(2)</p>
+          <p class="file-box-title">
+            附件信息({{ autoParams.attachments.length }})
+          </p>
           <button class="file-box-add-btn">
             <i>+</i>
             <span @click="$refs.filebox.click()">添加文件</span>
@@ -712,8 +714,7 @@ export default {
       })
     },
     download(id, name) {
-      const url =
-        'http://localhost:30016/api/ZGEntExtend/DownAttachmentFiles?id=' + id
+      const url = '/ent/api/ZGEntExtend/DownAttachmentFiles?id=' + id
       const a = document.createElement('a')
       a.href = url
       a.download = name
@@ -796,7 +797,7 @@ textarea:-ms-input-placeholder {
       padding-right: 0.52rem;
       background: #fff url('../../../assets/images/right.png') no-repeat right
         center;
-      background-size: 0.36rem;
+      background-size: 0.2rem;
       color: #333;
     }
   }

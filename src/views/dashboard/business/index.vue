@@ -11,10 +11,7 @@
             <span>执法人</span>
             <span>现场检查编号</span>
           </li>
-          <li
-            v-for="item in list1"
-            :key="item.id"
-          >
+          <li v-for="item in list1" :key="item.id">
             <span>{{ moment(item.date).format('YYYY-MM-DD HH:mm') }}</span>
             <span>{{ item.staff }}</span>
             <span>{{ item.title }}</span>
@@ -28,10 +25,7 @@
             <span>投诉时间</span>
             <span>现场检查编号</span>
           </li>
-          <li
-            v-for="item in list2"
-            :key="item.id"
-          >
+          <li v-for="item in list2" :key="item.id">
             <span>{{ item.content }}</span>
             <span>{{ item.staff }}</span>
             <span>{{ moment(item.date).format('YYYY-MM-DD HH:mm') }}</span>
@@ -51,7 +45,7 @@ export default {
   components: {
     'nav-bar': navBar
   },
-  data () {
+  data() {
     return {
       moduleName: '企业信息',
       moment: moment,
@@ -59,19 +53,35 @@ export default {
       list2: []
     }
   },
-  mounted () {
+  mounted() {
     this.getZGTaskList('list1', 1)
     this.getZGTaskList('list2', 4)
   },
   methods: {
-    getZGTaskList (key, type) {
-      this.$api.getZGTaskList({
-        enterid: this.$store.state.enterId,
-        type: type,
-        pageIndex: -1,
-        pageSize: 0
-      }).then(res => {
-        this[key] = JSON.parse(JSON.stringify(res.list))
+    getZGTaskList(key, type) {
+      this.$api
+        .getZGTaskList({
+          enterid: this.$store.state.enterId,
+          type: type,
+          pageIndex: -1,
+          pageSize: 0
+        })
+        .then(res => {
+          this[key] = JSON.parse(JSON.stringify(res.list))
+          let users = []
+          res.list.forEach(item => {
+            users.push(item.staff)
+          })
+          this.getUsers()
+        })
+    },
+    getUsers(users) {
+      this.$api.getUserByArrUserID({ items: users }).then(res => {
+        let data = JSON.parse(JSON.stringify(this.users))
+        res.forEach(item => {
+          data[item.id] = JSON.parse(JSON.stringify(item))
+        })
+        this.users = JSON.parse(JSON.stringify(data))
       })
     }
   }

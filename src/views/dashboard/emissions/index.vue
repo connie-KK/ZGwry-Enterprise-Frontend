@@ -2,7 +2,10 @@
   <div>
     <header-bar>{{ moduleName }}</header-bar>
     <div class="main-content">
-      <nav-bar :selected="selectedTab" :list="tabList"></nav-bar>
+      <nav-bar
+        :selected="selectedTab"
+        :list="tabList"
+      ></nav-bar>
       <div class="second-tab">
         <mt-navbar v-model="selectedSubTab">
           <mt-tab-item
@@ -13,29 +16,40 @@
         </mt-navbar>
       </div>
       <div class="main-content-box">
-        <div class="list" v-for="(item,index) in list" :key="index">
+        <div
+          class="list"
+          v-for="(item,index) in list"
+          :key="index"
+        >
           <div class="first-line">
             <span>{{item.name}}</span>
             <span @click="toDetail(item)">详情</span>
           </div>
-          <p
-            v-if="selectedSubTab!==yGWF&& selectedSubTab!==yJC&&item.standard "
-          >{{item.standard.name}}</p>
+          <p v-if="selectedSubTab!==yGWF&& selectedSubTab!==yJC&&item.standard ">{{item.standard.name}}</p>
           <p v-if="selectedSubTab===yGWF">{{item.processingmode}}</p>
           <p v-if="selectedSubTab===yJC">{{item.value}}</p>
-          <div v-if="selectedSubTab!==yJC" class="third-line">
+          <div
+            v-if="selectedSubTab!==yJC"
+            class="third-line"
+          >
             <span v-if="selectedSubTab!==yNoise&&selectedSubTab!==yGWF">{{item.isonlinemonitoring}}</span>
             <span v-if="selectedSubTab===yGWF">{{item.isdangerousorwaste}}</span>
             <span>{{item.filecount}}</span>
           </div>
-          <div v-if="selectedSubTab===yJC" class="third-line">
+          <div
+            v-if="selectedSubTab===yJC"
+            class="third-line"
+          >
             <span>{{item.factorname}}</span>
             <span>{{item.filecount}}</span>
           </div>
         </div>
       </div>
       <div class="footer">
-        <div class="submitBtn" @click="addItem">
+        <div
+          class="submitBtn"
+          @click="addItem"
+        >
           <span></span>
           <span>新增</span>
         </div>
@@ -56,7 +70,7 @@ export default {
     "mt-navbar": Navbar,
     "mt-tab-item": TabItem
   },
-  data() {
+  data () {
     return {
       moduleName: "企业信息",
       enterid: "",
@@ -76,7 +90,7 @@ export default {
     };
   },
   watch: {
-    selectedSubTab() {
+    selectedSubTab () {
       if (this.selectedSubTab === 0) {
         this.getMonitorList();
       } else {
@@ -84,12 +98,12 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.enterid = this.$store.state.enterid;
     this.getOutletList();
   },
   methods: {
-    getMonitorList() {
+    getMonitorList () {
       const payload = {
         enterid: this.enterid,
         pageIndex: 0,
@@ -107,7 +121,7 @@ export default {
         }
       });
     },
-    getOutletList() {
+    getOutletList () {
       const payload = {
         enterid: this.enterid,
         category: this.selectedSubTab,
@@ -133,12 +147,12 @@ export default {
         }
       });
     },
-    toDetail(e) {
+    toDetail (e) {
       const select = `${this.selectedTab}-${this.selectedSubTab}`;
       store.set("pageType", select);
       this.$router.push(`/emissionsDetail/${e.id}`);
     },
-    addItem() {
+    addItem () {
       const select = `${this.selectedTab}-${this.selectedSubTab}`;
       store.set("pageType", select);
       this.$router.push(`/emissionsDetail/0`);
@@ -147,7 +161,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "@/assets/scss/_flex.scss";
 .main-content {
   height: calc(100% - 1.29rem);

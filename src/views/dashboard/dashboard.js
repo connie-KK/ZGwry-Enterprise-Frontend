@@ -6,7 +6,10 @@ import App from '@/views/dashboard/dashboard.vue'
 import router from '@/router/dashboard'
 import store from '@/store'
 import Navigation from 'vue-navigation'
-Vue.use(Navigation, { router, store })
+Vue.use(Navigation, {
+  router,
+  store
+})
 
 //leaflet地图
 import 'leaflet'
@@ -36,11 +39,21 @@ Vue.component('HeaderBar', HeaderBar)
 import api from '@/assets/scripts/api'
 Vue.prototype.$api = api
 
+Vue.prototype.$uuid = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0,
+      v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   template: '<App/>',
-  components: { App },
+  components: {
+    App
+  },
   router,
   store
 })

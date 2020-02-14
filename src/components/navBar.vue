@@ -1,5 +1,8 @@
 <template>
-  <div class="navBar-box" ref="navbox">
+  <div
+    class="navBar-box"
+    ref="navbox"
+  >
     <div :style="{ width: myWidth + 'px' }">
       <mt-navbar v-model="mySelected">
         <mt-tab-item
@@ -7,8 +10,7 @@
           :ref="'item' + item.id"
           :key="item.id"
           :id="item.id"
-          >{{ item.name }}</mt-tab-item
-        >
+        >{{ item.name }}</mt-tab-item>
       </mt-navbar>
     </div>
   </div>
@@ -28,7 +30,7 @@ export default {
       default: 1
     }
   },
-  data() {
+  data () {
     return {
       mySelected: this.selected,
       list: [
@@ -42,7 +44,7 @@ export default {
     }
   },
   computed: {
-    myWidth() {
+    myWidth () {
       let text = ''
       this.list.forEach(item => {
         text += item.name
@@ -51,20 +53,23 @@ export default {
     }
   },
   watch: {
-    mySelected() {
+    mySelected () {
       this.deFirFun()
       let router =
         this.list.filter(item => {
           return item.id === this.mySelected
-        })[0].router || '/home'
+        })[0].router
+      if (router === '/home') {
+        router = '/home/' + this.$store.state.enterId
+      }
       this.$router.replace(router)
     }
   },
-  mounted() {
+  mounted () {
     this.deFirFun()
   },
   methods: {
-    deFirFun() {
+    deFirFun () {
       let wWidth = document.body.clientWidth
       let mLeft = this.$refs['item' + this.mySelected][0].$el.offsetLeft
       let mWidth = this.$refs['item' + this.mySelected][0].$el.clientWidth

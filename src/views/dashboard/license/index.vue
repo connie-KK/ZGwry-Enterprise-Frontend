@@ -26,11 +26,18 @@
       <div class="main-content-box">
         <div class="item-box">
           <span>单位名称</span>
-          <input type="text" placeholder="请输入单位名称" v-model="data.name" />
+          <input
+            type="text"
+            placeholder="请输入单位名称"
+            v-model="data.name"
+          />
         </div>
         <div class="item-box">
           <span>是否办理许可证</span>
-          <mt-switch class="my-switch" v-model="data.state"></mt-switch>
+          <mt-switch
+            class="my-switch"
+            v-model="data.state"
+          ></mt-switch>
         </div>
         <div class="item-box">
           <span>证书编码</span>
@@ -80,7 +87,10 @@
             v-model="data.buss_addr"
           />
         </div>
-        <div class="item-box" @click="datePicker(1)">
+        <div
+          class="item-box"
+          @click="datePicker(1)"
+        >
           <span>发证日期</span>
           <input
             type="text"
@@ -97,7 +107,10 @@
             v-model="data.Issuingunit"
           />
         </div>
-        <div class="item-box" @click="datePicker(2)">
+        <div
+          class="item-box"
+          @click="datePicker(2)"
+        >
           <span>有效期</span>
           <input
             type="text"
@@ -113,7 +126,10 @@
             <span @click="$refs.filebox1.click()">添加文件</span>
           </button>
           <ul class="file-list">
-            <li v-for="(item, index) in pdocItems" :key="item.id">
+            <li
+              v-for="(item, index) in pdocItems"
+              :key="item.id"
+            >
               <p @click="ifDownload(item.id, item.name, 'DownPollFiles')">
                 {{ item.name }}
               </p>
@@ -130,7 +146,10 @@
             <span @click="$refs.filebox2.click()">添加文件</span>
           </button>
           <ul class="file-list">
-            <li v-for="(item, index) in emergplanItems" :key="item.id">
+            <li
+              v-for="(item, index) in emergplanItems"
+              :key="item.id"
+            >
               <p @click="ifDownload(item.id, item.name, 'DownEmergplanFiles')">
                 {{ item.name }}
               </p>
@@ -147,7 +166,10 @@
             <span @click="$refs.filebox3.click()">添加文件</span>
           </button>
           <ul class="file-list">
-            <li v-for="(item, index) in attachmentItems" :key="item.id">
+            <li
+              v-for="(item, index) in attachmentItems"
+              :key="item.id"
+            >
               <p @click="ifDownload(item.id, item.name, 'DownAttachmentFiles')">
                 {{ item.name }}
               </p>
@@ -162,7 +184,10 @@
             <span @click="$refs.filebox4.click()">添加文件</span>
           </button>
           <ul class="file-list pic-list">
-            <li v-for="(item, index) in drawingItems" :key="item.id">
+            <li
+              v-for="(item, index) in drawingItems"
+              :key="item.id"
+            >
               <div
                 class="pic-box"
                 @click="
@@ -229,7 +254,7 @@ export default {
     'mt-switch': Switch,
     'mt-datetime-picker': DatetimePicker
   },
-  data() {
+  data () {
     return {
       moduleName: '企业信息',
       moment: moment,
@@ -260,27 +285,27 @@ export default {
     }
   },
   watch: {
-    'data.issuedate'() {
+    'data.issuedate' () {
       this.pickerValue1 = new Date(this.data.issuedate)
     },
-    'data.enddate'() {
+    'data.enddate' () {
       this.pickerValue2 = new Date(this.data.enddate)
     }
   },
-  mounted() {
+  mounted () {
     this.getPollpermitsByid()
   },
   methods: {
-    datePicker(state) {
+    datePicker (state) {
       this.$refs[`datePicker${state}`].open()
     },
-    handleConfirm1(e) {
+    handleConfirm1 (e) {
       this.data.issuedate = moment(e).format('YYYY-MM-DD')
     },
-    handleConfirm2(e) {
+    handleConfirm2 (e) {
       this.data.enddate = moment(e).format('YYYY-MM-DD')
     },
-    getPollpermitsByid() {
+    getPollpermitsByid () {
       this.$api
         .getPollpermitsByid({
           params: {
@@ -288,6 +313,9 @@ export default {
           }
         })
         .then(res => {
+          if (res.items === -1) {
+            return false
+          }
           this.data = res.items
           this.pdocItems = res.pdocItems
           this.emergplanItems = res.emergplanItems
@@ -295,25 +323,25 @@ export default {
           this.drawingItems = res.drawingItems
         })
     },
-    filesSelected1(e) {
+    filesSelected1 (e) {
       this.filesSelected(e, 'pdocItems', 'uploadPollFiles', 24)
     },
-    filesSelected2(e) {
+    filesSelected2 (e) {
       this.filesSelected(e, 'emergplanItems', 'uploadEmergplanFiles', 0)
     },
-    filesSelected3(e) {
+    filesSelected3 (e) {
       this.filesSelected(e, 'attachmentItems', 'uploadAttachmentFiles', 0)
     },
-    filesSelected4(e) {
+    filesSelected4 (e) {
       this.filesSelected(e, 'drawingItems', 'uploadEntdrawingFiles', 1)
     },
-    filesSelected(e, type, fun, etype) {
+    filesSelected (e, type, fun, etype) {
       let files = e.target.files
       let formData = new FormData()
       formData.append('file', files[0])
       this.uploadFiles(formData, type, fun, etype)
     },
-    uploadFiles(formData, type, fun, etype) {
+    uploadFiles (formData, type, fun, etype) {
       formData.append('year', moment().format('YYYY'))
       formData.append('etype', etype)
       formData.append('pmitid', this.$store.state.enterId)
@@ -321,7 +349,7 @@ export default {
         this.getPollpermitsByid()
       })
     },
-    deleteFiles(id, fun) {
+    deleteFiles (id, fun) {
       MessageBox.confirm('确认删除此文件?').then(action => {
         if (action === 'confirm') {
           axios.post(`/ent/api/enterprise/${fun}/${id}`).then(res => {
@@ -332,14 +360,14 @@ export default {
         }
       })
     },
-    ifDownload(id, name, fun) {
+    ifDownload (id, name, fun) {
       MessageBox.confirm('确认下载此文件?').then(action => {
         if (action === 'confirm') {
           this.download(id, name, fun)
         }
       })
     },
-    download(id, name, fun) {
+    download (id, name, fun) {
       const url = `http://localhost:30016/api/enterprise/${fun}?id=${id}`
       const a = document.createElement('a')
       a.href = url
@@ -347,10 +375,10 @@ export default {
       document.body.appendChild(a)
       a.click()
     },
-    openImg(src) {
+    openImg (src) {
       ImagePreview([src])
     },
-    updatePollpermits() {
+    updatePollpermits () {
       let data = JSON.parse(JSON.stringify(this.data))
       data.enddate = data.enddate
         ? moment(data.enddate).format('YYYY-MM-DD HH:mm:ss')
@@ -361,6 +389,8 @@ export default {
       data.startdate = data.startdate
         ? moment(data.startdate).format('YYYY-MM-DD HH:mm:ss')
         : ''
+      data.id = data.id || this.$uuid()
+      data.enterpriseid = this.$store.state.enterId
       this.$api.updatePollpermits(data).then(res => {
         if (res === true) {
           Toast('保存成功')
@@ -424,7 +454,7 @@ textarea:-ms-input-placeholder {
     width: 4rem;
     &:disabled {
       padding-right: 0.52rem;
-      background: #fff url('../../../assets/images/right.png') no-repeat right
+      background: #fff url("../../../assets/images/right.png") no-repeat right
         center;
       background-size: 0.36rem;
       color: #333;
@@ -485,7 +515,7 @@ textarea:-ms-input-placeholder {
       overflow: hidden;
       p {
         float: left;
-        background: url('../../../assets/images/file.png') no-repeat left center;
+        background: url("../../../assets/images/file.png") no-repeat left center;
         background-size: 0.3rem;
         line-height: 0.7rem;
         font-size: 0.34rem;
@@ -500,7 +530,7 @@ textarea:-ms-input-placeholder {
         width: 0.4rem;
         height: 0.4rem;
         float: right;
-        background: url('../../../assets/images/close_bg.png') no-repeat left
+        background: url("../../../assets/images/close_bg.png") no-repeat left
           center;
         background-size: 0.4rem;
         margin-top: 0.15rem;

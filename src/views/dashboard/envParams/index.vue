@@ -3,7 +3,10 @@
     <header-bar>{{ moduleName }}</header-bar>
     <div class="main-content">
       <nav-bar :selected="3"></nav-bar>
-      <mt-popup v-model="popupVisible1" position="bottom">
+      <mt-popup
+        v-model="popupVisible1"
+        position="bottom"
+      >
         <mt-picker
           :slots="slots1"
           @change="onValuesChange1"
@@ -11,7 +14,10 @@
           :defaultIndex="defaultIndex1"
         ></mt-picker>
       </mt-popup>
-      <mt-popup v-model="popupVisible2" position="bottom">
+      <mt-popup
+        v-model="popupVisible2"
+        position="bottom"
+      >
         <mt-picker
           :slots="slots2"
           @change="onValuesChange2"
@@ -19,7 +25,10 @@
           :defaultIndex="defaultIndex2"
         ></mt-picker>
       </mt-popup>
-      <mt-popup v-model="popupVisible3" position="bottom">
+      <mt-popup
+        v-model="popupVisible3"
+        position="bottom"
+      >
         <mt-picker
           :slots="slots3"
           @change="onValuesChange3"
@@ -27,7 +36,10 @@
           :defaultIndex="defaultIndex3"
         ></mt-picker>
       </mt-popup>
-      <mt-popup v-model="popupVisible4" position="bottom">
+      <mt-popup
+        v-model="popupVisible4"
+        position="bottom"
+      >
         <mt-picker
           :slots="slots4"
           @change="onValuesChange4"
@@ -35,7 +47,10 @@
           :defaultIndex="defaultIndex4"
         ></mt-picker>
       </mt-popup>
-      <mt-popup v-model="popupVisible5" position="bottom">
+      <mt-popup
+        v-model="popupVisible5"
+        position="bottom"
+      >
         <mt-picker
           :slots="slots5"
           @change="onValuesChange5"
@@ -45,7 +60,10 @@
       </mt-popup>
       <div class="main-content-box">
         <p class="params-title">环境属性</p>
-        <div class="item-box" @click="popupVisible1 = true">
+        <div
+          class="item-box"
+          @click="popupVisible1 = true"
+        >
           <span>水源保护级别</span>
           <input
             type="text"
@@ -54,7 +72,10 @@
             placeholder="请选择级别"
           />
         </div>
-        <div class="item-box" @click="popupVisible2 = true">
+        <div
+          class="item-box"
+          @click="popupVisible2 = true"
+        >
           <span>水域功能区级别</span>
           <input
             type="text"
@@ -63,7 +84,10 @@
             placeholder="请选择级别"
           />
         </div>
-        <div class="item-box" @click="popupVisible3 = true">
+        <div
+          class="item-box"
+          @click="popupVisible3 = true"
+        >
           <span>噪声功能区级别</span>
           <input
             type="text"
@@ -72,7 +96,10 @@
             placeholder="请选择级别"
           />
         </div>
-        <div class="item-box" @click="popupVisible4 = true">
+        <div
+          class="item-box"
+          @click="popupVisible4 = true"
+        >
           <span>空气功能区级别</span>
           <input
             type="text"
@@ -252,9 +279,7 @@
           ></mt-switch>
         </div>
         <div class="item-box">
-          <span
-            >是否在三年内发生较大以上突发环境事件或者因环境污染问题造成较大社会影响</span
-          >
+          <span>是否在三年内发生较大以上突发环境事件或者因环境污染问题造成较大社会影响</span>
           <mt-switch
             class="my-switch"
             v-model="autoParams.issocialinfluence"
@@ -295,7 +320,10 @@
             v-model="autoParams.isemissionrestriction"
           ></mt-switch>
         </div>
-        <div class="item-box" @click="popupVisible5 = true">
+        <div
+          class="item-box"
+          @click="popupVisible5 = true"
+        >
           <span>环保诚信等级</span>
           <input
             type="text"
@@ -331,7 +359,10 @@
             <span @click="$refs.filebox.click()">添加文件</span>
           </button>
           <ul class="file-list">
-            <li v-for="(item, index) in autoParams.attachments" :key="item.id">
+            <li
+              v-for="(item, index) in autoParams.attachments"
+              :key="item.id"
+            >
               <p @click="ifDownLoad(item)">{{ item.title }}</p>
               <i @click="deleteFile(index)"></i>
             </li>
@@ -362,7 +393,7 @@ export default {
     'mt-popup': Popup,
     'mt-picker': Picker
   },
-  data() {
+  data () {
     return {
       moduleName: '企业信息',
       value: false,
@@ -513,7 +544,7 @@ export default {
     }
   },
   computed: {
-    slots1() {
+    slots1 () {
       return [
         {
           flex: 1,
@@ -522,7 +553,7 @@ export default {
         }
       ]
     },
-    slots2() {
+    slots2 () {
       return [
         {
           flex: 1,
@@ -531,7 +562,7 @@ export default {
         }
       ]
     },
-    slots3() {
+    slots3 () {
       return [
         {
           flex: 1,
@@ -540,7 +571,7 @@ export default {
         }
       ]
     },
-    slots4() {
+    slots4 () {
       return [
         {
           flex: 1,
@@ -549,7 +580,7 @@ export default {
         }
       ]
     },
-    slots5() {
+    slots5 () {
       return [
         {
           flex: 1,
@@ -558,7 +589,7 @@ export default {
         }
       ]
     },
-    defaultIndex1() {
+    defaultIndex1 () {
       let index = 0
       this.pros.forEach((item, i) => {
         if (item.code === this.autoParams.waterprotectionlevel) {
@@ -567,7 +598,7 @@ export default {
       })
       return index
     },
-    defaultIndex2() {
+    defaultIndex2 () {
       let index = 0
       this.funs.forEach((item, i) => {
         if (item.code === this.autoParams.waterfunctionlevel) {
@@ -576,7 +607,7 @@ export default {
       })
       return index
     },
-    defaultIndex3() {
+    defaultIndex3 () {
       let index = 0
       this.noises.forEach((item, i) => {
         if (item.code === this.autoParams.noisefunctionlevel) {
@@ -585,7 +616,7 @@ export default {
       })
       return index
     },
-    defaultIndex4() {
+    defaultIndex4 () {
       let index = 0
       this.airs.forEach((item, i) => {
         if (item.code === this.autoParams.airfunctionlevel) {
@@ -594,7 +625,7 @@ export default {
       })
       return index
     },
-    defaultIndex5() {
+    defaultIndex5 () {
       let index = 0
       this.intLevels.forEach((item, i) => {
         if (item.code === this.autoParams.integritylevel) {
@@ -603,7 +634,7 @@ export default {
       })
       return index
     },
-    defaultName1() {
+    defaultName1 () {
       let name = ''
       this.pros.forEach(item => {
         if (item.code === this.autoParams.waterprotectionlevel) {
@@ -612,7 +643,7 @@ export default {
       })
       return name
     },
-    defaultName2() {
+    defaultName2 () {
       let name = ''
       this.funs.forEach(item => {
         if (item.code === this.autoParams.waterfunctionlevel) {
@@ -621,7 +652,7 @@ export default {
       })
       return name
     },
-    defaultName3() {
+    defaultName3 () {
       let name = ''
       this.noises.forEach(item => {
         if (item.code === this.autoParams.noisefunctionlevel) {
@@ -630,7 +661,7 @@ export default {
       })
       return name
     },
-    defaultName4() {
+    defaultName4 () {
       let name = ''
       this.airs.forEach(item => {
         if (item.code === this.autoParams.airfunctionlevel) {
@@ -639,7 +670,7 @@ export default {
       })
       return name
     },
-    defaultName5() {
+    defaultName5 () {
       let name = ''
       this.intLevels.forEach(item => {
         if (item.code === this.autoParams.integritylevel) {
@@ -649,11 +680,11 @@ export default {
       return name
     }
   },
-  mounted() {
+  mounted () {
     this.getData()
   },
   methods: {
-    filesSelected(e) {
+    filesSelected (e) {
       let files = e.target.files
       let formData = new FormData()
       for (let i = 0; i < files.length; i++) {
@@ -662,7 +693,7 @@ export default {
       }
       this.uploadEntExtendAttachment(formData)
     },
-    uploadEntExtendAttachment(files) {
+    uploadEntExtendAttachment (files) {
       this.$api.uploadEntExtendAttachment(files).then(res => {
         res.forEach(item => {
           item.rowState = 'add'
@@ -670,7 +701,7 @@ export default {
         this.autoParams.attachments.push(...res)
       })
     },
-    getData() {
+    getData () {
       this.$api
         .getZGEnvironmentalProps({
           enterid: this.$store.state.enterId
@@ -688,7 +719,7 @@ export default {
           this.autoParams = JSON.parse(JSON.stringify(data))
         })
     },
-    upDate() {
+    upDate () {
       let params = JSON.parse(JSON.stringify(this.autoParams))
       for (let key in params) {
         if (params[key] === true) {
@@ -698,22 +729,24 @@ export default {
           params[key] = 0
         }
       }
+      params.id = params.id || this.$uuid()
+      params.enterpriseid = this.$store.state.enterId
       this.$api.updateZGEnviromentalProps(params).then(res => {
         Toast('保存成功')
         this.getData()
       })
     },
-    deleteFile(index) {
+    deleteFile (index) {
       this.autoParams.attachments.splice(index, 1)
     },
-    ifDownLoad(item) {
+    ifDownLoad (item) {
       MessageBox.confirm('确认下载此文件?').then(action => {
         if (action === 'confirm') {
           this.download(item.id, item.title)
         }
       })
     },
-    download(id, name) {
+    download (id, name) {
       const url = '/ent/api/ZGEntExtend/DownAttachmentFiles?id=' + id
       const a = document.createElement('a')
       a.href = url
@@ -721,19 +754,19 @@ export default {
       document.body.appendChild(a)
       a.click()
     },
-    onValuesChange1(e) {
+    onValuesChange1 (e) {
       this.autoParams.waterprotectionlevel = e.values[0].code
     },
-    onValuesChange2(e) {
+    onValuesChange2 (e) {
       this.autoParams.waterfunctionlevel = e.values[0].code
     },
-    onValuesChange3(e) {
+    onValuesChange3 (e) {
       this.autoParams.noisefunctionlevel = e.values[0].code
     },
-    onValuesChange4(e) {
+    onValuesChange4 (e) {
       this.autoParams.airfunctionlevel = e.values[0].code
     },
-    onValuesChange5(e) {
+    onValuesChange5 (e) {
       this.autoParams.integritylevel = e.values[0].code
     }
   }
@@ -795,7 +828,7 @@ textarea:-ms-input-placeholder {
     width: 4rem;
     &:disabled {
       padding-right: 0.52rem;
-      background: #fff url('../../../assets/images/right.png') no-repeat right
+      background: #fff url("../../../assets/images/right.png") no-repeat right
         center;
       background-size: 0.2rem;
       color: #333;
@@ -855,7 +888,7 @@ textarea:-ms-input-placeholder {
       overflow: hidden;
       p {
         float: left;
-        background: url('../../../assets/images/file.png') no-repeat left center;
+        background: url("../../../assets/images/file.png") no-repeat left center;
         background-size: 0.3rem;
         line-height: 0.7rem;
         font-size: 0.34rem;
@@ -870,7 +903,7 @@ textarea:-ms-input-placeholder {
         width: 0.4rem;
         height: 0.4rem;
         float: right;
-        background: url('../../../assets/images/close_bg.png') no-repeat left
+        background: url("../../../assets/images/close_bg.png") no-repeat left
           center;
         background-size: 0.4rem;
         margin-top: 0.15rem;

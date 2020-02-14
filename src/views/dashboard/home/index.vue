@@ -11,11 +11,18 @@
             :key="index"
           >
             <p class="label">{{ item.label }}</p>
-            <input type="text" v-model="item.value" class="info" />
+            <input
+              type="text"
+              v-model="item.value"
+              class="info"
+            />
           </div>
         </div>
         <div class="lists list-header">
-          <span v-for="(item, index) in listHeader" :key="index">{{
+          <span
+            v-for="(item, index) in listHeader"
+            :key="index"
+          >{{
             item
           }}</span>
         </div>
@@ -28,18 +35,48 @@
           <span>{{ item.name }}</span>
           <span>{{ item.value }}{{ item.unit }}</span>
         </div>
+        <div
+          class="add-item-box"
+          v-if="productItemsState"
+        >
+          <input
+            style="width:30%;"
+            v-model="proItemData.name"
+            placeholder="名称"
+          />
+          <input
+            style="width:25%;"
+            v-model="proItemData.value"
+            placeholder="产量"
+          />
+          <input
+            style="width:25%;"
+            v-model="proItemData.unit"
+            placeholder="单位"
+          />
+          <button @click="addProItem">确定</button>
+        </div>
         <div class="listBtnGroup">
-          <div class="addBtn listBtn" @click="addItem(productItems)">
+          <div
+            class="addBtn listBtn"
+            @click="productItemsState = true"
+          >
             <span></span>
             <span>添加</span>
           </div>
-          <div class="delBtn listBtn" @click="deleteItem(productItems)">
+          <div
+            class="delBtn listBtn"
+            @click="deleteItem(productItems)"
+          >
             <span></span>
             <span>删除</span>
           </div>
         </div>
         <div class="lists list-header second-header">
-          <span v-for="(item, index) in listHeaderFactor" :key="index">{{
+          <span
+            v-for="(item, index) in listHeaderFactor"
+            :key="index"
+          >{{
             item
           }}</span>
         </div>
@@ -53,12 +90,39 @@
           <span>{{ item.name }}</span>
           <span>{{ item.value }}{{ item.unit }}</span>
         </div>
+        <div
+          class="add-item-box"
+          v-if="materialItmesState"
+        >
+          <input
+            style="width:30%;"
+            v-model="matItemData.name"
+            placeholder="名称"
+          />
+          <input
+            style="width:25%;"
+            v-model="matItemData.value"
+            placeholder="使用量"
+          />
+          <input
+            style="width:25%;"
+            v-model="matItemData.unit"
+            placeholder="单位"
+          />
+          <button @click="addMatItem">确定</button>
+        </div>
         <div class="listBtnGroup">
-          <div class="addBtn listBtn">
+          <div
+            class="addBtn listBtn"
+            @click="materialItmesState = true"
+          >
             <span></span>
             <span>添加</span>
           </div>
-          <div class="delBtn listBtn" @click="deleteItem(materialItmes)">
+          <div
+            class="delBtn listBtn"
+            @click="deleteItem(materialItmes)"
+          >
             <span></span>
             <span>删除</span>
           </div>
@@ -74,12 +138,13 @@
 <script>
 import navBar from '@/components/navBar.vue'
 import moment from 'moment'
+import { Toast } from 'mint-ui'
 export default {
   name: 'home',
   components: {
     'nav-bar': navBar
   },
-  data() {
+  data () {
     return {
       moduleName: '企业信息',
       enterid: '',
@@ -88,15 +153,27 @@ export default {
       levelArr: ['国控', '省控', '市控/重点', '区控/非重点'],
       productionStateArr: ['正常营业', '停业', '关闭'],
       productItems: [],
-      materialItmes: []
+      materialItmes: [],
+      proItemData: {
+        name: '',
+        value: '',
+        unit: ''
+      },
+      matItemData: {
+        name: '',
+        value: '',
+        unit: ''
+      },
+      productItemsState: false,
+      materialItmesState: false
     }
   },
   computed: {
-    list() {
+    list () {
       return this.$store.state.pollSourceInfoHeader
     }
   },
-  created() {
+  created () {
     this.enterid = this.$route.params.id
     this.$store.state.enterId = this.enterid
     this.$store.state.enterid = this.enterid
@@ -104,7 +181,7 @@ export default {
     this.getPollSourceList()
   },
   methods: {
-    getPollSourceList() {
+    getPollSourceList () {
       const payload = {
         id: this.enterid
       }
@@ -153,7 +230,7 @@ export default {
         }
       })
     },
-    selectItem(arr, index) {
+    selectItem (arr, index) {
       let selecteItem = arr[index]
       arr.forEach(item => {
         item.class = ''
@@ -161,20 +238,55 @@ export default {
       selecteItem.class = 'selected'
       this.$set(arr, index, selecteItem)
     },
-    deleteItem(arr) {
+    deleteItem (arr) {
       arr.forEach((item, index) => {
         if (item.class === 'selected') {
           arr.splice(index, 1)
         }
       })
     },
-    addItem(arr) {}
+    addProItem () {
+      for (let key in this.proItemData) {
+        if (!this.proItemData[key]) {
+          Toast('不能为空！')
+          return false
+        }
+      }
+      let data = JSON.parse(JSON.stringify(this.proItemData))
+      data.id = this.$uuid()
+      data.rowState = 'add'
+      this.productItems.push(data)
+      this.proItemData = {
+        name: '',
+        value: '',
+        unit: ''
+      }
+      this.productItemsState = false
+    },
+    addMatItem () {
+      for (let key in this.matItemData) {
+        if (!this.matItemData[key]) {
+          Toast('不能为空！')
+          return false
+        }
+      }
+      let data = JSON.parse(JSON.stringify(this.matItemData))
+      data.id = this.$uuid()
+      data.rowState = 'add'
+      this.materialItmes.push(data)
+      this.matItemData = {
+        name: '',
+        value: '',
+        unit: ''
+      }
+      this.materialItmesState = false
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/scss/_flex.scss';
+@import "@/assets/scss/_flex.scss";
 .main-content {
   height: calc(100% - 1.29rem);
   .main-content-box {
@@ -330,6 +442,7 @@ p {
   bottom: 0;
   height: 1.28rem;
   background: rgba(255, 255, 255, 1);
+  width: 100%;
   .submitBtn {
     @include flexbox;
     @include align-items(center);
@@ -340,6 +453,25 @@ p {
     border-radius: 3px;
     font-size: 0.34rem;
     color: rgba(255, 255, 255, 1);
+  }
+}
+.add-item-box {
+  input {
+    border: 0;
+    background: #fff;
+    height: 0.5rem;
+    margin: 0.05rem 0;
+    padding-left: 0.1rem;
+    margin-right: 0.1rem;
+  }
+  button {
+    height: 0.5rem;
+    width: 15%;
+    padding: 0;
+    border: 0;
+    margin: 0.05rem 0;
+    background: #3296fa;
+    color: #fff;
   }
 }
 </style>

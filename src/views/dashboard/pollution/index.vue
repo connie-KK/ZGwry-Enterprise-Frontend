@@ -2,19 +2,25 @@
   <div>
     <header-bar>{{ moduleName }}</header-bar>
     <div class="main-content">
-      <nav-bar :selected="selectedTab" :list="tabList"></nav-bar>
+      <nav-bar
+        :selected="selectedTab"
+        :list="tabList"
+      ></nav-bar>
       <div class="second-tab">
         <mt-navbar v-model="selectedSubTab">
           <mt-tab-item
             v-for="secondItem in tabList"
             :id="secondItem.id"
             :key="secondItem.id"
-            >{{ secondItem.name }}</mt-tab-item
-          >
+          >{{ secondItem.name }}</mt-tab-item>
         </mt-navbar>
       </div>
       <div class="main-content-box">
-        <div class="list list2" v-for="(item, index) in list" :key="index">
+        <div
+          class="list list2"
+          v-for="(item, index) in list"
+          :key="index"
+        >
           <div class="first-line">
             <span>{{ item.facilityname }}</span>
             <span @click="toDetail(item)">详情</span>
@@ -50,11 +56,11 @@ export default {
     'mt-tab-item': TabItem
   },
   watch: {
-    selectedSubTab() {
+    selectedSubTab () {
       this.getPollControlList()
     }
   },
-  data() {
+  data () {
     return {
       moduleName: '企业信息',
       enterid: '',
@@ -71,12 +77,12 @@ export default {
       list: []
     }
   },
-  created() {
+  created () {
     this.enterid = this.$store.state.enterId
     this.getPollControlList()
   },
   methods: {
-    getPollControlList() {
+    getPollControlList () {
       const payload = {
         enterid: this.enterid,
         category: this.selectedSubTab,
@@ -106,7 +112,7 @@ export default {
         }
       })
     },
-    toDetail(e) {
+    toDetail (e) {
       const select = `${this.selectedTab}-${this.selectedSubTab}`
       store.set('pageType', select)
       this.$router.push(`/emissionsDetail/${e.id}`)
@@ -115,8 +121,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@import '@/assets/scss/_flex.scss';
+<style lang="scss" scoped>
+@import "@/assets/scss/_flex.scss";
 .main-content {
   height: calc(100% - 1.29rem);
   .main-content-box {

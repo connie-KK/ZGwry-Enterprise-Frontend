@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 const originalPush = Router.prototype.push
-Router.prototype.push = function push(location, onResolve, onReject) {
+Router.prototype.push = function push (location, onResolve, onReject) {
   if (onResolve || onReject) {
     return originalPush.call(this, location, onResolve, onReject)
   }
@@ -12,7 +12,8 @@ Vue.use(Router)
 
 export default new Router({
   base: `${process.env.BASE_URL}/dashboard`,
-  routes: [{
+  routes: [
+    {
       path: '/home/:id',
       name: 'home',
       component: () => import('@/views/dashboard/home/index.vue')
@@ -26,6 +27,11 @@ export default new Router({
       path: '/emissionsDetail/:id',
       name: 'emissionsDetail',
       component: () => import('@/views/dashboard/emissions/detail.vue')
+    },
+    {
+      path: '/pollutionDetail/:id',
+      name: 'pollutionDetail',
+      component: () => import('@/views/dashboard/pollution/detail.vue')
     },
     {
       path: '/emissionsMap/:id',

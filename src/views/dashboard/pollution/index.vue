@@ -2,25 +2,19 @@
   <div>
     <header-bar>{{ moduleName }}</header-bar>
     <div class="main-content">
-      <nav-bar
-        :selected="selectedTab"
-        :list="tabList"
-      ></nav-bar>
+      <nav-bar :selected="selectedTab"
+               :list="tabList"></nav-bar>
       <div class="second-tab">
         <mt-navbar v-model="selectedSubTab">
-          <mt-tab-item
-            v-for="secondItem in tabList"
-            :id="secondItem.id"
-            :key="secondItem.id"
-          >{{ secondItem.name }}</mt-tab-item>
+          <mt-tab-item v-for="secondItem in tabList"
+                       :id="secondItem.id"
+                       :key="secondItem.id">{{ secondItem.name }}</mt-tab-item>
         </mt-navbar>
       </div>
       <div class="main-content-box">
-        <div
-          class="list list2"
-          v-for="(item, index) in list"
-          :key="index"
-        >
+        <div class="list list2"
+             v-for="(item, index) in list"
+             :key="index">
           <div class="first-line">
             <span>{{ item.facilityname }}</span>
             <span @click="toDetail(item)">详情</span>
@@ -34,7 +28,8 @@
         </div>
       </div>
       <div class="footer">
-        <div class="submitBtn">
+        <div class="submitBtn"
+             @click="addItem">
           <span></span>
           <span>新增</span>
         </div>
@@ -115,7 +110,13 @@ export default {
     toDetail (e) {
       const select = `${this.selectedTab}-${this.selectedSubTab}`
       store.set('pageType', select)
-      this.$router.push(`/emissionsDetail/${e.id}`)
+      this.$router.push(`/pollutionDetail/${e.id}`)
+    },
+    addItem () {
+      const e = {
+        id: 'add' + this.selectedSubTab
+      }
+      this.toDetail(e)
     }
   }
 }

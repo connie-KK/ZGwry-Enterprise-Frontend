@@ -178,6 +178,8 @@ export default {
     // this.enterid = this.getQueryString("id");
     // this.enterid = "75ae3c94-93f7-412a-8d03-5cf4554122c8";
     this.enterid = "82bd35e2-acd5-4a66-86fd-f1d435eb12fe";
+    this.$store.state.enterId = this.enterid;
+    this.$store.state.enterid = this.enterid;
     this.list = this.pollSourceInfoHeader;
     this.getPollSourceList();
   },

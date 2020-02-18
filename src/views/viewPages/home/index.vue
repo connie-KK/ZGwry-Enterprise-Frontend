@@ -123,7 +123,9 @@ export default {
   },
   created() {
     // this.enterid = this.$route.params.id;
-    this.enterid = "75ae3c94-93f7-412a-8d03-5cf4554122c8";
+    // this.enterid = "75ae3c94-93f7-412a-8d03-5cf4554122c8";
+    this.enterid = "838135fd-6a22-4d60-8d4a-d36ff2c7e14c";
+    
     this.$store.state.enterId = this.enterid;
     this.$store.state.enterid = this.enterid;
     this.$store.commit("set_enterpriseid", this.enterid);

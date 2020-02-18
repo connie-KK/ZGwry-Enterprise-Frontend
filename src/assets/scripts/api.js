@@ -152,38 +152,38 @@ const interfaces = [
   },
   // 上传附件
   {
-    fun: "uploadAttachment",
-    interface: "/api/ZGEntExtend/UploadEntExtendAttachment",
-    type: "post",
-    serviceName: "serviceEnt"
+    fun: 'uploadAttachment',
+    interface: '/api/ZGEntExtend/UploadEntExtendAttachment',
+    type: 'post',
+    serviceName: 'serviceEnt'
   },
   // 新增更新自贡企业环境属性
   {
-    fun: "updateZGEnviromentalProps",
-    interface: "/api/ZGEntExtend/UpdateZGEnviromentalProps",
-    type: "post",
-    serviceName: "serviceEnt"
+    fun: 'updateZGEnviromentalProps',
+    interface: '/api/ZGEntExtend/UpdateZGEnviromentalProps',
+    type: 'post',
+    serviceName: 'serviceEnt'
   },
   // 根据类别获取自贡企业排放标准列表（不分页）
   {
-    fun: "getZGStandardList",
-    interface: "/api/ZGEntExtend/GetZGStandardList",
-    type: "post",
-    serviceName: "serviceEnt"
+    fun: 'getZGStandardList',
+    interface: '/api/ZGEntExtend/GetZGStandardList',
+    type: 'post',
+    serviceName: 'serviceEnt'
   },
   // 新增更新自贡企业排放口信息
   {
-    fun: "updateZGOutput",
-    interface: "/api/ZGEntExtend/UpdateZGOutput",
-    type: "post",
-    serviceName: "serviceEnt"
+    fun: 'updateZGOutput',
+    interface: '/api/ZGEntExtend/UpdateZGOutput',
+    type: 'post',
+    serviceName: 'serviceEnt'
   },
   // 新增更新企业污染治理设施
   {
-    fun: "updateZGTreatFacility",
-    interface: "/api/ZGEntExtend/UpdateZGTreatFacility",
-    type: "post",
-    serviceName: "serviceEnt"
+    fun: 'updateZGTreatFacility',
+    interface: '/api/ZGEntExtend/UpdateZGTreatFacility',
+    type: 'post',
+    serviceName: 'serviceEnt'
   }
 ]
 

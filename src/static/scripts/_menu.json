@@ -5,7 +5,7 @@
       "code": "MAINTENANCE_ROOT_ITEM",
       "onMenu": "_MAIN",
       "name": "环境质量",
-      "action": "/dashboard"
+      "action": "/viewPages"
     }
   ],
   "menuItems":[]

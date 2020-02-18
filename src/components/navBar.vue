@@ -49,7 +49,7 @@ export default {
       this.list.forEach(item => {
         text += item.name
       })
-      return text.length * 24
+      return text.length * 25
     }
   },
   watch: {

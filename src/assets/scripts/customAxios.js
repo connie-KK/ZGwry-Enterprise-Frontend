@@ -19,6 +19,9 @@ const customAxios = (prefix = '') => {
   // request拦截器
   requestInstance = service.interceptors.request.use(
     config => {
+      // if (prefix === "/stoken") {
+      //   config.url = 'http://183.220.144.57:30000' + config.url
+      // }
       config.url = prefix + config.url
       if (!config.data || !config.data.loading) {
         store.commit("set_loading", true)

@@ -5,26 +5,17 @@
       <nav-bar :selected="1"></nav-bar>
       <div class="main-content-box">
         <div>
-          <div
-            :class="['list', item.class]"
-            v-for="(item, index) in list"
-            :key="index"
-          >
+          <div :class="['list', item.class]" v-for="(item, index) in list" :key="index">
             <p class="label">{{ item.label }}</p>
-            <input
-              type="text"
-              v-model="item.value"
-              class="info"
-            />
+            <input type="text" v-model="item.value" class="info" />
           </div>
         </div>
         <div class="lists list-header">
-          <span
-            v-for="(item, index) in listHeader"
-            :key="index"
-          >{{
+          <span v-for="(item, index) in listHeader" :key="index">
+            {{
             item
-          }}</span>
+            }}
+          </span>
         </div>
         <div
           v-for="(item, index) in productItems"
@@ -35,50 +26,28 @@
           <span>{{ item.name }}</span>
           <span>{{ item.value }}{{ item.unit }}</span>
         </div>
-        <div
-          class="add-item-box"
-          v-if="productItemsState"
-        >
-          <input
-            style="width:30%;"
-            v-model="proItemData.name"
-            placeholder="名称"
-          />
-          <input
-            style="width:25%;"
-            v-model="proItemData.value"
-            placeholder="产量"
-          />
-          <input
-            style="width:25%;"
-            v-model="proItemData.unit"
-            placeholder="单位"
-          />
+        <div class="add-item-box" v-if="productItemsState">
+          <input style="width:30%;" v-model="proItemData.name" placeholder="名称" />
+          <input style="width:25%;" v-model="proItemData.value" placeholder="产量" />
+          <input style="width:25%;" v-model="proItemData.unit" placeholder="单位" />
           <button @click="addProItem">确定</button>
         </div>
         <div class="listBtnGroup">
-          <div
-            class="addBtn listBtn"
-            @click="productItemsState = true"
-          >
+          <div class="addBtn listBtn" @click="productItemsState = true">
             <span></span>
             <span>添加</span>
           </div>
-          <div
-            class="delBtn listBtn"
-            @click="deleteItem(productItems)"
-          >
+          <div class="delBtn listBtn" @click="deleteItem(productItems)">
             <span></span>
             <span>删除</span>
           </div>
         </div>
         <div class="lists list-header second-header">
-          <span
-            v-for="(item, index) in listHeaderFactor"
-            :key="index"
-          >{{
+          <span v-for="(item, index) in listHeaderFactor" :key="index">
+            {{
             item
-          }}</span>
+            }}
+          </span>
         </div>
         <div
           class="lists list-content"
@@ -90,39 +59,18 @@
           <span>{{ item.name }}</span>
           <span>{{ item.value }}{{ item.unit }}</span>
         </div>
-        <div
-          class="add-item-box"
-          v-if="materialItmesState"
-        >
-          <input
-            style="width:30%;"
-            v-model="matItemData.name"
-            placeholder="名称"
-          />
-          <input
-            style="width:25%;"
-            v-model="matItemData.value"
-            placeholder="使用量"
-          />
-          <input
-            style="width:25%;"
-            v-model="matItemData.unit"
-            placeholder="单位"
-          />
+        <div class="add-item-box" v-if="materialItmesState">
+          <input style="width:30%;" v-model="matItemData.name" placeholder="名称" />
+          <input style="width:25%;" v-model="matItemData.value" placeholder="使用量" />
+          <input style="width:25%;" v-model="matItemData.unit" placeholder="单位" />
           <button @click="addMatItem">确定</button>
         </div>
         <div class="listBtnGroup">
-          <div
-            class="addBtn listBtn"
-            @click="materialItmesState = true"
-          >
+          <div class="addBtn listBtn" @click="materialItmesState = true">
             <span></span>
             <span>添加</span>
           </div>
-          <div
-            class="delBtn listBtn"
-            @click="deleteItem(materialItmes)"
-          >
+          <div class="delBtn listBtn" @click="deleteItem(materialItmes)">
             <span></span>
             <span>删除</span>
           </div>
@@ -136,153 +84,154 @@
 </template>
 
 <script>
-import navBar from '@/components/navBar.vue'
-import moment from 'moment'
-import { Toast } from 'mint-ui'
+import navBar from "@/components/navBar.vue";
+import moment from "moment";
+import { Toast } from "mint-ui";
 export default {
-  name: 'home',
+  name: "home",
   components: {
-    'nav-bar': navBar
+    "nav-bar": navBar
   },
-  data () {
+  data() {
     return {
-      moduleName: '企业信息',
-      enterid: '',
-      listHeader: ['产品', '年产量'],
-      listHeaderFactor: ['原辅材料', '材料年使用量'],
-      levelArr: ['国控', '省控', '市控/重点', '区控/非重点'],
-      productionStateArr: ['正常营业', '停业', '关闭'],
+      moduleName: "企业信息",
+      enterid: "",
+      listHeader: ["产品", "年产量"],
+      listHeaderFactor: ["原辅材料", "材料年使用量"],
+      levelArr: ["国控", "省控", "市控/重点", "区控/非重点"],
+      productionStateArr: ["正常营业", "停业", "关闭"],
       productItems: [],
       materialItmes: [],
       proItemData: {
-        name: '',
-        value: '',
-        unit: ''
+        name: "",
+        value: "",
+        unit: ""
       },
       matItemData: {
-        name: '',
-        value: '',
-        unit: ''
+        name: "",
+        value: "",
+        unit: ""
       },
       productItemsState: false,
       materialItmesState: false
-    }
+    };
   },
   computed: {
-    list () {
-      return this.$store.state.pollSourceInfoHeader
+    list() {
+      return this.$store.state.pollSourceInfoHeader;
     }
   },
-  created () {
-    this.enterid = this.$route.params.id
-    this.$store.state.enterId = this.enterid
-    this.$store.state.enterid = this.enterid
-    this.$store.commit('set_enterpriseid', this.enterid)
-    this.getPollSourceList()
+  created() {
+    // this.enterid = this.$route.params.id;
+    this.enterid = "75ae3c94-93f7-412a-8d03-5cf4554122c8";
+    this.$store.state.enterId = this.enterid;
+    this.$store.state.enterid = this.enterid;
+    this.$store.commit("set_enterpriseid", this.enterid);
+    this.getPollSourceList();
   },
   methods: {
-    getPollSourceList () {
+    getPollSourceList() {
       const payload = {
         id: this.enterid
-      }
+      };
       this.$api.getZGEnterpriseByid(payload).then(res => {
         if (res) {
           this.list.forEach((item, index) => {
             if (res[item.key] === 0 || res[item.key]) {
-              if (item.key.includes('date') || item.key.includes('Time')) {
-                item.value = moment(res[item.key]).format('YYYY-MM-DD')
-              } else if (item.key === 'level') {
-                item.value = this.levelArr[res[item.key] - 1]
+              if (item.key.includes("date") || item.key.includes("Time")) {
+                item.value = moment(res[item.key]).format("YYYY-MM-DD");
+              } else if (item.key === "level") {
+                item.value = this.levelArr[res[item.key] - 1];
               } else {
-                item.value = res[item.key]
+                item.value = res[item.key];
               }
-              this.$set(this.list, index, item)
-            } else if (item.key === 'lat-lng') {
-              item.value = `${res['lng']}E，${res['lat']}N`
-            } else if (item.key === 'region') {
-              item.value = `${res['province']} ${res['city']} ${res['district']}`
+              this.$set(this.list, index, item);
+            } else if (item.key === "lat-lng") {
+              item.value = `${res["lng"]}E，${res["lat"]}N`;
+            } else if (item.key === "region") {
+              item.value = `${res["province"]} ${res["city"]} ${res["district"]}`;
             }
-            if (item.value && typeof item.value === 'string') {
-              item.value = item.value.replace(null, '')
-              item.value = item.value.replace(undefined, '')
+            if (item.value && typeof item.value === "string") {
+              item.value = item.value.replace(null, "");
+              item.value = item.value.replace(undefined, "");
             }
-          })
-          this.productItems = res.productItems
-          this.materialItmes = res.materialItmes
+          });
+          this.productItems = res.productItems;
+          this.materialItmes = res.materialItmes;
         }
-      })
+      });
       this.$api.getZGEnterpriseExtendByid(payload).then(res => {
         if (res) {
           this.list.forEach((item, index) => {
             if (res[item.key] === 0 || res[item.key]) {
-              if (item.key.includes('date') || item.key.includes('Time')) {
-                item.value = moment(res[item.key]).format('YYYY-MM-DD')
-              } else if (item.key === 'isMonitoring') {
-                item.value = res[item.key] ? '是' : '否'
-              } else if (item.key === 'productionState') {
-                item.value = this.productionStateArr[res[item.key] - 1]
+              if (item.key.includes("date") || item.key.includes("Time")) {
+                item.value = moment(res[item.key]).format("YYYY-MM-DD");
+              } else if (item.key === "isMonitoring") {
+                item.value = res[item.key] ? "是" : "否";
+              } else if (item.key === "productionState") {
+                item.value = this.productionStateArr[res[item.key] - 1];
               } else {
-                item.value = res[item.key]
+                item.value = res[item.key];
               }
-              this.$set(this.list, index, item)
+              this.$set(this.list, index, item);
             }
-          })
+          });
         }
-      })
+      });
     },
-    selectItem (arr, index) {
-      let selecteItem = arr[index]
+    selectItem(arr, index) {
+      let selecteItem = arr[index];
       arr.forEach(item => {
-        item.class = ''
-      })
-      selecteItem.class = 'selected'
-      this.$set(arr, index, selecteItem)
+        item.class = "";
+      });
+      selecteItem.class = "selected";
+      this.$set(arr, index, selecteItem);
     },
-    deleteItem (arr) {
+    deleteItem(arr) {
       arr.forEach((item, index) => {
-        if (item.class === 'selected') {
-          arr.splice(index, 1)
+        if (item.class === "selected") {
+          arr.splice(index, 1);
         }
-      })
+      });
     },
-    addProItem () {
+    addProItem() {
       for (let key in this.proItemData) {
         if (!this.proItemData[key]) {
-          Toast('不能为空！')
-          return false
+          Toast("不能为空！");
+          return false;
         }
       }
-      let data = JSON.parse(JSON.stringify(this.proItemData))
-      data.id = this.$uuid()
-      data.rowState = 'add'
-      this.productItems.push(data)
+      let data = JSON.parse(JSON.stringify(this.proItemData));
+      data.id = this.$uuid();
+      data.rowState = "add";
+      this.productItems.push(data);
       this.proItemData = {
-        name: '',
-        value: '',
-        unit: ''
-      }
-      this.productItemsState = false
+        name: "",
+        value: "",
+        unit: ""
+      };
+      this.productItemsState = false;
     },
-    addMatItem () {
+    addMatItem() {
       for (let key in this.matItemData) {
         if (!this.matItemData[key]) {
-          Toast('不能为空！')
-          return false
+          Toast("不能为空！");
+          return false;
         }
       }
-      let data = JSON.parse(JSON.stringify(this.matItemData))
-      data.id = this.$uuid()
-      data.rowState = 'add'
-      this.materialItmes.push(data)
+      let data = JSON.parse(JSON.stringify(this.matItemData));
+      data.id = this.$uuid();
+      data.rowState = "add";
+      this.materialItmes.push(data);
       this.matItemData = {
-        name: '',
-        value: '',
-        unit: ''
-      }
-      this.materialItmesState = false
+        name: "",
+        value: "",
+        unit: ""
+      };
+      this.materialItmesState = false;
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

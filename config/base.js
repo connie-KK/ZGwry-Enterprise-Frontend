@@ -1,7 +1,7 @@
 const glob = require('glob')
 const pagesConfig = require('./tpl.config')
 const pages = {}
-const customDiretory = 'dashboard'
+const customDiretory = 'viewPages'
 pages['index'] = {
   entry: 'src/views/app.js',
   template: 'public/index.html',

@@ -1,9 +1,9 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import App from '@/views/dashboard/dashboard.vue'
+import App from '@/views/viewPages/viewPages.vue'
 
-import router from '@/router/dashboard'
+import router from '@/router/viewPages'
 import store from '@/store'
 import Navigation from 'vue-navigation'
 Vue.use(Navigation, {

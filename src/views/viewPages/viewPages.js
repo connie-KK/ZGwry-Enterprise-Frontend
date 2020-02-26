@@ -31,6 +31,7 @@ import '@/assets/icons/back'
 import '@/assets/icons/right'
 import '@/assets/icons/location'
 import '@/assets/icons/attachment'
+import '@/assets/icons/search'
 
 import HeaderBar from '@/components/HeaderBar.vue'
 Vue.component('HeaderBar', HeaderBar)

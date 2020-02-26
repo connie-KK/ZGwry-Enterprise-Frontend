@@ -12,17 +12,26 @@ Vue.use(Router)
 
 export default new Router({
   base: `${process.env.BASE_URL}/viewPages`,
-  routes: [
-    // {
-    //   path: '/home/:id',
-    //   name: 'home',
-    //   component: () => import('@/views/viewPages/home/index.vue')
-    // },
+  routes: [{
+      path: '/homePage/:id',
+      name: 'homePage',
+      component: () => import('@/views/viewPages/homePage/index.vue')
+    },
     {
       path: '/home',
       name: 'home',
       component: () => import('@/views/viewPages/home/index.vue')
     },
+    {
+      path: '/entlist/:id',
+      name: 'entlist',
+      component: () => import('@/views/viewPages/list/index.vue')
+    },
+    // {
+    //   path: '/homePage',
+    //   name: 'homePage',
+    //   component: () => import('@/views/viewPages/homePage/index.vue')
+    // },
     {
       path: '/emissions',
       name: 'emissions',
@@ -72,6 +81,96 @@ export default new Router({
       path: '/envParams',
       name: 'envParams',
       component: () => import('@/views/viewPages/envParams/index.vue')
+    },
+    {
+      path: '/taskList/:id',
+      name: 'taskList',
+      component: () => import('@/views/viewPages/wghTask/taskList.vue')
+    },
+    {
+      path: '/putTask/:id',
+      name: 'putTask',
+      component: () => import('@/views/viewPages/wghTask/putTask.vue')
+    },
+    {
+      path: '/taskModelList',
+      name: 'taskModelList',
+      component: () => import('@/views/viewPages/wghTask/taskModelList.vue')
+    },
+    {
+      path: '/taskLinkEntList',
+      name: 'taskLinkEntList',
+      component: () => import('@/views/viewPages/wghTask/taskLinkEntList.vue')
+    },
+    {
+      path: '/taskAssign',
+      name: 'taskAssign',
+      component: () => import('@/views/viewPages/wghTask/taskAssign.vue')
+    },
+    {
+      path: '/taskLinkEventList',
+      name: 'taskLinkEventList',
+      component: () => import('@/views/viewPages/wghTask/taskLinkEventList.vue')
+    },
+    {
+      path: '/taskResult/:id',
+      name: 'taskResult',
+      component: () => import('@/views/viewPages/wghTask/taskResult.vue')
+    },
+    {
+      path: '/taskAssess/:id',
+      name: 'taskAssess',
+      component: () => import('@/views/viewPages/wghTask/taskAssess.vue')
+    },
+    {
+      path: '/taskAssessC/:id',
+      name: 'taskAssessC',
+      component: () => import('@/views/viewPages/wghTask/taskAssessC.vue')
+    },
+    {
+      path: '/mapPosition',
+      name: 'mapPosition',
+      component: () => import('@/views/viewPages/wghTask/mapPosition.vue')
+    },
+    {
+      path: '/eventList',
+      name: 'eventList',
+      component: () => import('@/views/viewPages/wghEvent/eventList.vue')
+    },
+    {
+      path: '/eventContent/:id',
+      name: 'eventContent',
+      component: () => import('@/views/viewPages/wghEvent/eventContent.vue')
+    },
+    {
+      path: '/eventDetail/:id',
+      name: 'eventDetail',
+      component: () => import('@/views/viewPages/wghEvent/eventDetail.vue')
+    },
+    {
+      path: '/eventDetailLevel1/:id',
+      name: 'eventDetailLevel1',
+      component: () => import('@/views/viewPages/wghEvent/eventDetailLevel1.vue')
+    },
+    {
+      path: '/eventMap/:id',
+      name: 'eventMap',
+      component: () => import('@/views/viewPages/wghEvent/eventMap.vue')
+    },
+    {
+      path: '/enterpriseList',
+      name: 'enterpriseList',
+      component: () => import('@/views/viewPages/wghEvent/enterpriseList.vue')
+    },
+    {
+      path: '/msgList',
+      name: 'msgList',
+      component: () => import('@/views/viewPages/wghEvent/msgList.vue')
+    },
+    {
+      path: '/msgDetail/:id',
+      name: 'msgDetail',
+      component: () => import('@/views/viewPages/wghEvent/msgDetail.vue')
     },
     {
       path: '*',

@@ -1167,6 +1167,13 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
+"@ztree/ztree_v3@^3.5.40":
+  version "3.5.42"
+  resolved "http://r.cnpmjs.org/@ztree/ztree_v3/download/@ztree/ztree_v3-3.5.42.tgz#36ed1ca3d72973af1c308baf6627892b4d79129e"
+  integrity sha1-Nu0co9cpc68cMIuvZieJK015Ep4=
+  dependencies:
+    jquery ">=1.4.4"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -5583,6 +5590,11 @@ javascript-stringify@^1.6.0:
   resolved "https://registry.yarnpkg.com/javascript-stringify/-/javascript-stringify-1.6.0.tgz#142d111f3a6e3dae8f4a9afd77d45855b5a9cce3"
   integrity sha1-FC0RHzpuPa6PSpr9d9RYVbWpzOM=
 
+jquery@>=1.4.4, jquery@^3.4.1:
+  version "3.4.1"
+  resolved "http://r.cnpmjs.org/jquery/download/jquery-3.4.1.tgz#714f1f8d9dde4bdfa55764ba37ef214630d80ef2"
+  integrity sha1-cU8fjZ3eS9+lV2S6N+8hRjDYDvI=
+
 js-base64@^2.1.8:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.5.1.tgz#1efa39ef2c5f7980bb1784ade4a8af2de3291121"
@@ -9307,6 +9319,14 @@ vue-eslint-parser@^5.0.0:
     espree "^4.1.0"
     esquery "^1.0.1"
     lodash "^4.17.11"
+
+vue-giant-tree@^0.1.2:
+  version "0.1.2"
+  resolved "http://r.cnpmjs.org/vue-giant-tree/download/vue-giant-tree-0.1.2.tgz#70cbaaabe1f82e10f59d086dc1188b2621dc54a3"
+  integrity sha1-cMuqq+H4LhD1nQhtwRiLJiHcVKM=
+  dependencies:
+    "@ztree/ztree_v3" "^3.5.40"
+    jquery "^3.4.1"
 
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"

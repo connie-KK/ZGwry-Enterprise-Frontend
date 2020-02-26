@@ -1,6 +1,9 @@
 <template>
   <div>
-    <header-bar>{{ moduleName }}</header-bar>
+    <header-bar
+      leftIcon="back"
+      leftText="返回"
+    >{{ moduleName }}</header-bar>
     <div class="main-content">
       <nav-bar :selected="6"></nav-bar>
       <div class="main-content-box">
@@ -11,7 +14,10 @@
             <span>执法人</span>
             <span>现场检查编号</span>
           </li>
-          <li v-for="item in list1" :key="item.id">
+          <li
+            v-for="item in list1"
+            :key="item.id"
+          >
             <span>{{ moment(item.date).format('YYYY-MM-DD HH:mm') }}</span>
             <span>{{ item.staff }}</span>
             <span>{{ item.title }}</span>
@@ -25,7 +31,10 @@
             <span>投诉时间</span>
             <span>现场检查编号</span>
           </li>
-          <li v-for="item in list2" :key="item.id">
+          <li
+            v-for="item in list2"
+            :key="item.id"
+          >
             <span>{{ item.content }}</span>
             <span>{{ item.staff }}</span>
             <span>{{ moment(item.date).format('YYYY-MM-DD HH:mm') }}</span>
@@ -45,7 +54,7 @@ export default {
   components: {
     'nav-bar': navBar
   },
-  data() {
+  data () {
     return {
       moduleName: '企业信息',
       moment: moment,
@@ -53,12 +62,12 @@ export default {
       list2: []
     }
   },
-  mounted() {
+  mounted () {
     this.getZGTaskList('list1', 1)
     this.getZGTaskList('list2', 4)
   },
   methods: {
-    getZGTaskList(key, type) {
+    getZGTaskList (key, type) {
       this.$api
         .getZGTaskList({
           enterid: this.$store.state.enterId,
@@ -75,7 +84,7 @@ export default {
           this.getUsers()
         })
     },
-    getUsers(users) {
+    getUsers (users) {
       this.$api.getUserByArrUserID({ items: users }).then(res => {
         let data = JSON.parse(JSON.stringify(this.users))
         res.forEach(item => {

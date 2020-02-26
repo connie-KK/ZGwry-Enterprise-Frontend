@@ -1,20 +1,29 @@
 <template>
   <div>
-    <header-bar>{{ moduleName }}</header-bar>
+    <header-bar
+      leftIcon="back"
+      leftText="返回"
+    >{{ moduleName }}</header-bar>
     <div class="main-content">
-      <nav-bar :selected="selectedTab"
-               :list="tabList"></nav-bar>
+      <nav-bar
+        :selected="selectedTab"
+        :list="tabList"
+      ></nav-bar>
       <div class="second-tab">
         <mt-navbar v-model="selectedSubTab">
-          <mt-tab-item v-for="secondItem in tabList"
-                       :id="secondItem.id"
-                       :key="secondItem.id">{{ secondItem.name }}</mt-tab-item>
+          <mt-tab-item
+            v-for="secondItem in tabList"
+            :id="secondItem.id"
+            :key="secondItem.id"
+          >{{ secondItem.name }}</mt-tab-item>
         </mt-navbar>
       </div>
       <div class="main-content-box">
-        <div class="list list2"
-             v-for="(item, index) in list"
-             :key="index">
+        <div
+          class="list list2"
+          v-for="(item, index) in list"
+          :key="index"
+        >
           <div class="first-line">
             <span>{{ item.facilityname }}</span>
             <span @click="toDetail(item)">详情</span>
@@ -28,8 +37,10 @@
         </div>
       </div>
       <div class="footer">
-        <div class="submitBtn"
-             @click="addItem">
+        <div
+          class="submitBtn"
+          @click="addItem"
+        >
           <span></span>
           <span>新增</span>
         </div>

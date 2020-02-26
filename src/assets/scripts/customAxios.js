@@ -51,10 +51,14 @@ const customAxios = (prefix = '') => {
 
 const serviceApi = customAxios('/api')
 const serviceEnt = customAxios('/ent')
+const serviceEnv = customAxios('/env')
 const serviceStoken = customAxios('/stoken')
+const serviceMyserv = customAxios('/myserv')
 
 export default {
   serviceApi,
   serviceEnt,
-  serviceStoken
+  serviceEnv,
+  serviceStoken,
+  serviceMyserv
 }

@@ -1,6 +1,9 @@
 <template>
   <div>
-    <header-bar>{{ moduleName }}</header-bar>
+    <header-bar
+      leftIcon="back"
+      leftText="返回"
+    >{{ moduleName }}</header-bar>
     <mt-datetime-picker
       type="date"
       ref="datePicker1"

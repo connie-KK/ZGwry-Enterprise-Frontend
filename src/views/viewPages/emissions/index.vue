@@ -1,6 +1,9 @@
 <template>
   <div>
-    <header-bar>{{ moduleName }}</header-bar>
+    <header-bar
+      leftIcon="back"
+      leftText="返回"
+    >{{ moduleName }}</header-bar>
     <div class="main-content">
       <nav-bar
         :selected="selectedTab"

@@ -1,5 +1,6 @@
 name='ysfe'
-cd $PROJECTS/vue/cst-ys
+# cd $PROJECTS/vue/cst-ys
+cd D:/work/ZGwry-Enterprise-Frontend
 
 echo "building source..."
 npm run site --name=yishui

@@ -34,7 +34,7 @@ export default {
     return {
       mySelected: this.selected,
       list: [
-        { id: 1, name: '企业信息', router: '/home' },
+        { id: 1, name: '企业信息', router: '/homePage' },
         { id: 2, name: '许可证/相关文件', router: '/license' },
         { id: 3, name: '环境属性', router: '/envParams' },
         { id: 4, name: '排放信息', router: '/emissions' },
@@ -59,8 +59,8 @@ export default {
         this.list.filter(item => {
           return item.id === this.mySelected
         })[0].router
-      if (router === '/home') {
-        router = '/home/' + this.$store.state.enterId
+      if (router === '/homePage') {
+        router = '/homePage/' + this.$store.state.enterId
       }
       this.$router.replace(router)
     }

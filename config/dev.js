@@ -29,10 +29,22 @@ const devConfig = merge(baseConfig, {
           '^/ent': ''
         }
       },
+      '/env': {
+        target: 'http://183.220.144.57:30003',
+        pathRewrite: {
+          '^/env': ''
+        }
+      },
       '/stoken': {
         target: 'http://183.220.144.57:30000',
         pathRewrite: {
           '^/stoken': ''
+        }
+      },
+      '/myserv': {
+        target: 'http://183.220.144.57:30001',
+        pathRewrite: {
+          '^/myserv': ''
         }
       }
     },

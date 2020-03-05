@@ -677,7 +677,7 @@ const interfaces = [
     fun: 'getTaskHandleDetail',
     interface: '/api/GBM/GetTaskHandleDetail',
     type: 'post',
-    serviceName: 'serviceMyserv'
+    serviceName: 'serviceEnt'
   },
   {
     //获取污染源企业列表

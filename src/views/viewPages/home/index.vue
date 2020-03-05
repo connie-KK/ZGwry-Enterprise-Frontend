@@ -99,17 +99,20 @@ export default {
                 {
                   name: '待办任务',
                   imgUrl: require('@/assets/images/b1.png'),
-                  url: '/taskList/0'
+                  url: '/taskList/0',
+                  params: 'WGH'
                 },
                 {
                   name: '任务列表',
                   imgUrl: require('@/assets/images/b2.png'),
-                  url: '/taskList/0'
+                  url: '/taskList/0',
+                  params: 'WGH'
                 },
                 {
                   name: '发布任务',
                   imgUrl: require('@/assets/images/b3.png'),
-                  url: '/putTask/0'
+                  url: '/putTask/0',
+                  params: 'WGH'
                 },
                 // {
                 //   name: '',
@@ -119,17 +122,20 @@ export default {
                 {
                   name: '待办事件',
                   imgUrl: require('@/assets/images/b4.png'),
-                  url: '/eventList'
+                  url: '/eventList',
+                  params: 'WGH'
                 },
                 {
                   name: '事件列表',
                   imgUrl: require('@/assets/images/b5.png'),
-                  url: '/eventList'
+                  url: '/eventList',
+                  params: 'WGH'
                 },
                 {
                   name: '事件上报',
                   imgUrl: require('@/assets/images/b6.png'),
-                  url: '/eventContent/-1'
+                  url: '/eventContent/-1',
+                  params: 'WGH'
                 }
               ]
             }
@@ -145,17 +151,20 @@ export default {
                 {
                   name: '待办任务',
                   imgUrl: require('@/assets/images/c1.png'),
-                  url: '/overViewWater'
+                  url: '/overViewWater',
+                  params: 'HBGJ'
                 },
                 {
                   name: '任务列表',
                   imgUrl: require('@/assets/images/c2.png'),
-                  url: '/overViewWater'
+                  url: '/overViewWater',
+                  params: 'HBGJ'
                 },
                 {
                   name: '发布任务',
                   imgUrl: require('@/assets/images/c3.png'),
-                  url: '/overViewWater'
+                  url: '/overViewWater',
+                  params: 'HBGJ'
                 }
               ]
             }

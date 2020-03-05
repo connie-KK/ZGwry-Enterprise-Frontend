@@ -3,13 +3,14 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
-      :isShowSearch="isShowSearch"
+      :isShowSearchIcon="isShowSearchIcon"
       :showBorder="isShowBorder"
       :serachFun="toSearchList"
+      :toggleSearchBox="toToggleSearchBox"
     >
       {{ moduleName }}
     </header-bar>
-    <div class="main-content">
+    <div :class="[isShowSearchBox?'main-content-with-search':'','main-content']">
       <ul
         class="ul-box"
         ref="srollbox"
@@ -36,7 +37,8 @@ export default {
     return {
       moduleName: '企业列表',
       searchKey: '',
-      isShowSearch: true,
+      isShowSearchIcon: true,
+      isShowSearchBox: false,
       isShowBorder: false,
       list: [],
       pageIndex: 0,
@@ -78,6 +80,9 @@ export default {
       this.list = []
       this.getList()
     },
+    toToggleSearchBox(e) {
+      this.isShowSearchBox = e;
+    },
     clickItem (item) {
       if (this.$store.state.taskParams.taskenterprises.includes(item.id)) {
         Toast('该企业已存在！')
@@ -93,9 +98,8 @@ export default {
 <style lang="scss">
 #taskLinkEntList {
   .main-content {
-    top: 2.32rem;
     background: #fff;
-    height: calc(100% - 2.32rem);
+    height: 100%;
     p {
       padding: 0;
       margin: 0;

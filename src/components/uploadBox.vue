@@ -2,20 +2,15 @@
   <div class="uploadBox">
     <input
       type="file"
+      accept="image/*"
       name="file"
       id="myfile"
       @change="changeData(this)"
     />
     <ul>
-      <li
-        v-for="(item,index) in myData"
-        :key="index + 'llist'"
-      >
-        <img :src="item.url" />
-        <span
-          @click="deleteItem(item)"
-          v-if="showDelete"
-        >×</span>
+      <li v-for="(item, index) in myData" :key="index + 'llist'">
+        <img :src="item.url" @click="$emit('clickimg', index)" />
+        <span @click="deleteItem(item)" v-if="showDelete">×</span>
       </li>
     </ul>
   </div>
@@ -39,22 +34,28 @@ export default {
     showDelete: {
       type: Boolean,
       default: true
+    },
+    initt: {
+      type: String,
+      default: 'none'
     }
   },
-  data () {
+  data() {
     return {
       myData: this.data
     }
   },
-  watch: {
-
-  },
-  mounted () { },
+  watch: {},
+  mounted() {},
   methods: {
-    addItem () {
-      window.myfile.click()
+    addItem() {
+      if (this.initt === 'dingding') {
+        this.uploadImg()
+      } else {
+        window.myfile.click()
+      }
     },
-    changeData () {
+    changeData() {
       let files = document.getElementById('myfile').files
       this.$emit('upload', files)
       if (this.autoShow) {
@@ -69,7 +70,13 @@ export default {
         }
       }
     },
-    deleteItem (data) {
+    async uploadImg() {
+      let imgs = await window.dingtalk.chooseImage({
+        count: 5
+      })
+      this.$emit('upload', imgs.filePaths)
+    },
+    deleteItem(data) {
       this.$emit('deleteItem', data)
     }
   }

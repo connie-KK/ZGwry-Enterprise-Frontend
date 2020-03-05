@@ -3,13 +3,14 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
-      :isShowSearch="isShowSearch"
+      :isShowSearchIcon="isShowSearchIcon"
       :showBorder="isShowBorder"
       :serachFun="toSearchList"
+      :toggleSearchBox="toToggleSearchBox"
     >
       {{ moduleName }}
     </header-bar>
-    <div class="main-content">
+    <div :class="[isShowSearchBox?'main-content-with-search':'','main-content']">
       <div class="map-container">
         <div id="map-container"></div>
         <img class="center-position" src="@/assets/images/location2.png" />
@@ -45,7 +46,8 @@ export default {
     return {
       moduleName: '相关位置',
       searchKey: '',
-      isShowSearch: true,
+      isShowSearchIcon: true,
+      isShowSearchBox: false,
       isShowBorder: false,
       zoom: 17,
       map: null,
@@ -71,6 +73,9 @@ export default {
   methods: {
     toSearchList(e) {
       this.getLnglat(e)
+    },
+    toToggleSearchBox(e) {
+      this.isShowSearchBox = e;
     },
     initMap() {
       this.map = new AMap.Map('map-container', {
@@ -147,8 +152,7 @@ export default {
 }
 #mapPosition {
   .main-content {
-    height: calc(100% - 2.32rem);
-    top: 2.32rem;
+    height: 100%;
     .map-container {
       @include flexbox;
       @include justify-content(center);

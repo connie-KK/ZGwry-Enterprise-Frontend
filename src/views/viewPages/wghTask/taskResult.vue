@@ -3,27 +3,25 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
-      :isShowSearch="isShowSearch"
+      :isShowSearchIcon="isShowSearchIcon"
       :showBorder="isShowBorder"
     >
       {{ moduleName }}
     </header-bar>
-    <div
-      class="main-content"
-      v-if="data"
-    >
+    <div class="main-content" v-if="data">
       <div class="box-item">
         <span class="item-title">时间</span>
         <p class="checkbox2">{{ data.date1 }}</p>
       </div>
       <div class="box-item">
         <span class="item-title">网格/部门</span>
-        <p class="checkbox2">{{ data.parentName }}<span v-if="data.parentName && data.gridName">-</span>{{ data.gridName }}</p>
+        <p class="checkbox2">
+          {{ data.parentName
+          }}<span v-if="data.parentName && data.gridName">-</span
+          >{{ data.gridName }}
+        </p>
       </div>
-      <div
-        class="box-item"
-        @click="popupType = true"
-      >
+      <div class="box-item" @click="popupType = true">
         <span class="item-title">相关企业</span>
         <p class="checkbox">{{ enterName }}</p>
       </div>
@@ -40,11 +38,7 @@
           v-model="contentText"
           v-if="!id"
         ></textarea>
-        <div
-          class="remark-box"
-          v-if="id"
-          v-html="contentText"
-        ></div>
+        <div class="remark-box" v-if="id" v-html="contentText"></div>
       </div>
       <div class="box-item">
         <span class="item-title">图片</span>
@@ -61,13 +55,12 @@
           @upload="uploadData"
           @deleteItem="deleteItem"
           :showDelete="deleteState"
+          @clickimg="openImg"
+          :initt="initt"
         ></upload-box>
       </div>
       <div class="add-btn">
-        <button
-          @click="submit"
-          v-if="!id"
-        >确定</button>
+        <button @click="submit" v-if="!id">确定</button>
       </div>
     </div>
     <mt-popup
@@ -88,10 +81,10 @@
 <script>
 import moment from 'moment'
 import uploadBox from '@/components/uploadBox'
-import {
-  Popup,
-  Picker
-} from 'mint-ui'
+import { Popup, Picker } from 'mint-ui'
+import ImagePreview from 'vant/lib/image-preview'
+import 'vant/lib/image-preview/style'
+import cookie from 'js-cookie'
 export default {
   name: 'taskResult',
   components: {
@@ -99,16 +92,17 @@ export default {
     'mt-popup': Popup,
     'mt-picker': Picker
   },
-  data () {
+  data() {
     return {
       moduleName: '任务执行结果',
       searchKey: '',
-      isShowSearch: false,
+      isShowSearchIcon: false,
       isShowBorder: true,
       id: '',
       contentText: '',
       imgData: [],
       popupType: false,
+      initt: 'none',
       data: {
         task: '',
         date1: moment().format('YYYY-MM-DD HH:00:00'),
@@ -124,16 +118,16 @@ export default {
     }
   },
   computed: {
-    deleteState () {
+    deleteState() {
       return !this.id
     },
-    taskEnter () {
+    taskEnter() {
       return this.$store.state.taskEnter
     },
-    userAssInfoList () {
+    userAssInfoList() {
       return this.$store.state.userAssInfoList
     },
-    slots () {
+    slots() {
       let temp = [
         {
           id: '',
@@ -150,7 +144,7 @@ export default {
       ]
     }
   },
-  mounted () {
+  mounted() {
     this.id = this.$route.params.id
     if (this.id && !this.id.includes('X-')) {
       this.getData()
@@ -161,7 +155,7 @@ export default {
     }
   },
   methods: {
-    submit () {
+    submit() {
       let params = JSON.parse(JSON.stringify(this.data))
       let atts = []
       this.imgData.forEach(img => {
@@ -178,7 +172,7 @@ export default {
         this.$router.go(-1)
       })
     },
-    onValuesChange (e) {
+    onValuesChange(e) {
       if (e.values.length) {
         this.data.enterprise = e.values[0].id
         this.enterName = e.values[0].name
@@ -188,49 +182,86 @@ export default {
         this.enterName = '《和企业/污染源无关》'
       }
     },
-    getData () {
-      this.$api.getTaskHandleDetail({
-        id: this.id
-      }).then(res => {
-        if (res) {
-          res.date1 = moment(res.date).format('YYYY-MM-DD')
-          this.data = res
-          res.attachments.forEach(item => {
-            if (item.url.includes('Content') && !item.url.includes(this.$360url)) {
-              item.url = this.$360url + item.url
-              this.imgData.push(item)
+    getData() {
+      this.$api
+        .getTaskHandleDetail({
+          id: this.id
+        })
+        .then(res => {
+          if (res) {
+            res.date1 = moment(res.date).format('YYYY-MM-DD')
+            this.data = res
+            res.attachments.forEach(item => {
+              if (
+                item.url.includes('Content') &&
+                !item.url.includes(this.$360url)
+              ) {
+                item.url = this.$360url + item.url
+                this.imgData.push(item)
+              }
+            })
+            this.contentText = res.results
+            this.getUserName(res.staff)
+          }
+        })
+    },
+    async uploadData(e) {
+      if (this.initt === 'dingding') {
+        let imgarr = []
+        for (let i = 0; i < e.length; i++) {
+          let x = await window.dingtalk.uploadFile({
+            url: 'https://zsxt.azuratech.com:8002/api/GBM/UploadAttachment',
+            filePath: e[i],
+            fileName: 'image',
+            fileType: 'image',
+            header: {
+              'content-type': 'multipart/form',
+              Authorization: `Bearer ${cookie.get('AzuraCookie')}`
             }
           })
-          this.contentText = res.results
-          this.getUserName(res.staff)
+          if (x.data && x.data.includes('id')) {
+            let img = JSON.parse(x.data)
+            imgarr.push(img[0])
+          }
         }
-      })
-    },
-    uploadData (e) {
-      let data = new FormData()
-      for (let i = 0; i < e.length; i++) {
-        data.append('file' + i, e[i])
-      }
-      this.$api.uploadAttachment(data).then(res => {
-        res.forEach(item => {
-          if (item.url.includes('Content') && !item.url.includes(this.$360url)) {
+        imgarr.forEach(item => {
+          if (
+            item.url.includes('Content') &&
+            !item.url.includes(this.$360url)
+          ) {
             item.url = this.$360url + item.url
           }
         })
-        this.imgData.push(...res)
-      })
+        this.imgData.push(...imgarr)
+      } else {
+        let data = new FormData()
+        for (let i = 0; i < e.length; i++) {
+          data.append('file' + i, e[i])
+        }
+        this.$api.uploadAttachment(data).then(res => {
+          res.forEach(item => {
+            if (
+              item.url.includes('Content') &&
+              !item.url.includes(this.$360url)
+            ) {
+              item.url = this.$360url + item.url
+            }
+          })
+          this.imgData.push(...res)
+        })
+      }
     },
-    deleteItem (e) {
+    deleteItem(e) {
       this.imgData.forEach((item, index) => {
         if (item.url === e.url) {
           this.imgData.splice(index, 1)
         }
       })
     },
-    addPic () {
+    addPic() {
       this.$refs.upload.addItem()
     },
-    getUserName (id) {
+    getUserName(id) {
       this.$api
         .getUserByArrUserID({
           items: [id]
@@ -239,7 +270,7 @@ export default {
           this.staffName = res[0].username
         })
     },
-    getUser () {
+    getUser() {
       this.$api.getUser().then(res => {
         if (res) {
           this.data.staff = res.id
@@ -248,7 +279,7 @@ export default {
         }
       })
     },
-    getStaffInfo (id) {
+    getStaffInfo(id) {
       this.$api
         .getStaffInfo({
           id
@@ -264,6 +295,18 @@ export default {
             })
           }
         })
+    },
+    openImg(index) {
+      let imgs = []
+      this.imgData.forEach(item => {
+        imgs.push(item.url)
+      })
+      console.log(ImagePreview)
+      ImagePreview({
+        images: imgs,
+        startPosition: index,
+        closeable: true
+      })
     }
   }
 }
@@ -308,6 +351,7 @@ export default {
     top: 1.29rem;
     background: #fff;
     height: calc(100% - 2.62rem);
+    overflow-y: auto;
     .pic-box {
       height: 0.31rem;
       float: right;
@@ -365,7 +409,7 @@ export default {
         text-align: right;
         font-size: 0.3rem;
         color: #9e9e9e;
-        background: url("../../../assets/images/right.png") no-repeat right
+        background: url('../../../assets/images/right.png') no-repeat right
           center;
         background-size: auto 0.32rem;
       }
@@ -385,7 +429,7 @@ export default {
         position: relative;
         margin-top: 0.2rem;
         &::before {
-          content: "+";
+          content: '+';
           border: 0.02rem solid #3296fa;
           border-radius: 50%;
           line-height: 0.3rem;
@@ -412,7 +456,7 @@ export default {
           position: relative;
           i.delete {
             &::before {
-              content: "-";
+              content: '-';
               border: 0.02rem solid #3296fa;
               border-radius: 50%;
               line-height: 0.3rem;
@@ -429,7 +473,7 @@ export default {
             }
           }
           i.jump {
-            background: #f8f8f8 url("../../../assets/images/right.png")
+            background: #f8f8f8 url('../../../assets/images/right.png')
               no-repeat right center;
             background-size: auto 0.32rem;
             right: 0.4rem;

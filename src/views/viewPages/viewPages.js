@@ -49,6 +49,8 @@ Vue.prototype.$uuid = () => {
   })
 }
 
+Vue.prototype.$360url = '/ent/'
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

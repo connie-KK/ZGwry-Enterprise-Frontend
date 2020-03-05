@@ -9253,10 +9253,10 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vant@^2.4.7:
-  version "2.4.7"
-  resolved "http://r.cnpmjs.org/vant/download/vant-2.4.7.tgz#d51b555f5998a38b6dceac14f795f9f63d8a708f"
-  integrity sha1-1RtVX1mYo4ttzqwU95X59j2KcI8=
+vant@^2.5.3:
+  version "2.5.3"
+  resolved "http://r.cnpmjs.org/vant/download/vant-2.5.3.tgz#1c34ea853a2db62c6c6dcc45b4673ab27696c82e"
+  integrity sha1-HDTqhTottixsbcxFtGc6snaWyC4=
   dependencies:
     "@babel/runtime" "7.x"
     "@vant/icons" "1.2.1"

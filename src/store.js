@@ -720,6 +720,7 @@ export default new Vuex.Store({
     toTaskEvent: '',
     toTaskEventTitle: '',
     isAddTaskState: 0,
+    initType: 'HBGJ', // HBGJ WGH
     // 任务
     allDep: [],
     gridCell: null,
@@ -734,7 +735,7 @@ export default new Vuex.Store({
       staffName: '',
       date: '',
       deadline: '',
-      type: 1,
+      type: 0,
       state: 0,
       taskenterprises: [],
       taskcoords: [],

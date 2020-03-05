@@ -3,7 +3,7 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
-      :isShowSearch="isShowSearch"
+      :isShowSearchIcon="isShowSearchIcon"
       :showBorder="isShowBorder"
     >
       {{ moduleName }}
@@ -100,7 +100,7 @@ export default {
     return {
       moduleName: '任务考核',
       searchKey: '',
-      isShowSearch: false,
+      isShowSearchIcon: false,
       isShowBorder: true,
       id: '',
       contentText: '',

@@ -3,26 +3,20 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
-      :isShowSearch="isShowSearch"
+      :isShowSearchIcon="isShowSearchIcon"
       :showBorder="isShowBorder"
     >
       {{ moduleName }}
     </header-bar>
     <div class="main-content">
-      <ul class="ul-box">
-        <li @click="popupVisible1 = true">
+      <ul class="ul-box" :class="isEdit ? '' : 'notbk'">
+        <li @click="isEdit ? (popupVisible1 = true) : false">
           <p>{{ depType }}</p>
         </li>
-        <li
-          @click="popupVisible2 = true"
-          v-if="!isManyCell"
-        >
+        <li @click="isEdit ? (popupVisible2 = true) : false" v-if="!isManyCell">
           <p>{{ depStaff }}</p>
         </li>
-        <li
-          @click="popupVisible3 = true"
-          v-if="!isManyCell"
-        >
+        <li @click="isEdit ? (popupVisible3 = true) : false" v-if="!isManyCell">
           <p>{{ staffName }}</p>
         </li>
       </ul>
@@ -35,33 +29,21 @@
         :first="isFirst"
       ></check-tree>
     </div>
-    <mt-popup
-      v-model="popupVisible1"
-      position="bottom"
-      class="popup-box"
-    >
+    <mt-popup v-model="popupVisible1" position="bottom" class="popup-box">
       <mt-picker
         :slots="slotsType"
         @change="onValuesChangeType"
         valueKey="name"
       ></mt-picker>
     </mt-popup>
-    <mt-popup
-      v-model="popupVisible2"
-      position="bottom"
-      class="popup-box"
-    >
+    <mt-popup v-model="popupVisible2" position="bottom" class="popup-box">
       <mt-picker
         :slots="slotsDep"
         @change="onValuesChangeDep"
         valueKey="name"
       ></mt-picker>
     </mt-popup>
-    <mt-popup
-      v-model="popupVisible3"
-      position="bottom"
-      class="popup-box"
-    >
+    <mt-popup v-model="popupVisible3" position="bottom" class="popup-box">
       <mt-picker
         :slots="slotsPeople"
         @change="onValuesChangePeople"
@@ -81,12 +63,12 @@ export default {
     'mt-picker': Picker,
     checkTree
   },
-  data () {
+  data() {
     return {
       isFirst: true,
       moduleName: '指派给',
       searchKey: '',
-      isShowSearch: false,
+      isShowSearchIcon: false,
       isShowBorder: true,
       list: [],
       depList: [],
@@ -102,13 +84,16 @@ export default {
     }
   },
   computed: {
-    gridCell () {
+    isEdit() {
+      return this.$store.state.isEdit
+    },
+    gridCell() {
       return this.$store.state.gridCell
     },
-    checkGridCell () {
+    checkGridCell() {
       return this.$store.state.checkGridCell
     },
-    singleGridCell () {
+    singleGridCell() {
       if (!this.gridCell) {
         return []
       }
@@ -146,7 +131,7 @@ export default {
       })
       return temp
     },
-    depType () {
+    depType() {
       if (this.isManyCell) {
         return '多网格'
       }
@@ -154,7 +139,11 @@ export default {
         return this.$store.state.taskParams.depType === item.code
       })[0].name
     },
-    depStaff () {
+    depStaff() {
+      if (this.slotsDep[0].values.length && !this.$store.state.taskParams.dep) {
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.$store.state.taskParams.dep = this.slotsDep[0].values[0].id
+      }
       const dep = this.depList.filter(item => {
         return item.id === this.$store.state.taskParams.dep
       })
@@ -167,13 +156,9 @@ export default {
       if (dep2.length) {
         return dep2[0].name
       }
-      if (this.slotsDep[0].values.length) {
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.$store.state.taskParams.dep = this.slotsDep[0].values[0].id
-      }
       return '未指定'
     },
-    staffName () {
+    staffName() {
       let temp = '未指定'
       this.depList.forEach(item => {
         if (item.id === this.$store.state.taskParams.dep) {
@@ -195,7 +180,7 @@ export default {
       })
       return temp
     },
-    slotsType () {
+    slotsType() {
       let myIndex = 0
       this.typesList.forEach((item, index) => {
         if (item.code === this.$store.state.taskParams.depType) {
@@ -217,7 +202,7 @@ export default {
         }
       ]
     },
-    slotsDep () {
+    slotsDep() {
       let myIndex = 0
       let val
       if (this.depType === '部门') {
@@ -244,7 +229,7 @@ export default {
         }
       ]
     },
-    slotsPeople () {
+    slotsPeople() {
       let vals = [{ name: '未指定', id: '' }]
       let myIndex = 0
       if (this.depType === '部门') {
@@ -282,24 +267,24 @@ export default {
       ]
       return temp
     },
-    rrIsManyCell () {
+    rrIsManyCell() {
       return this.$store.state.taskParams.isManyCell
     }
   },
   watch: {
-    isManyCell () {
+    isManyCell() {
       this.$store.state.taskParams.isManyCell = this.isManyCell
     }
   },
-  mounted () {
+  mounted() {
     this.getAllDer()
     this.isManyCell = this.rrIsManyCell
   },
   methods: {
-    checkChange (e) {
+    checkChange(e) {
       this.$store.state.checkGridCell = e
     },
-    getAllDer () {
+    getAllDer() {
       let res = JSON.parse(JSON.stringify(this.$store.state.allDep))
       let userIds = []
       let deps = []
@@ -338,7 +323,7 @@ export default {
           }
         })
     },
-    onValuesChangeType (e) {
+    onValuesChangeType(e) {
       if (this.isFirst) {
         return
       }
@@ -349,13 +334,14 @@ export default {
         this.isManyCell = false
       }
     },
-    onValuesChangeDep (e) {
+    onValuesChangeDep(e) {
       if (!e.values.length || !e.values[0] || this.isFirst) {
         return
       }
+      console.log(e.values[0].id)
       this.$store.state.taskParams.dep = e.values[0].id
     },
-    onValuesChangePeople (e) {
+    onValuesChangePeople(e) {
       if (!e.values.length || !e.values[0] || this.isFirst) {
         return
       }
@@ -390,11 +376,16 @@ export default {
       height: 1.12rem;
       line-height: 1.12rem;
       padding: 0 0.32rem;
-      background: #fff url("../../../assets/images/right.png") no-repeat
+      background: #fff url('../../../assets/images/right.png') no-repeat
         calc(100% - 0.5rem) center;
       background-size: auto 0.32rem;
       font-size: 0.34rem;
       border-bottom: 1px solid #e0e0e0;
+    }
+  }
+  .notbk {
+    li {
+      background: #fff;
     }
   }
   .tree-box {

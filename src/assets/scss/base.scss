@@ -324,15 +324,29 @@ input[type="submit"],
 input {
   color: #333 !important;
 }
-input, textarea {
-    user-select: text;  
+
+input,
+textarea {
+  user-select: text;
 }
-select{
+
+select {
   -webkit-appearance: none;
 }
+
 input[disabled],
 textarea[disabled] {
   color: #333;
   opacity: 1;
   background: #fff;
+}
+
+input,
+textarea {
+  color: #333 !important;
+}
+
+.checkbox,
+.checkbox2 {
+  color: #333 !important;
 }

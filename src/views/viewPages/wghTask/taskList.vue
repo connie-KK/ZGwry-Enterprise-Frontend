@@ -3,18 +3,21 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
-      :isShowSearch="isShowSearch"
+      :isShowSearchIcon="isShowSearchIcon"
       :showBorder="isShowBorder"
       :serachFun="toSearchList"
+      :toggleSearchBox="toToggleSearchBox"
     >
       {{ moduleName }}
     </header-bar>
-    <div class="main-content">
+    <div
+      :class="[
+        isShowSearchBox ? 'main-content-with-search' : '',
+        'main-content'
+      ]"
+    >
       <div class="filter-box">
-        <p
-          @click="onlyMe = !onlyMe"
-          :class="{ active: onlyMe }"
-        >
+        <p @click="onlyMe = !onlyMe" :class="{ active: onlyMe }">
           仅看我的任务
         </p>
         <p @click="popupVisible = true">筛选</p>
@@ -24,18 +27,15 @@
           :id="'tab' + item.code"
           v-for="(item, index) in types"
           :key="index + 'type'"
-        >{{ item.title }}</mt-tab-item>
+          >{{ item.title }}</mt-tab-item
+        >
       </mt-navbar>
       <ul
         class="tasklist-box"
         ref="srollbox"
         :class="isBack ? 'isback' : 'auto'"
       >
-        <li
-          v-for="item in listData"
-          :key="item.task"
-          @click="clickItem(item)"
-        >
+        <li v-for="item in listData" :key="item.task" @click="clickItem(item)">
           <span class="task-method">{{ taskMethodMap[item.method] }}</span>
           <p class="task-name">{{ item.name }}</p>
           <span
@@ -44,24 +44,22 @@
               color: taskStateMap[item.state].color,
               background: taskStateMap[item.state].bkColor
             }"
-          >{{ taskStateMap[item.state].name }}</span>
+            >{{
+              taskStateMap[item.state].name === '全部'
+                ? '未发布'
+                : taskStateMap[item.state].name
+            }}</span
+          >
           <p class="task-date">执行期限：{{ item.date }}</p>
           <p class="task-type">任务性质：{{ taskTypeMap[item.type] }}</p>
           <p class="task-date1">最新执行时间：{{ item.date1 }}</p>
         </li>
       </ul>
-      <div
-        class="add-btn"
-        v-if="!isBack"
-      >
+      <div class="add-btn" v-if="!isBack">
         <button @click="$router.push('/putTask/0')">发布任务</button>
       </div>
     </div>
-    <mt-popup
-      v-model="popupVisible"
-      position="right"
-      class="popup-box"
-    >
+    <mt-popup v-model="popupVisible" position="right" class="popup-box">
       <div class="filter-content">
         <p class="filter-title">筛选</p>
         <img
@@ -79,7 +77,8 @@
                 :key="item.name"
                 :class="{ active: filterParams.state === Number(key) }"
                 @click="filterParams.state = Number(key)"
-              >{{ item.name }}</span>
+                >{{ item.name }}</span
+              >
             </div>
           </li>
           <li>
@@ -91,7 +90,8 @@
                 :key="item"
                 :class="{ active: filterParams.type === Number(key) }"
                 @click="filterParams.type = Number(key)"
-              >{{ item }}</span>
+                >{{ item }}</span
+              >
             </div>
           </li>
           <li>
@@ -101,16 +101,15 @@
                 class="tip date-tip date-tip1"
                 :class="{ active: filterParams.sDate }"
                 @click="$refs.picker1.open()"
-              >{{ d1 }}</span>
-              <img
-                src="@/assets/images/right1.png"
-                class="right-icon"
-              />
+                >{{ d1 }}</span
+              >
+              <img src="@/assets/images/right1.png" class="right-icon" />
               <span
                 class="tip date-tip date-tip2"
                 :class="{ active: filterParams.eDate }"
                 @click="$refs.picker2.open()"
-              >{{ d2 }}</span>
+                >{{ d2 }}</span
+              >
             </div>
           </li>
           <li>
@@ -126,7 +125,7 @@
             </div>
           </li>
           <li>
-            <p>任务类型</p>
+            <p>排序</p>
             <div>
               <span
                 class="tip"
@@ -134,7 +133,8 @@
                 :key="item"
                 :class="{ active: filterParams.orderBy === key }"
                 @click="filterParams.orderBy = key"
-              >{{ item }}</span>
+                >{{ item }}</span
+              >
             </div>
           </li>
           <li>
@@ -148,10 +148,7 @@
           </li>
         </ul>
         <div class="btn-box">
-          <button
-            class="popup-btn"
-            @click="checkFilterParams"
-          >确定</button>
+          <button class="popup-btn" @click="checkFilterParams">确定</button>
         </div>
       </div>
     </mt-popup>
@@ -185,11 +182,12 @@ export default {
     'mt-datetime-picker': DatetimePicker,
     checkTree
   },
-  data () {
+  data() {
     return {
       moduleName: '任务列表',
       isBack: false,
-      isShowSearch: true,
+      isShowSearchIcon: true,
+      isShowSearchBox: false,
       isShowBorder: false,
       popupVisible: false,
       onlyMe: false,
@@ -212,22 +210,46 @@ export default {
           color: '#27AD28',
           bkColor: '#E2FFE0'
         },
+        5: {
+          name: '结果退回',
+          color: '#27AD28',
+          bkColor: '#E2FFE0'
+        },
         4: {
           name: '执行中',
-          color: '#C9602A',
-          bkColor: '#FFF3E0'
+          color: '#27AD28',
+          bkColor: '#E2FFE0'
         },
         0: {
-          name: '未完成',
+          name: '全部',
           color: '#9133D2',
           bkColor: '#F9EAFE'
+        },
+        1: {
+          name: '待审核',
+          color: '#9133D2',
+          bkColor: '#F9EAFE'
+        },
+        2: {
+          name: '审核通过',
+          color: '#27AD28',
+          bkColor: '#E2FFE0'
+        },
+        3: {
+          name: '已撤销',
+          color: '#27AD28',
+          bkColor: '#E2FFE0'
         }
       },
       taskTypeMap: {
+        0: '全部',
         1: '日常任务',
         2: '事件处理任务',
         3: '双随机任务',
-        4: '重污染空气'
+        4: '重污染空气',
+        5: '日常巡查',
+        6: '信访办理',
+        7: '任务交办'
       },
       taskOrderByMap: {
         1: '执行时间',
@@ -236,7 +258,7 @@ export default {
       filterParams: {
         seachKey: '',
         state: 0,
-        type: 1,
+        type: 0,
         sDate: moment()
           .subtract(30, 'days')
           .format('YYYY-MM-DD'),
@@ -247,7 +269,7 @@ export default {
       },
       filterParamsTrue: {
         state: 0,
-        type: 1,
+        type: 0,
         sDate: moment()
           .subtract(30, 'days')
           .format('YYYY-MM-DD'),
@@ -256,40 +278,14 @@ export default {
         orderBy: '1',
         checkGridCell: []
       },
-      pars: [
-        {
-          id: 123,
-          name: '市环保局',
-          children: [
-            {
-              id: 1232,
-              name: '宏观城关'
-            },
-            {
-              id: 12232,
-              name: '宏观城5关'
-            }
-          ]
-        },
-        {
-          id: 1423,
-          name: '市环保局2',
-          children: [
-            {
-              id: 12532,
-              name: '宏观3城关'
-            },
-            {
-              id: 12632,
-              name: '宏观4城关'
-            }
-          ]
-        }
-      ]
+      pars: []
     }
   },
   computed: {
-    listData () {
+    initType() {
+      return this.$store.state.initType
+    },
+    listData() {
       let temp = []
       let list = JSON.parse(JSON.stringify(this.list))
       list.forEach(item => {
@@ -298,7 +294,11 @@ export default {
         item.method = item.direction === 'issued' ? 2 : 1
         item.date1 = moment(item.date).format('YYYY-MM-DD')
         item.date = moment(item.lastDate).format('YYYY-MM-DD')
-        if (state === '' || Number(state) === item.state) {
+        if (
+          state === '' ||
+          (Number(state) === 0 && item.state < 6) ||
+          (Number(state) === 1 && item.state === 6)
+        ) {
           if ((this.onlyMe && item.staff === this.myStaff) || !this.onlyMe) {
             if (!this.filterParamsTrue.checkGridCell.length) {
               temp.push(item)
@@ -321,23 +321,24 @@ export default {
       })
       return temp
     },
-    d1 () {
+    d1() {
       return moment(this.filterParams.sDate).format('YYYY-MM-DD HH:mm:ss')
     },
-    d2 () {
+    d2() {
       return moment(this.filterParams.eDate).format('YYYY-MM-DD HH:mm:ss')
     },
-    userName () {
+    userName() {
       return ''
     },
-    gridName () {
+    gridName() {
       return ''
     },
-    gridCell () {
+    gridCell() {
       return this.$store.state.gridCell
     }
   },
-  mounted () {
+  mounted() {
+    console.log(this.initType)
     this.getList()
     this.getUser()
     const tempId = this.$route.params.id
@@ -346,7 +347,7 @@ export default {
     }
   },
   methods: {
-    clickItem (item) {
+    clickItem(item) {
       if (this.isBack) {
         this.$store.state.toEventInfo = JSON.parse(JSON.stringify(item))
         this.$router.go(-1)
@@ -354,27 +355,35 @@ export default {
         this.$router.push('/putTask/' + item.task)
       }
     },
-    getList () {
-      this.$api
-        .getTasksByKey({
-          pageIndex: -1,
-          pageSize: 100,
-          taskName: this.filterParamsTrue.seachKey, //任务名
-          state: this.filterParamsTrue.state, //任务状态
-          type: this.filterParamsTrue.type, //任务类型
-          gridName: this.gridName, //网格名
-          strDate: this.filterParamsTrue.sDate, //开始时间
-          endDate: this.filterParamsTrue.eDate, //结束时间
-          addr: this.filterParamsTrue.area, //地址
-          subtype: Number(this.filterParamsTrue.orderBy), //1或者为空，根据任务创建时间倒序，2根据任务完成时间倒序
-          userName: this.userName, //用户名
-          isOverdue: null //true逾期, false 未逾期
-        })
-        .then(res => {
-          this.list = res
-        })
+    getList() {
+      let params = {
+        pageIndex: -1,
+        pageSize: 100,
+        taskName: this.filterParamsTrue.seachKey, //任务名
+        state: this.filterParamsTrue.state, //任务状态
+        type: this.filterParamsTrue.type, //任务类型
+        gridName: this.gridName, //网格名
+        strDate: moment(this.filterParamsTrue.sDate).format(
+          'YYYY-MM-DD HH:mm:ss'
+        ), //开始时间
+        endDate: moment(this.filterParamsTrue.eDate).format(
+          'YYYY-MM-DD HH:mm:ss'
+        ), //结束时间
+        addr: this.filterParamsTrue.area, //地址
+        subtype: Number(this.filterParamsTrue.orderBy), //1或者为空，根据任务创建时间倒序，2根据任务完成时间倒序
+        userName: this.userName, //用户名
+        isOverdue: null //true逾期, false 未逾期
+      }
+      for (let key in params) {
+        if (!params[key]) {
+          delete params[key]
+        }
+      }
+      this.$api.getTasksByKey(params).then(res => {
+        this.list = res
+      })
     },
-    getUser () {
+    getUser() {
       this.$api.getUser().then(res => {
         if (res) {
           this.myStaff = res.id
@@ -382,17 +391,20 @@ export default {
         }
       })
     },
-    toSearchList (e) {
+    toSearchList(e) {
       this.filterParamsTrue.seachKey = e
       this.getList()
     },
-    isCheck (id) {
+    toToggleSearchBox(e) {
+      this.isShowSearchBox = e
+    },
+    isCheck(id) {
       return (
         this.filterParams.checks.includes(id) ||
         this.filterParams.checkCs.includes(id)
       )
     },
-    checkB (id, state) {
+    checkB(id, state) {
       if (!state) {
         const tids = this.pars.filter(tidItem => {
           return tidItem.id === id
@@ -426,21 +438,21 @@ export default {
         }
       }
     },
-    checkFilterParams () {
+    checkFilterParams() {
       this.popupVisible = false
       this.filterParamsTrue = JSON.parse(JSON.stringify(this.filterParams))
       this.getList()
     },
-    handleConfirmDate1 (e) {
+    handleConfirmDate1(e) {
       this.filterParams.sDate = moment(e).format('YYYY-MM-DD HH:mm:ss')
     },
-    handleConfirmDate2 (e) {
+    handleConfirmDate2(e) {
       this.filterParams.eDate = moment(e).format('YYYY-MM-DD HH:mm:ss')
     },
-    checkChange (e) {
+    checkChange(e) {
       this.filterParams.checkGridCell = e
     },
-    getStaffInfo (id) {
+    getStaffInfo(id) {
       this.$api
         .getStaffInfo({
           id
@@ -451,7 +463,7 @@ export default {
           }
         })
     },
-    getGridCellTree (grid) {
+    getGridCellTree(grid) {
       this.$api
         .getGridCellTree({
           grid
@@ -466,10 +478,15 @@ export default {
 
 <style lang="scss">
 #tasklist {
+  .mint-popup {
+    width: auto;
+  }
+  .mint-popup-bottom {
+    width: 100%;
+  }
   .main-content {
-    top: 2.32rem;
     background: #fff;
-    height: calc(100% - 2.32rem);
+    height: 100%;
     p {
       padding: 0;
       margin: 0;
@@ -493,7 +510,7 @@ export default {
         position: relative;
         background: #aab8c6;
         &::before {
-          content: "";
+          content: '';
           position: absolute;
           left: 0.18rem;
           width: 0.32rem;
@@ -506,7 +523,7 @@ export default {
           box-sizing: border-box;
         }
         &.active {
-          background: #3296fa url("../../../assets/images/ischeck.png")
+          background: #3296fa url('../../../assets/images/ischeck.png')
             no-repeat 0.18rem center;
           background-size: 0.32rem 0.32rem;
           &::before {
@@ -516,7 +533,7 @@ export default {
       }
       &:nth-child(2) {
         float: right;
-        background: url("../../../assets/images/filter.png") no-repeat left
+        background: url('../../../assets/images/filter.png') no-repeat left
           center;
         background-size: 0.32rem 0.32rem;
         line-height: 0.54rem;
@@ -537,7 +554,7 @@ export default {
       height: calc(100% - 1.9rem);
     }
     li {
-      background: #fff url("../../../assets/images/right.png") no-repeat;
+      background: #fff url('../../../assets/images/right.png') no-repeat;
       background-position: calc(100% - 0.52rem) 0.56rem;
       background-size: 0.16rem 0.31rem;
       height: 1.92rem;
@@ -613,7 +630,7 @@ export default {
       color: #fff;
       border-radius: 0.04rem;
       font-size: 0.34rem;
-      background: #3296fa url("../../../assets/images/add-cycle.png") no-repeat
+      background: #3296fa url('../../../assets/images/add-cycle.png') no-repeat
         2.3rem center;
       background-size: 0.35rem 0.35rem;
     }
@@ -714,7 +731,7 @@ export default {
               display: inline-block;
             }
             &::before {
-              content: "";
+              content: '';
               display: inline-block;
               width: 0.36rem;
               height: 0.36rem;
@@ -727,7 +744,7 @@ export default {
             }
             &.check {
               &::before {
-                background: url("../../../assets/images/check.png") no-repeat
+                background: url('../../../assets/images/check.png') no-repeat
                   50%;
                 background-size: 100% auto;
                 border: 0;

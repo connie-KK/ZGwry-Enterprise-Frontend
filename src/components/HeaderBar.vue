@@ -69,15 +69,10 @@ export default {
   },
   methods: {
     goBack() {
-      if(cookie.get('PushData')) {
-        cookie.set('PushData', '')
-        this.$router.push('/home')
-      } else {
       if (this.customBack) {
-          this.customBack();
-        } else {
-          window.history.go(-1);
-        }
+        this.customBack();
+      } else {
+        window.history.go(-1);
       }
     },
     confirmSearch(e) {

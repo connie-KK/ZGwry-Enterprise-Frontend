@@ -29,7 +29,9 @@ export default {
     }
   },
   mounted () {
-    this.autoOpen()
+    setInterval(() => {
+      this.autoOpen()
+    }, 1000)
   },
   watch: {
     loading () {
@@ -45,6 +47,7 @@ export default {
     autoOpen () {
       const routex = cookie.get('PushData')
       if (routex) {
+        cookie.set('PushData', '')
         this.$router.push(routex.split('$').join('/'))
       }
     }

@@ -345,6 +345,10 @@ export default {
     if (tempId === '1') {
       this.isBack = true
     }
+    if (tempId === '3') {
+      this.selected = 'tab0'
+      this.onlyMe = true
+    }
   },
   methods: {
     clickItem(item) {

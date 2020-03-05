@@ -25,6 +25,7 @@
 
 <script>
 import icon from "@/components/aepIcon";
+import cookie from 'js-cookie'
 export default {
   name: "HeaderBar",
   components: {
@@ -68,10 +69,15 @@ export default {
   },
   methods: {
     goBack() {
-      if (this.customBack) {
-        this.customBack();
+      if(cookie.get('PushData')) {
+        cookie.set('PushData', '')
+        this.$router.push('/home')
       } else {
-        window.history.go(-1);
+      if (this.customBack) {
+          this.customBack();
+        } else {
+          window.history.go(-1);
+        }
       }
     },
     confirmSearch(e) {

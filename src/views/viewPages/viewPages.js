@@ -64,8 +64,8 @@ new Vue({
 import axios from 'axios'
 if (process.env.NODE_ENV === 'development') {
   axios.post('http://183.220.144.57:30000//token', {
-    userid: 'admin',
-    password: '123456',
+    userid: 'san',
+    password: 'Aa111111',
     'grant_type': 'password'
   }).then(res => {
     if (res.data && res.data.access_token) {

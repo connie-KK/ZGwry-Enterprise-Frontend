@@ -39,12 +39,13 @@ export default {
           this.$store.commit("set_loading", false);
         }, 10 * 1000);
       }
-    },
+    }
+  },
+  methods: {
     autoOpen () {
       const routex = cookie.get('PushData')
       if (routex) {
-        cookie.set('PushData', '')
-        this.$router.push(routex)
+        this.$router.push(routex.split('$').join('/'))
       }
     }
   }

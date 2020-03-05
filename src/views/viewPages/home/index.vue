@@ -104,7 +104,7 @@ export default {
                 {
                   name: '待办任务',
                   imgUrl: require('@/assets/images/b1.png'),
-                  url: '/taskList/0',
+                  url: '/taskList/3',
                   params: 'WGH'
                 },
                 {
@@ -156,19 +156,19 @@ export default {
                 {
                   name: '待办任务',
                   imgUrl: require('@/assets/images/c1.png'),
-                  url: '/overViewWater',
+                  url: '/taskList/3',
                   params: 'HBGJ'
                 },
                 {
                   name: '任务列表',
                   imgUrl: require('@/assets/images/c2.png'),
-                  url: '/overViewWater',
+                  url: '/taskList/0',
                   params: 'HBGJ'
                 },
                 {
                   name: '发布任务',
                   imgUrl: require('@/assets/images/c3.png'),
-                  url: '/overViewWater',
+                  url: '/putTask/0',
                   params: 'HBGJ'
                 }
               ]
@@ -189,6 +189,9 @@ export default {
         this.$router.push(item.url)
       } else if (item.redirectUrl) {
         window.location.href = item.redirectUrl
+      }
+      if (item.params) {
+        this.$store.state.initType = item.params
       }
     },
     outputMobile() {

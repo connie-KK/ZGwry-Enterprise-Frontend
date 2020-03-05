@@ -6,6 +6,7 @@
       :isShowSearch="isShowSearch"
       :showBorder="isShowBorder"
       :serachFun="toSearchList"
+      :customBack="backFun"
     >
       {{ moduleName }}{{ count ? `(${count})` : '' }}
       <!-- <div slot="right" v-if="this.pageType == PollutionPage" @click="toMap">
@@ -99,6 +100,10 @@ export default {
     }
   },
   methods: {
+    backFun () {
+      this.$api.backHome()
+      this.$router.go(-1)
+    },
     routeChange () {
       this.pageType = this.$route.params.id
       this.moduleName = this.moduleList[this.pageType]

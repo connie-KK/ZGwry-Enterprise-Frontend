@@ -99,7 +99,9 @@
             type="text"
             disabled="disabled"
             placeholder="请选择发证日期"
-            :value="moment(data.issuedate).format('YYYY-MM-DD')"
+            :value="
+              data.issuedate ? moment(data.issuedate).format('YYYY-MM-DD') : ''
+            "
           />
         </div>
         <div class="item-box">
@@ -119,7 +121,9 @@
             type="text"
             disabled="disabled"
             placeholder="请选择有效期"
-            :value="moment(data.enddate).format('YYYY-MM-DD')"
+            :value="
+              data.enddate ? moment(data.enddate).format('YYYY-MM-DD') : ''
+            "
           />
         </div>
         <div class="file-box">
@@ -272,9 +276,9 @@ export default {
         certificateNo: '',
         code: '',
         creditcode: '',
-        enddate: moment().format('YYYY-MM-DD'),
+        enddate: null,
         industrytype: '',
-        issuedate: moment().format('YYYY-MM-DD'),
+        issuedate: null,
         Issuingunit: '',
         legal_rep: '',
         reg_addr: '',
@@ -317,6 +321,10 @@ export default {
         })
         .then(res => {
           if (res.items === -1) {
+            let tempData = JSON.parse(JSON.stringify(this.$store.state.infoToL))
+            this.data.name = tempData.name
+            this.data.legal_rep = tempData.legal
+            this.data.creditcode = tempData.creditcode
             return false
           }
           this.data = res.items
@@ -385,15 +393,14 @@ export default {
       let data = JSON.parse(JSON.stringify(this.data))
       data.enddate = data.enddate
         ? moment(data.enddate).format('YYYY-MM-DD HH:mm:ss')
-        : ''
+        : null
       data.issuedate = data.issuedate
         ? moment(data.issuedate).format('YYYY-MM-DD HH:mm:ss')
-        : ''
+        : null
       data.startdate = data.startdate
         ? moment(data.startdate).format('YYYY-MM-DD HH:mm:ss')
-        : ''
-      data.id = data.id || this.$uuid()
-      data.enterpriseid = this.$store.state.enterId
+        : null
+      data.id = this.$store.state.enterId
       this.$api.updatePollpermits(data).then(res => {
         if (res === true) {
           Toast('保存成功')
@@ -459,7 +466,7 @@ textarea:-ms-input-placeholder {
       padding-right: 0.52rem;
       background: #fff url("../../../assets/images/right.png") no-repeat right
         center;
-      background-size: 0.36rem;
+      background-size: 0.22rem;
       color: #333;
     }
   }
@@ -500,11 +507,12 @@ textarea:-ms-input-placeholder {
       line-height: 0.3rem;
       text-align: center;
       display: inline-block;
-      border: 0.01rem solid #3296fa;
-      border-radius: 50%;
+      font-size: 0.4rem;
+      vertical-align: middle;
     }
     span {
       margin-left: 0.25rem;
+      vertical-align: middle;
     }
   }
   .file-list {

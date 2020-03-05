@@ -1,6 +1,6 @@
 <template>
   <div>
-    <header-bar>{{ moduleName }}</header-bar>
+    <header-bar leftIcon="back" leftText="返回">{{ moduleName }}</header-bar>
     <div class="main-content">
       <nav-bar :selected="3"></nav-bar>
       <mt-popup v-model="popupVisible1" position="bottom">
@@ -676,7 +676,7 @@ export default {
           enterid: this.$store.state.enterId
         })
         .then(res => {
-          if(!res) {
+          if (!res) {
             return false
           }
           let data = res

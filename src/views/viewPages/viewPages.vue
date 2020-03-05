@@ -5,31 +5,46 @@
         <router-view></router-view>
       </transition>
     </navigation>
-    <img src="../../assets/images/loading.svg" class="loadImg" v-if="loading" />
+    <img
+      src="../../assets/images/loading.svg"
+      class="loadImg"
+      v-if="loading"
+    />
   </div>
 </template>
 
 <script>
+import cookie from 'js-cookie'
 export default {
   name: "app",
-  data() {
+  data () {
     return {
       transitionName: "fade",
       timer: null
     };
   },
   computed: {
-    loading() {
+    loading () {
       return this.$store.state.loading;
     }
   },
+  mounted () {
+    this.autoOpen()
+  },
   watch: {
-    loading() {
+    loading () {
       clearTimeout(this.timer);
       if (this.loading) {
         this.timer = setTimeout(() => {
           this.$store.commit("set_loading", false);
         }, 10 * 1000);
+      }
+    },
+    autoOpen () {
+      const routex = cookie.get('PushData')
+      if (routex) {
+        cookie.set('PushData', '')
+        this.$router.push(routex)
       }
     }
   }

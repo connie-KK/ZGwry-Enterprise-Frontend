@@ -19,7 +19,7 @@
             :key="item.id"
           >
             <span>{{ moment(item.date).format('YYYY-MM-DD HH:mm') }}</span>
-            <span>{{ item.staff }}</span>
+            <span>{{ users[item.staff].name }}</span>
             <span>{{ item.title }}</span>
           </li>
         </ul>
@@ -36,7 +36,7 @@
             :key="item.id"
           >
             <span>{{ item.content }}</span>
-            <span>{{ item.staff }}</span>
+            <span>{{ users[item.staff].name }}</span>
             <span>{{ moment(item.date).format('YYYY-MM-DD HH:mm') }}</span>
             <span>{{ item.title }}</span>
           </li>
@@ -59,7 +59,8 @@ export default {
       moduleName: '企业信息',
       moment: moment,
       list1: [],
-      list2: []
+      list2: [],
+      users: {}
     }
   },
   mounted () {
@@ -81,7 +82,9 @@ export default {
           res.list.forEach(item => {
             users.push(item.staff)
           })
-          this.getUsers()
+          if (users.length > 0) {
+            this.getUsers()
+          }
         })
     },
     getUsers (users) {

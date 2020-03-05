@@ -2,6 +2,7 @@
 // Base styles
 // --------------------------------------------------
 @import './variables.scss';
+
 /**
  * view-port list:
 320x480
@@ -31,6 +32,7 @@ html {
   font-size: -webkit-calc(13.33333333vw);
   font-size: calc(13.33333333vw);
 }
+
 @media screen and (max-width: 320px) {
   html {
     font-size: 42.667px;
@@ -38,6 +40,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 321px) and (max-width: 360px) {
   html {
     font-size: 48px;
@@ -45,6 +48,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 361px) and (max-width: 375px) {
   html {
     font-size: 50px;
@@ -52,6 +56,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 376px) and (max-width: 393px) {
   html {
     font-size: 52.4px;
@@ -59,6 +64,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 394px) and (max-width: 412px) {
   html {
     font-size: 54.93px;
@@ -66,6 +72,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 413px) and (max-width: 414px) {
   html {
     font-size: 55.2px;
@@ -73,6 +80,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 415px) and (max-width: 480px) {
   html {
     font-size: 64px;
@@ -80,6 +88,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 481px) and (max-width: 540px) {
   html {
     font-size: 72px;
@@ -87,6 +96,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 541px) and (max-width: 640px) {
   html {
     font-size: 85.33px;
@@ -94,6 +104,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 641px) and (max-width: 720px) {
   html {
     font-size: 96px;
@@ -101,6 +112,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 721px) and (max-width: 768px) {
   html {
     font-size: 102.4px;
@@ -108,6 +120,7 @@ html {
     font-size: calc(13.33333333vw);
   }
 }
+
 @media screen and (min-width: 769px) {
   html {
     font-size: 102.4px;
@@ -120,9 +133,9 @@ html {
 * {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;//禁止选择文字
+  -webkit-user-select: none; //禁止选择文字
   outline: none;
   padding: 0px;
   margin: 0px;
@@ -130,166 +143,196 @@ html {
 
 // Use box sizing on all the things!
 * {
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;//禁止选择文字
-    outline: none;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; //禁止选择文字
+  outline: none;
 }
+
 // We fix position the body and scroll `.content`.
 body {
-    font-family: $font-family-default;
-    font-size: $font-size-default;
-    line-height: $line-height-default;
-    color: #000;
-    background:rgba(248,248,248,1);
-    -webkit-overflow-scrolling: touch;
-    margin: 0;
+  font-family: $font-family-default;
+  font-size: $font-size-default;
+  line-height: $line-height-default;
+  color: #000;
+  background: rgba(248, 248, 248, 1);
+  -webkit-overflow-scrolling: touch;
+  margin: 0;
 }
 
 // Universal link styling
 a {
-    color: $primary-text-color;
-    text-decoration: none;
+  color: $primary-text-color;
+  text-decoration: none;
 
-    &:active {
-        color: darken($primary-text-color, 10%);
-    }
+  &:active {
+    color: darken($primary-text-color, 10%);
+  }
 }
 
 // Universal list styling
-ul, li{
-    padding: 0;
-    margin: 0;
-    list-style: none;
+ul,
+li {
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
 
-.padded{
-    margin: 20px 16px;
+.padded {
+  margin: 20px 16px;
 }
+
 //
 // Buttons
 // btn btn-primary btn-block btn-outlined
 
 $button-font-size: 14px !default;
 
-@mixin btn($color){
-    color: #fff;
-    background-color: $color;
-    border: 1px solid $color;
+@mixin btn($color) {
+  color: #fff;
+  background-color: $color;
+  border: 1px solid $color;
 
-    &:enabled:active,
-        &.active:enabled {
-        color: #fff;
-        background-color: darken($color, 10%);
-        border: 1px solid darken($color, 10%);
-    }
+  &:enabled:active,
+  &.active:enabled {
+    color: #fff;
+    background-color: darken($color, 10%);
+    border: 1px solid darken($color, 10%);
+  }
 }
+
 // --------------------------------------------------
 input[type="button"],
 input[type="submit"],
 input[type="reset"],
 button,
 .btn {
-    position: relative;
-    display: inline-block;
-    padding: 6px 12px;
-    margin-bottom: 0; // For input.btn
-    font-size: $button-font-size;
-    font-weight: $font-weight-light;
-    line-height: 1.42;//增大，和bootstrap保持一致；
-    color: #333;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: top;
-    cursor: pointer;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ccc;
-    border-top-left-radius: 3px;//fixed android 4.2
-    border-top-right-radius: 3px;//fixed android 4.2
-    border-bottom-right-radius: 3px;//fixed android 4.2
-    border-bottom-left-radius: 3px;//fixed android 4.2
-    border-radius: 3px;
-    transition: all;
-    transition-duration: .2s;
-    transition-timing-function: linear;
+  position: relative;
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0; // For input.btn
+  font-size: $button-font-size;
+  font-weight: $font-weight-light;
+  line-height: 1.42; //增大，和bootstrap保持一致；
+  color: #333;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: top;
+  cursor: pointer;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border-top-left-radius: 3px; //fixed android 4.2
+  border-top-right-radius: 3px; //fixed android 4.2
+  border-bottom-right-radius: 3px; //fixed android 4.2
+  border-bottom-left-radius: 3px; //fixed android 4.2
+  border-radius: 3px;
+  transition: all;
+  transition-duration: .2s;
+  transition-timing-function: linear;
 
-    // Active & filled button styles
-    &:enabled:active,
-        &.active:enabled {
-        color: #fff;
-        background-color: #666;
-    }
+  // Active & filled button styles
+  &:enabled:active,
+  &.active:enabled {
+    color: #fff;
+    background-color: #666;
+  }
 
-    // Disabled styles & filled button active styles
-    &:disabled,
-        &.disabled {
-        opacity: .6;
-    }
+  // Disabled styles & filled button active styles
+  &:disabled,
+  &.disabled {
+    opacity: .6;
+  }
 }
 
 // Primary button (Default color is blue)
 input[type="submit"],
-.btn-primary{
-    @include btn(#3296FA);
+.btn-primary {
+  @include btn(#3296FA);
 }
+
 .btn-block {
-    display: block;
-    width: 100%;
-    padding: 10px 0;
-    font-size: 0.32rem;
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  font-size: 0.32rem;
 }
 
 // 文字省略号
-.ellipsis{
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 // 两行文字省略号
-.ellipsis-2{
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    white-space: normal!important;
-    word-wrap: break-word;
+.ellipsis-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal !important;
+  word-wrap: break-word;
 }
-.pull-left{
-    float: left;
+
+.pull-left {
+  float: left;
 }
-.pull-right{
-    float: right;
+
+.pull-right {
+  float: right;
 }
-.content{
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+
+.content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
-.main-content{
-    position: absolute;
-    top: $header-height;
-    right: 0;
-    left: 0;
-    // background:rgba(255,255,255,1);
+
+.main-content {
+  position: absolute;
+  top: $header-height;
+  right: 0;
+  left: 0;
+  // background:rgba(255,255,255,1);
 }
+
 // Utility classes
 // flex
-.flex{
-    @extend %flexbox;
+.flex {
+  @extend %flexbox;
 }
-.align-items-center{
-    @include align-items(center);
+
+.align-items-center {
+  @include align-items(center);
 }
-.flex-item{
-    @include flex;
+
+.flex-item {
+  @include flex;
 }
+
 .main-content-box {
   height: calc(100% - 52px);
   overflow-y: auto;
+}
+
+input {
+  color: #333 !important;
+}
+input, textarea {
+    user-select: text;  
+}
+select{
+  -webkit-appearance: none;
+}
+input[disabled],
+textarea[disabled] {
+  color: #333;
+  opacity: 1;
+  background: #fff;
 }

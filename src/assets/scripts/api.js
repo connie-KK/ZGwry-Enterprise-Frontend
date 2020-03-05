@@ -818,7 +818,56 @@ const interfaces = [
     interface: '/api/GBM/updatetaskhandle',
     type: 'post',
     serviceName: 'serviceEnt'
-  }
+  },
+  {
+    //工业分类
+    fun: 'getIndustrialType',
+    interface: '/api/mod/GetIndustrialType',
+    type: 'post',
+    serviceName: 'serviceMyserv'
+  },
+  {
+    //更新企业信息
+    fun: 'updateEnterprise',
+    interface: '/api/Modmanage/UpdateEnterprise',
+    type: 'post',
+    serviceName: 'serviceMyserv'
+  },
+  {
+    //更新企业附加信息
+    fun: 'updateZGEnterpriseExtend',
+    interface: '/api/ZG/UpdateZGEnterpriseExtend',
+    type: 'post',
+    serviceName: 'serviceEnt'
+  },
+  {
+    //添加产品
+    fun: 'addProduct',
+    interface: '/api/Modmanage/AddProduct',
+    type: 'post',
+    serviceName: 'serviceMyserv'
+  },
+  {
+    //删除产品
+    fun: 'deleteProductid',
+    interface: '/api/Modmanage/DeleteProductid',
+    type: 'post',
+    serviceName: 'serviceMyserv'
+  },
+  {
+    //添加材料
+    fun: 'addMaterial',
+    interface: '/api/Modmanage/AddMaterial',
+    type: 'post',
+    serviceName: 'serviceMyserv'
+  },
+  {
+    //删除材料
+    fun: 'deleteRawMaterialByid',
+    interface: '/api/Modmanage/DeleteRawMaterialByid',
+    type: 'post',
+    serviceName: 'serviceMyserv'
+  },
 ]
 
 interfaces.forEach(method => {
@@ -826,5 +875,31 @@ interfaces.forEach(method => {
     return service[method.serviceName][method.type](method.interface, payload)
   }
 })
+
+api.logout = () => {
+  if (window.logOut) {
+    window.logOut()
+  }
+  let userAgent = window.navigator.userAgent
+  let state = !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
+  if (state) {
+    if (window.webkit && window.webkit.messageHandlers) {
+      window.webkit.messageHandlers.logOut.postMessage(null)
+    }
+  }
+}
+
+api.backHome = () => {
+  if (window.backHome) {
+    window.backHome()
+  }
+  let userAgent = window.navigator.userAgent
+  let state = !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
+  if (state) {
+    if (window.webkit && window.webkit.messageHandlers) {
+      window.webkit.messageHandlers.backHome.postMessage(null)
+    }
+  }
+}
 
 export default api

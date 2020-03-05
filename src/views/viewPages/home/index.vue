@@ -79,12 +79,12 @@ export default {
                   name: '污染源库',
                   imgUrl: require('@/assets/images/a1.png'),
                   url: '/entlist/0'
-                },
-                {
-                  name: '知识库',
-                  imgUrl: require('@/assets/images/a2.png'),
-                  url: '/overViewWater'
                 }
+                // {
+                //   name: '知识库',
+                //   imgUrl: require('@/assets/images/a2.png'),
+                //   url: '/overViewWater'
+                // }
               ]
             }
           ]
@@ -111,11 +111,11 @@ export default {
                   imgUrl: require('@/assets/images/b3.png'),
                   url: '/putTask/0'
                 },
-                {
-                  name: '',
-                  imgUrl: '',
-                  url: ''
-                },
+                // {
+                //   name: '',
+                //   imgUrl: '',
+                //   url: ''
+                // },
                 {
                   name: '待办事件',
                   imgUrl: require('@/assets/images/b4.png'),
@@ -181,19 +181,7 @@ export default {
       this.mobileState = true
     },
     mylogout() {
-      if (window.logOut) {
-        window.logOut()
-      }
-      let userAgent = window.navigator.userAgent
-      let state = !!userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
-      if (state) {
-        if (window.webkit && window.webkit.messageHandlers) {
-          window.webkit.messageHandlers.logOut.postMessage(null)
-        }
-        // ios退出登录后要再次点击a标签才能触发，所以重复点击两次即可
-        document.getElementById('logOutNode').click()
-        document.getElementById('logOutNode').click()
-      }
+      this.$api.logout()
     }
   }
 }

@@ -1,7 +1,10 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-const TokenKey = 'aepToken'
 import store from '@/store'
+import {
+  Toast
+} from 'mint-ui'
+import apis from './api'
 
 const customAxios = (prefix = '') => {
   let service = null
@@ -19,15 +22,27 @@ const customAxios = (prefix = '') => {
   // request拦截器
   requestInstance = service.interceptors.request.use(
     config => {
-      // if (prefix === "/stoken") {
-      //   config.url = 'http://183.220.144.57:30000' + config.url
-      // }
-      config.url = prefix + config.url
+      if (process.env.NODE_ENV === 'development') {
+        config.url = prefix + config.url
+      } else {
+        if (prefix === "/stoken") {
+          config.url = 'http://183.220.144.57:30000' + config.url
+        }
+        if (prefix === "/ent") {
+          config.url = 'http://183.220.144.57:30002' + config.url
+        }
+        if (prefix === "/env") {
+          config.url = 'http://183.220.144.57:30003' + config.url
+        }
+        if (prefix === "/myserv") {
+          config.url = 'http://183.220.144.57:30001' + config.url
+        }
+      }
       if (!config.data || !config.data.loading) {
         store.commit("set_loading", true)
       }
-      if (Cookies.get(TokenKey)) {
-        config.headers['Authorization'] = 'Bearer ' + Cookies.get(TokenKey) // 让每个请求携带自定义token 请根据实际情况自行修改
+      if (Cookies.get('AzuraCookie')) {
+        config.headers['Authorization'] = 'Bearer ' + Cookies.get('AzuraCookie') // 让每个请求携带自定义token 请根据实际情况自行修改
       }
       return config
     },
@@ -44,19 +59,23 @@ const customAxios = (prefix = '') => {
     },
     error => {
       store.commit("set_loading", false)
+      if (error.response.status === 401) {
+        Toast('获取数据失败！')
+        setTimeout(() => {
+          apis.logout()
+        }, 1000)
+      }
       return Promise.reject(error)
     })
   return service
 }
 
-const serviceApi = customAxios('/api')
 const serviceEnt = customAxios('/ent')
 const serviceEnv = customAxios('/env')
 const serviceStoken = customAxios('/stoken')
 const serviceMyserv = customAxios('/myserv')
 
 export default {
-  serviceApi,
   serviceEnt,
   serviceEnv,
   serviceStoken,

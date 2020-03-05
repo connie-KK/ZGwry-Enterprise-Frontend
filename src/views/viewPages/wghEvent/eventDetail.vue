@@ -29,7 +29,6 @@
           </div>
           <div class="right" v-if="item.type==='contract'">
             <span>{{detailData[item.key]}}</span>
-            <span class="msg" @click="toPhone('msg')"></span>
             <span class="phone" @click="toPhone('tel')"></span>
           </div>
           <div class="right" v-if="item.type==='rightArrow'" @click="selectTreatment">
@@ -56,7 +55,6 @@
               </div>
               <div class="right" v-if="it.type==='contractItem'">
                 <span>{{it.content}}</span>
-                <span class="msg" @click="toPhone('msg')"></span>
                 <span class="phone" @click="toPhone('tel')"></span>
               </div>
               <div class="right" v-if="it.type==='textItem'">
@@ -250,7 +248,7 @@ export default {
         //已完成或虚假时不可编辑，页面底部的确定按钮用来更新followup
         //1级的时候也不可以，因为不是自己的followup
         this.editState = false;
-      }else{
+      } else {
         this.editState = true;
       }
       if (res.state !== 4) {
@@ -274,13 +272,9 @@ export default {
     toContent() {
       this.$router.push(`/eventContent/${this.incidentId}`);
     },
-    toPhone(type) {
+    toPhonetoPhone(type) {
       if (this.detailData.telephone) {
-        if (type === "msg") {
-          window.location.href = "sms:" + this.detailData.telephone;
-        } else if (type === "tel") {
-          window.location.href = "tel:" + this.detailData.telephone;
-        }
+        window.location.href = "tel:" + this.detailData.telephone;
       } else {
         this.tips("未获取到审核人手机号码", "iconfont icon-error");
       }
@@ -452,15 +446,6 @@ export default {
         margin-right: 0.16rem;
       }
     }
-    .msg {
-      display: inline-block;
-      width: 0.32rem;
-      height: 0.31rem;
-      background: url("../../../assets/images/message.png") no-repeat left
-        center;
-      background-size: 0.32rem 0.31rem;
-      margin: 0 0.32rem;
-    }
     .phone {
       display: inline-block;
       width: 0.32rem;
@@ -511,9 +496,6 @@ export default {
   .top-margin {
     margin-top: 0.4rem;
     border-top: 0;
-  }
-  .mint-popup {
-    width: 100%;
   }
   .footer {
     position: fixed;

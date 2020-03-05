@@ -4,17 +4,33 @@
       leftIcon="back"
       leftText="返回"
       :showBorder="isShowBorder"
-      :isShowSearch="isShowSearch"
+      :isShowSearchIcon="isShowSearchIcon"
       :serachFun="toSearchList"
-    >
-      {{moduleName}}
-      <div class="right-header" slot="right" @click="toSort">排序</div>
-    </header-bar>
-    <div class="main-content">
-      <div class="e-nav" ref="escrollbox">
-        <mt-navbar v-model="selected">
-          <mt-tab-item :id="index" v-for="(item,index) in tabData" :key="index">{{item}}</mt-tab-item>
-        </mt-navbar>
+      :toggleSearchBox="toToggleSearchBox"
+      :customBack="goBack"
+    >{{moduleName}}</header-bar>
+    <div :class="[isShowSearchBox?'main-content-with-search':'','main-content']">
+      <div class="content-header">
+        <div class="sort-box">
+          <div
+            v-for="(item,index) in sortBox"
+            :class="item.class"
+            :key="index"
+            @click="changeSort(index)"
+          >
+            <span>{{item.name}}</span>
+            <span :class="item.sort"></span>
+          </div>
+        </div>
+        <div class="state-box">
+          <div
+            v-for="(item,index) in stateBox"
+            :key="index"
+            :class="item.class"
+            @click="changeState(index)"
+          >{{item.name}}</div>
+          <div>{{listData.length}}</div>
+        </div>
       </div>
       <div v-for="(item,index) in listData" :key="index" class="list" @click="toDetail(item)">
         <div class="left">
@@ -24,10 +40,10 @@
             <span class="info">{{item.stateInfo}}</span>
           </div>
           <div>
-            <span>添加日期：{{item.date}}</span>
+            <span>添加日期：{{item.showDate}}</span>
             <span>{{item.typeInfo}}</span>
           </div>
-          <div v-if="item.taskhandletime">最新执行时间：{{item.taskhandletime}}</div>
+          <div v-if="item.showTaskhandletime">最新执行时间：{{item.showTaskhandletime}}</div>
         </div>
         <div class="right">
           <icon name="right" scale="1"></icon>
@@ -35,23 +51,13 @@
       </div>
       <p class="tips" v-if="!listData.length&&!firstState">暂无数据</p>
     </div>
-    <mt-popup v-model="popupVisible" position="bottom">
-      <mt-picker :slots="slots" @change="setdType" valueKey="valueKey"></mt-picker>
-    </mt-popup>
   </div>
 </template>
 
 <script>
-import { Navbar, Popup, Picker, TabItem } from "mint-ui";
 import moment from "moment";
 export default {
   name: "EventList",
-  components: {
-    "mt-navbar": Navbar,
-    "mt-popup": Popup,
-    "mt-picker": Picker,
-    "mt-tab-item": TabItem
-  },
   watch: {
     selected() {
       this.setListData();
@@ -63,8 +69,9 @@ export default {
       secondTabIndex: 1,
       thirdTabIndex: 2,
       moduleName: "事件列表",
-      isShowBorder: false,
-      isShowSearch: true,
+      isShowBorder: true,
+      isShowSearchIcon: true,
+      isShowSearchBox: false,
       filter: "",
       selected: "",
       tabData: ["全部事件", "未完成事件", "已解决事件"],
@@ -74,16 +81,6 @@ export default {
       listAll: [],
       listComplate: [],
       moduleId360: "",
-      popupVisible: false,
-      slots: [
-        {
-          values: [
-            { valueKey: "添加时间", value: "date" },
-            { valueKey: "最新执行时间", value: "taskhandletime" }
-          ],
-          textAlign: "center"
-        }
-      ],
       levels: [
         { value: 1, name: "县级网格" },
         { value: 2, name: "乡级网格" },
@@ -91,15 +88,49 @@ export default {
       ],
       types: [],
       firstState: true,
-      gridLevel: "" //当前登录用户对应网格等级
+      gridLevel: "", //当前登录用户对应网格等级
+      sortBox: [
+        {
+          name: "添加时间",
+          class: "selected",
+          sort: "sortDown",
+          key: "date"
+        },
+        {
+          name: "最新执行时间",
+          key: "handledate"
+        }
+      ],
+      stateBox: [
+        {
+          name: "全部",
+          class: "selected"
+        },
+        {
+          name: "未完成"
+        },
+        {
+          name: "已解决"
+        }
+      ],
+      routeId: ""
     };
   },
   created() {
+    this.routeId = this.$route.params.id;
+    let index;
+    if (this.routeId > 0) {
+      //获取全部
+      index = 0;
+    } else {
+      //未完成
+      index = 1;
+    }
+    this.changeState(index);
     this.getUserId();
     this.getHandleEventLists();
     this.getmodsList();
   },
-  mounted() {},
   methods: {
     setListData() {
       if (this.selected === 0) {
@@ -110,6 +141,7 @@ export default {
       } else if (this.selected === 2) {
         this.listData = JSON.parse(JSON.stringify(this.listComplate));
       }
+      this.sortList();
     },
     getUserId() {
       this.$api.getUser().then(res => {
@@ -173,7 +205,7 @@ export default {
           if (item.state) {
             switch (item.state) {
               case 1:
-                item.stateInfo = "未发布";
+                item.stateInfo = "上报中";
                 item.class = "reported";
                 break;
               case 2:
@@ -206,8 +238,8 @@ export default {
               item.typeInfo = typeItem.name;
             }
           });
-          item.date = moment(item.date).format("YYYY-MM-DD");
-          item.taskhandletime = item.taskhandletime
+          item.showDate = moment(item.date).format("YYYY-MM-DD");
+          item.showTaskhandletime = item.taskhandletime
             ? moment(item.taskhandletime).format("YYYY-MM-DD HH:mm:ss")
             : "";
           tempArr.push(item);
@@ -262,6 +294,12 @@ export default {
         this.getHandleEventLists();
       }
     },
+    toToggleSearchBox(e) {
+      this.isShowSearchBox = e;
+    },
+    goBack() {
+      this.$router.push("/enList");
+    },
     setdType(picker) {
       const selectedVal = picker.getValues();
       if (selectedVal instanceof Array && selectedVal.length === 1) {
@@ -273,8 +311,53 @@ export default {
         });
       }
     },
-    toSort() {
-      this.popupVisible = true;
+    changeSort(index) {
+      let selected = this.sortBox[index];
+      if (selected.class === "selected") {
+        //已经是选中状态
+        if (selected.sort === "sortUp") {
+          selected.sort = "sortDown";
+        } else if (selected.sort === "sortDown") {
+          selected.sort = "sortUp";
+        }
+      } else {
+        selected.class = "selected";
+        selected.sort = "sortUp";
+        let notSelected = this.sortBox[1 - index];
+        notSelected.class = "";
+        notSelected.sort = "";
+        this.$set(this.sortBox, 1 - index, notSelected);
+      }
+      this.$set(this.sortBox, index, selected);
+      //排序
+      this.sortList();
+    },
+    sortList() {
+      let selected;
+      this.sortBox.forEach(item => {
+        if (item.class === "selected") {
+          selected = item;
+        }
+      });
+      const key = selected.key;
+      this.listData.sort((a, b) => {
+        if (a[key] && b[key]) {
+          if (selected.sort === "sortUp") {
+            return new Date(a[key]).getTime() - new Date(b[key]).getTime();
+          } else {
+            return new Date(b[key]).getTime() - new Date(a[key]).getTime();
+          }
+        }
+      });
+    },
+    changeState(index) {
+      this.stateBox.forEach(item => {
+        item.class = "";
+      });
+      let selected = this.stateBox[index];
+      selected.class = "selected";
+      this.$set(this.stateBox, index, selected);
+      this.selected = index;
     },
     toDetail(item) {
       if (item.state === 3 || this.gridLevel === 3) {
@@ -291,18 +374,18 @@ export default {
           this.$store.commit("set_followup", item.followup);
           let toLevel1Followup = false;
           item.followup.forEach(followItem => {
-            if (followItem.level === 1) {
-              toLevel1Followup = true;
-              this.$router.push(`/eventDetailLevel1/${followItem.id}`);
-            }
+            // if (followItem.level === 1) {
+            //   toLevel1Followup = true;
+            this.$router.push(`/eventDetailLevel1/${followItem.id}`);
+            // }
           });
-          if (!toLevel1Followup) {
-            item.followup.forEach(followItem => {
-              if (followItem.level === 2) {
-                this.$router.push(`/eventDetail/${followItem.id}`);
-              }
-            });
-          }
+          // if (!toLevel1Followup) {
+          //   item.followup.forEach(followItem => {
+          //     if (followItem.level === 2) {
+          //       this.$router.push(`/eventDetail/${followItem.id}`);
+          //     }
+          //   });
+          // }
         } else if (
           this.gridLevel === 2 &&
           Array.isArray(item.followup) &&
@@ -326,13 +409,71 @@ export default {
 @import "@/assets/scss/variables.scss";
 @import "@/assets/scss/_flex.scss";
 #eventList {
-  .right-header {
-    font-size: 0.32rem;
-    font-weight: 500;
-    color: rgba(50, 150, 250, 1);
-  }
-  .main-content {
-    top: $header-withSearch-height;
+  .content-header {
+    .sort-box {
+      height: 0.64rem;
+      background: rgba(255, 255, 255, 1);
+      @include flexbox;
+      @include flex-direction(row);
+      div {
+        height: 100%;
+        width: 50%;
+        color: rgba(48, 48, 48, 1);
+        font-size: 0.3rem;
+        @include flexbox;
+        @include justify-content(center);
+        @include align-items(center);
+        span:last-child {
+          display: inline-block;
+          width: 0.36rem;
+          height: 0.36rem;
+          margin-left: 0.11rem;
+          background: url(../../../assets/images/sort.png) no-repeat;
+        }
+        span.sortUp {
+          background: url(../../../assets/images/sortUp.png) no-repeat;
+        }
+        span.sortDown {
+          background: url(../../../assets/images/sortDown.png) no-repeat;
+        }
+      }
+      div:first-child {
+        border-right: solid 1px #cecece;
+      }
+      .selected {
+        color: rgba(50, 150, 250, 1);
+      }
+    }
+    .state-box {
+      @include flexbox;
+      @include flex-direction(row);
+      @include justify-content(space-between);
+      padding: 0 1.23rem;
+      margin: 0.3rem 0;
+      div {
+        @include flexbox;
+        @include align-items(center);
+        height: 0.54rem;
+      }
+      div:not(:last-child) {
+        background: rgba(164, 188, 212, 1);
+        border-radius: 0.06rem;
+        color: rgba(255, 255, 255, 1);
+        font-size: 0.3rem;
+        padding: 0 0.2rem;
+      }
+      div:last-child {
+        @include justify-content(center);
+        width: 0.64rem;
+        background: rgba(24, 119, 210, 1);
+        border-radius: 0.25rem;
+        color: rgba(255, 255, 255, 1);
+        font-size: 0.32rem;
+      }
+      .selected {
+        background: rgba(50, 150, 250, 1) !important;
+      }
+    }
   }
   .e-nav {
     width: 100%;
@@ -466,9 +607,6 @@ export default {
   }
   .list:last-child {
     border: 0;
-  }
-  .mint-popup {
-    width: 100%;
   }
   .tips {
     line-height: 0.4rem;

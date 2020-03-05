@@ -219,7 +219,7 @@ export default {
           .then(resx => {
             if (resx[0] && resx[0] === "OK" && resx[1] && resx[1] === "OK") {
               this.tips("提交成功", "iconfont icon-success");
-              this.$router.push("/eventList");
+              this.$router.push("/eventList/1");
             } else {
               this.tips("提交失败", "iconfont icon-error");
             }

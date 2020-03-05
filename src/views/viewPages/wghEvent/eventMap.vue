@@ -1,197 +1,262 @@
 <template>
-  <div class="content" id="eventMap">
-    <header-bar leftIcon="back" leftText="返回" :showBorder="isShowBorder">{{moduleName}}</header-bar>
-    <div class="map-container">
-      <div id="map-container"></div>
+  <div class="content" id="mapPosition">
+    <header-bar
+      leftIcon="back"
+      leftText="返回"
+      :isShowSearchIcon="isShowSearchIcon"
+      :showBorder="isShowBorder"
+      :serachFun="toSearchList"
+      :toggleSearchBox="toToggleSearchBox"
+    >{{ moduleName }}</header-bar>
+    <div :class="[isShowSearchBox?'main-content-with-search':'','main-content']">
+      <div class="map-container">
+        <div id="map-container"></div>
+        <img class="center-position" src="@/assets/images/location2.png" />
+        <div class="position">
+          <div class="position-now" @click="getMyPosition">
+            <img src="@/assets/images/position.png" />
+            <span>定位当前</span>
+          </div>
+          <div class="position-ok" @click="submit">
+            <img src="@/assets/images/check-cycle.png" />
+            <span>确定位置</span>
+          </div>
+          <div class="info-box">
+            <input v-model="area" />
+            <p>{{ lng }}E, {{ lat }} N</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="footer">
-      <button @click="getCurrentPosition">
-        <span class="leftImg"></span>
-        <span>定位当前</span>
-      </button>
-      <button @click="setLocation">
-        <span class="rightImg"></span>
-        <span>确定位置</span>
-      </button>
-    </div>
-    <div class="location-tips">{{this.location}}</div>
   </div>
 </template>
 
 <script>
+{
+  const key = "84af24a85c0ce6dbaa1dfca048fda1ae";
+  let script = document.createElement("script");
+  script.src = "https://webapi.amap.com/maps?v=1.4.15&key=" + key;
+  document.head.appendChild(script);
+}
 export default {
   name: "EventMap",
   data() {
     return {
-      isShowBorder: false,
       moduleName: "事件位置",
-      location: "",
-      centerLocation: [],
-      markers: {},
+      searchKey: "",
+      isShowSearchIcon: true,
+      isShowSearchBox: false,
+      isShowBorder: false,
+      zoom: 17,
+      map: null,
+      area: "",
+      lat: 0,
+      lng: 0,
       routerId: ""
     };
   },
-  mounted() {
-    this.routerId = this.$route.params.id;
-    this.centerLocation = JSON.parse(JSON.stringify(this.$store.state.eventLatLng));
-    if (!this.centerLocation.length) {
-      this.getCurrentPosition();
-    } else {
-      this.getLocation();
-      this.initMap();
+  computed: {},
+  watch: {
+    lat() {
+      this.map.setCenter([this.lng, this.lat]);
+    },
+    lng() {
+      this.map.setCenter([this.lng, this.lat]);
     }
   },
+  mounted() {
+    this.routerId = this.$route.params.id;
+    setTimeout(() => {
+      this.initMap();
+    }, 1000);
+  },
   methods: {
-    getLocation() {
-      this.location = `${this.centerLocation[1]} E,${this.centerLocation[0]} N`;
+    toSearchList(e) {
+      this.getLnglat(e);
+    },
+    toToggleSearchBox(e) {
+      this.isShowSearchBox = e;
     },
     initMap() {
-      this.map = this.$map.createMap("map-container", {
-        zoomControl: false,
-        attributionControl: false
+      this.map = new AMap.Map("map-container", {
+        zoom: this.zoom
       });
-      // 加载 open street map 图层服务
-      this.$map.createTileLayer(this.map);
-      this.addMarker();
-      this.map.on("click", e => {
-        const lng = e.latlng.lng.toFixed(5);
-        const lat = e.latlng.lat.toFixed(5);
-        this.location = `${lng} E,${lat} N`;
-        this.centerLocation = [lat, lng];
-        this.addMarker();
+      this.getCenter();
+      this.getMyPosition();
+      this.map.on("moveend", () => {
+        this.getCenter();
       });
     },
-    addMarker() {
-      // 设施地图视图 中心位置
-      if (this.markers) {
-        this.map.removeLayer(this.markers);
-      }
-      this.map.setView(this.centerLocation, 16);
-      const icon = L.icon({
-        iconUrl: require("@/assets/images/location2.png"),
-        iconSize: [16, 22.2]
-      });
-      this.markers = L.marker(this.centerLocation, {
-        icon: icon
-      }).addTo(this.map);
+    getCenter() {
+      const p = this.map.getCenter();
+      this.lat = p.lat;
+      this.lng = p.lng;
+      this.getArea([this.lng, this.lat]);
     },
-    getCurrentPosition() {
-      this.$map.loadScript().then(AMap => {
-        AMap.plugin("AMap.Geolocation", () => {
-          var geolocation = new AMap.Geolocation({
-            enableHighAccuracy: true, //是否使用高精度定位，默认:true
-            timeout: 10000 //超过10秒后停止定位，默认：5s
-          });
-          geolocation.getCurrentPosition((status, result) => {
-            if (status == "complete") {
-              //解析定位结果
-              if (result.position) {
-                this.location = `${result.position.lng} E,${result.position.lat} N`;
-                this.centerLocation = [
-                  result.position.lat,
-                  result.position.lng
-                ];
-                if (this.map) {
-                  this.addMarker();
-                } else {
-                  this.initMap();
-                }
-              }
-            } else {
-              //解析定位错误信息
-              console.error(result);
-            }
-          });
+    getArea(lnglat) {
+      AMap.plugin("AMap.Geocoder", () => {
+        let geocoder = new AMap.Geocoder();
+        geocoder.getAddress(lnglat, (status, result) => {
+          if (status === "complete" && result.info === "OK") {
+            this.area = result.regeocode.formattedAddress;
+          }
         });
       });
     },
-    setLocation() {
-      this.$store.commit("set_eventLatLng", JSON.parse(JSON.stringify(this.centerLocation)));
+    getLnglat(area) {
+      AMap.plugin("AMap.Geocoder", () => {
+        let geocoder = new AMap.Geocoder();
+        geocoder.getLocation(area, (status, result) => {
+          if (status === "complete" && result.info === "OK") {
+            if (result.geocodes.length) {
+              const p = result.geocodes[0].location;
+              this.lat = p.lat;
+              this.lng = p.lng;
+            }
+          }
+        });
+      });
+    },
+    getMyPosition() {
+      AMap.plugin("AMap.Geolocation", () => {
+        let geolocation = new AMap.Geolocation({
+          enableHighAccuracy: true,
+          timeout: 10000
+        });
+        geolocation.getCurrentPosition();
+        AMap.event.addListener(geolocation, "complete", e => {
+          this.lat = e.position.lat;
+          this.lng = e.position.lng;
+          this.area = e.formattedAddress;
+        });
+      });
+    },
+    submit() {
+      this.$store.commit("set_eventLatLng", [this.lat, this.lng]);
       this.$router.push(`/eventContent/${this.routerId}`);
     }
   }
 };
 </script>
-
 <style lang="scss">
 @import "@/assets/scss/_flex.scss";
-#eventMap {
-  .map-container {
-    @include flexbox;
-    @include justify-content(center);
-    position: absolute;
-    left: 0;
-    top: 1.29rem;
-    width: 100%;
-    height: calc(100% - 2.57rem);
-    #map-container {
+.amap-copyright,
+.amap-logo {
+  display: none !important;
+}
+#mapPosition {
+  .main-content {
+    height: 100%;
+    .map-container {
+      @include flexbox;
+      @include justify-content(center);
+      position: absolute;
+      left: 0;
+      top: 0;
       width: 100%;
-      height: 100%;
+      height: calc(100% - 1.25rem);
+      #map-container {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .leaflet-popup-content-wrapper {
+      height: 40px;
+      background: transparent;
+      border-radius: 3px;
+      color: rgba(255, 255, 255, 1);
+      font-size: 14px;
+      .leaflet-popup-content {
+        @include flexbox;
+        @include align-items(center);
+        @include justify-content(space-around);
+        @include flex-direction(column);
+        height: 100%;
+        margin: 0;
+      }
+    }
+    .leaflet-popup-tip-container,
+    .leaflet-popup-close-button {
+      display: none;
     }
   }
-  .footer {
+  .mappopup {
+    text-align: center;
+    font-size: 0.2rem;
+    padding: 0.07rem;
+    text-shadow: 0px 1px 6px rgba(0, 0, 0, 0.7);
+  }
+  .leaflet-popup-content-wrapper {
+    padding: 0;
+  }
+  .center-position {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 2.32rem;
+    bottom: 1.69rem;
+    margin: auto;
+    height: 0.44rem;
+    width: 0.3rem;
+  }
+  .info-box {
+    position: fixed;
+    top: 2.65rem;
+    width: 100%;
+    left: 0;
+    input,
+    p {
+      display: block;
+      border: 0;
+      width: calc(100% - 1.5rem);
+      font-size: 0.3rem;
+      margin: 0;
+      min-height: 0.8rem;
+      line-height: 0.5rem;
+      padding: 0.15rem 0.1rem;
+      text-align: center;
+      background: #dbeeff;
+      margin: 0 0.75rem 0.2rem;
+      color: #3296fa;
+    }
+  }
+  .position {
+    background: #fff;
     position: fixed;
     bottom: 0;
+    left: 0;
+    padding: 0.16rem 0.32rem;
+    z-index: 9999;
     width: 100%;
-    height: 1.28rem;
-    background: rgba(255, 255, 255, 1);
-    @include flexbox;
-    @include flex-direction(row);
-    padding: 0.16rem 0;
-    > button:first-child {
-      width: 2.55rem;
+    overflow: hidden;
+    .position-now {
+      float: left;
+      width: 2.7rem;
+      border: 1px solid #3296fa;
+      color: #3296fa;
+    }
+    .position-ok {
+      float: right;
+      width: 4rem;
+      border: 1px solid #3296fa;
+      background: #3296fa;
+      color: #fff;
+    }
+    div {
+      text-align: center;
       height: 0.96rem;
-      border-radius: 0.03rem;
-      border: 0.02rem solid rgba(50, 150, 250, 1);
-      margin: 0 calc(33% - 2.15rem);
-      > span {
-        color: rgba(50, 150, 250, 1);
+      span {
         font-size: 0.34rem;
+        vertical-align: middle;
+        line-height: 0.96rem;
       }
-      > span:first-child {
-        display: inline-block;
+      img {
         width: 0.36rem;
         height: 0.36rem;
-        background: url("../../../assets/images/currentLocation.png") no-repeat
-          left center;
-        background-size: 0.36rem 0.36rem;
-        margin-right: 0.16rem;
+        vertical-align: middle;
+        margin-right: 0.08rem;
       }
     }
-    > button:nth-child(2) {
-      width: 3.99rem;
-      height: 0.96rem;
-      background: rgba(50, 150, 250, 1);
-      border-radius: 0.03rem;
-      > span {
-        color: rgba(255, 255, 255, 1);
-        font-size: 0.34rem;
-      }
-      > span:first-child {
-        display: inline-block;
-        width: 0.36rem;
-        height: 0.36rem;
-        background: url("../../../assets/images/shape.png") no-repeat left
-          center;
-        background-size: 0.36rem 0.36rem;
-        margin-right: 0.16rem;
-      }
-    }
-  }
-  .location-tips {
-    position: absolute;
-    top: 1.6rem;
-    left: calc(50% - 3rem);
-    z-index: 999;
-    width: 6rem;
-    height: 0.8rem;
-    background: rgba(219, 238, 255, 1);
-    border-radius: 0.03rem;
-    @include flexbox;
-    @include justify-content(center);
-    @include align-items(center);
-    color: rgba(50, 150, 250, 1);
-    font-size: 0.34rem;
   }
 }
 </style>

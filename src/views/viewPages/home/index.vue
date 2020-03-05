@@ -84,12 +84,12 @@ export default {
                   name: '污染源库',
                   imgUrl: require('@/assets/images/a1.png'),
                   url: '/entlist/0'
+                },
+                {
+                  name: '知识库',
+                  imgUrl: require('@/assets/images/a2.png'),
+                  url: '/documents'
                 }
-                // {
-                //   name: '知识库',
-                //   imgUrl: require('@/assets/images/a2.png'),
-                //   url: '/overViewWater'
-                // }
               ]
             }
           ]
@@ -127,13 +127,13 @@ export default {
                 {
                   name: '待办事件',
                   imgUrl: require('@/assets/images/b4.png'),
-                  url: '/eventList',
+                  url: '/eventList/-1',
                   params: 'WGH'
                 },
                 {
                   name: '事件列表',
                   imgUrl: require('@/assets/images/b5.png'),
-                  url: '/eventList',
+                  url: '/eventList/1',
                   params: 'WGH'
                 },
                 {

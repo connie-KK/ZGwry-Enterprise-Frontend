@@ -3,17 +3,15 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
-      :isShowSearch="isShowSearch"
       :showBorder="isShowBorder"
-      :serachFun="toSearchList"
       :customBack="backFun"
+      :isShowSearchIcon="isShowSearchIcon"
+      :serachFun="toSearchList"
+      :toggleSearchBox="toToggleSearchBox"
     >
       {{ moduleName }}{{ count ? `(${count})` : '' }}
-      <!-- <div slot="right" v-if="this.pageType == PollutionPage" @click="toMap">
-        <icon name="location" scale="1"></icon>
-      </div> -->
     </header-bar>
-    <div class="main-content">
+    <div :class="[isShowSearchBox?'main-content-with-search':'','main-content']">
       <div
         class="other"
         ref="scrollbox"
@@ -54,7 +52,6 @@ export default {
       AlarmPage: '1',
       AlarmSubType: 0,
       moduleName: '污染源',
-      isShowSearch: true,
       alarmEnters: [],
       list: [],
       count: 0,
@@ -66,7 +63,9 @@ export default {
       pageIndex: 0,
       dataState: true,
       pageType: '',
-      downState: false
+      downState: false,
+      isShowSearchIcon:true,
+      isShowSearchBox:false
     }
   },
   computed: {
@@ -187,6 +186,9 @@ export default {
         this.getList()
       })
     },
+    toToggleSearchBox(e) {
+      this.isShowSearchBox = e;
+    },
     toSearchList (e) {
       this.firstState = true
       this.filter = e
@@ -212,9 +214,6 @@ export default {
 <style lang="scss" scoped>
 @import "@/assets/scss/_flex.scss";
 @import "@/assets/scss/variables.scss";
-.main-content {
-  top: $header-withSearch-height;
-}
 .sort_box {
   @include flexbox;
   @include align-items(center);

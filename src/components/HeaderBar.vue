@@ -7,25 +7,26 @@
         </span>
         <span class="text">{{leftText}}</span>
       </div>
-      <div class="header-title">
+      <div class="header-title" @click="clickTitle">
         <slot></slot>
       </div>
       <div class="header-right">
-        <slot name="right"></slot>
+        <span class="search-box" v-if="isShowSearchIcon" @click="clickSearch"></span>
+        <slot name="right" class="right-slot"></slot>
       </div>
     </div>
-    <div class="searchBox" v-if="isShowSearch">
+    <div class="searchBox" v-if="isShowSearchBox">
       <span class="icon" @click="loadSearchData">
         <icon name="search" scale="1"></icon>
       </span>
-      <input type="search" v-model="searchValue" placeholder="搜索" @keypress="confirmSearch" />
+      <input type="text" v-model="searchValue" placeholder="请输入关键字" @keypress="confirmSearch" />
+      <span v-if="searchValue" @click="loadSearchData">搜索</span>
     </div>
   </div>
 </template>
 
 <script>
 import icon from "@/components/aepIcon";
-import cookie from 'js-cookie'
 export default {
   name: "HeaderBar",
   components: {
@@ -46,13 +47,18 @@ export default {
     customBack: {
       type: Function
     },
+    //搜索框显示隐藏
+    toggleSearchBox: {
+      type: Function,
+      default: function() {}
+    },
     //搜索框搜索
     serachFun: {
       type: Function,
       default: function() {}
     },
     //是否显示搜索框
-    isShowSearch: {
+    isShowSearchIcon: {
       type: Boolean,
       default: false
     },
@@ -60,11 +66,17 @@ export default {
     showBorder: {
       type: Boolean,
       default: false
+    },
+    //点击标题触发
+    barTitle: {
+      type: Function,
+      default: function() {}
     }
   },
   data() {
     return {
-      searchValue: ""
+      searchValue: "",
+      isShowSearchBox: false
     };
   },
   methods: {
@@ -74,6 +86,7 @@ export default {
       } else {
         window.history.go(-1);
       }
+      this.$store.commit("set_loading", false);
     },
     confirmSearch(e) {
       if (e.keyCode == 13) {
@@ -83,6 +96,13 @@ export default {
     },
     loadSearchData() {
       this.serachFun(this.searchValue);
+    },
+    clickTitle() {
+      this.barTitle();
+    },
+    clickSearch() {
+      this.isShowSearchBox = !this.isShowSearchBox;
+      this.toggleSearchBox(this.isShowSearchBox);
     }
   }
 };
@@ -107,7 +127,7 @@ export default {
   @include align-items(center);
   width: 100%;
   height: $header-height;
-  color: rgba(25, 31, 37, 1);
+  color: #191f25;
   box-sizing: border-box;
   line-height: 1;
   padding: 0 10px;
@@ -128,11 +148,24 @@ export default {
   @include align-items(center);
 }
 .header-right {
+  @include flexbox;
+  @include align-items(center);
+  @include justify-content(flex-end);
   svg {
     width: 0.3rem;
     height: 0.35rem;
   }
   text-align: right;
+  .search-box {
+    display: inline-block;
+    width: 0.36rem;
+    height: 0.36rem;
+    background: url(../assets/images/blue-search.png) no-repeat;
+    background-size: 100%;
+  }
+  div:not(:first-child) {
+    margin-left: 0.4rem;
+  }
 }
 .header-title {
   @include flex(1.5);
@@ -160,18 +193,17 @@ export default {
   @include flexbox;
   @include align-items(center);
   margin: 0 0 0.3rem 0.32rem;
-  width: 6.86rem;
+  width: calc(100% - 0.64rem);
   height: 0.72rem;
   border-radius: 0.0533rem;
-  border: 1px solid #e3e3e4;
-  background-color: #e3e3e4;
+  background: #efeef1;
   input {
     border: 0;
     margin-left: 0.2133rem;
-    width: 6.86rem;
+    width: 5.2rem;
     height: 0.72rem;
     font-size: 0.3rem;
-    background-color: #e3e3e4;
+    background: #efeef1;
     color: #989a9d;
   }
   .icon {
@@ -181,6 +213,11 @@ export default {
       width: 0.32rem;
       height: 0.32rem;
     }
+  }
+  span:last-child {
+    color: rgba(50, 150, 250, 1);
+    font-size: 0.3rem;
+    margin-left: 0.3rem;
   }
 }
 </style>

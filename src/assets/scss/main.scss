@@ -20,3 +20,9 @@
         display: none;
     }
   }
+  .mint-popup {
+    width: 100%;
+    .picker-item.picker-selected {
+      color: #3296fa;
+    }
+  }

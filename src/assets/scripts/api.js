@@ -868,6 +868,13 @@ const interfaces = [
     type: 'post',
     serviceName: 'serviceMyserv'
   },
+  {
+    //环境标准\检测方法\ 环境知识 相关接口
+    fun: 'getDocumentList',
+    interface: 'api/modmanage/GetDocumentList',
+    type: 'post',
+    serviceName: 'serviceMyserv'
+  }
 ]
 
 interfaces.forEach(method => {

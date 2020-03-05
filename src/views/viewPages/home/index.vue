@@ -38,7 +38,12 @@
                 :key="imgIndex"
                 v-on:click="toDetail(imgItem)"
               >
-                <img class="img" :src="imgItem.imgUrl" :alt="imgItem.name" />
+                <img
+                  class="img"
+                  v-if="imgItem.imgUrl"
+                  :src="imgItem.imgUrl"
+                  :alt="imgItem.name"
+                />
                 <div class="note">{{ imgItem.name }}</div>
               </div>
             </div>
@@ -114,11 +119,11 @@ export default {
                   url: '/putTask/0',
                   params: 'WGH'
                 },
-                // {
-                //   name: '',
-                //   imgUrl: '',
-                //   url: ''
-                // },
+                {
+                  name: '',
+                  imgUrl: '',
+                  url: ''
+                },
                 {
                   name: '待办事件',
                   imgUrl: require('@/assets/images/b4.png'),

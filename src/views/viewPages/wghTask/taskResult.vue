@@ -8,7 +8,10 @@
     >
       {{ moduleName }}
     </header-bar>
-    <div class="main-content" v-if="data">
+    <div
+      class="main-content"
+      v-if="data"
+    >
       <div class="box-item">
         <span class="item-title">时间</span>
         <p class="checkbox2">{{ data.date1 }}</p>
@@ -17,11 +20,13 @@
         <span class="item-title">网格/部门</span>
         <p class="checkbox2">
           {{ data.parentName
-          }}<span v-if="data.parentName && data.gridName">-</span
-          >{{ data.gridName }}
+          }}<span v-if="data.parentName && data.gridName">-</span>{{ data.gridName }}
         </p>
       </div>
-      <div class="box-item" @click="popupType = true">
+      <div
+        class="box-item"
+        @click="popupType = true"
+      >
         <span class="item-title">相关企业</span>
         <p class="checkbox">{{ enterName }}</p>
       </div>
@@ -38,7 +43,11 @@
           v-model="contentText"
           v-if="!id"
         ></textarea>
-        <div class="remark-box" v-if="id" v-html="contentText"></div>
+        <div
+          class="remark-box"
+          v-if="id"
+          v-html="contentText"
+        ></div>
       </div>
       <div class="box-item">
         <span class="item-title">图片</span>
@@ -60,7 +69,10 @@
         ></upload-box>
       </div>
       <div class="add-btn">
-        <button @click="submit" v-if="!id">确定</button>
+        <button
+          @click="submit"
+          v-if="!id"
+        >确定</button>
       </div>
     </div>
     <mt-popup
@@ -92,7 +104,7 @@ export default {
     'mt-popup': Popup,
     'mt-picker': Picker
   },
-  data() {
+  data () {
     return {
       moduleName: '任务执行结果',
       searchKey: '',
@@ -118,16 +130,16 @@ export default {
     }
   },
   computed: {
-    deleteState() {
+    deleteState () {
       return !this.id
     },
-    taskEnter() {
+    taskEnter () {
       return this.$store.state.taskEnter
     },
-    userAssInfoList() {
+    userAssInfoList () {
       return this.$store.state.userAssInfoList
     },
-    slots() {
+    slots () {
       let temp = [
         {
           id: '',
@@ -144,7 +156,7 @@ export default {
       ]
     }
   },
-  mounted() {
+  mounted () {
     this.id = this.$route.params.id
     if (this.id && !this.id.includes('X-')) {
       this.getData()
@@ -155,7 +167,7 @@ export default {
     }
   },
   methods: {
-    submit() {
+    submit () {
       let params = JSON.parse(JSON.stringify(this.data))
       let atts = []
       this.imgData.forEach(img => {
@@ -164,6 +176,7 @@ export default {
           rowState: 'add'
         })
       })
+      params.results = this.contentText
       params.id = this.$uuid()
       params.attachments = atts
       params.date = moment(params.date1).format('YYYY-MM-DD HH:mm:ss')
@@ -172,7 +185,7 @@ export default {
         this.$router.go(-1)
       })
     },
-    onValuesChange(e) {
+    onValuesChange (e) {
       if (e.values.length) {
         this.data.enterprise = e.values[0].id
         this.enterName = e.values[0].name
@@ -182,7 +195,7 @@ export default {
         this.enterName = '《和企业/污染源无关》'
       }
     },
-    getData() {
+    getData () {
       this.$api
         .getTaskHandleDetail({
           id: this.id
@@ -205,7 +218,7 @@ export default {
           }
         })
     },
-    async uploadData(e) {
+    async uploadData (e) {
       if (this.initt === 'dingding') {
         let imgarr = []
         for (let i = 0; i < e.length; i++) {
@@ -251,17 +264,17 @@ export default {
         })
       }
     },
-    deleteItem(e) {
+    deleteItem (e) {
       this.imgData.forEach((item, index) => {
         if (item.url === e.url) {
           this.imgData.splice(index, 1)
         }
       })
     },
-    addPic() {
+    addPic () {
       this.$refs.upload.addItem()
     },
-    getUserName(id) {
+    getUserName (id) {
       this.$api
         .getUserByArrUserID({
           items: [id]
@@ -270,7 +283,7 @@ export default {
           this.staffName = res[0].username
         })
     },
-    getUser() {
+    getUser () {
       this.$api.getUser().then(res => {
         if (res) {
           this.data.staff = res.id
@@ -279,7 +292,7 @@ export default {
         }
       })
     },
-    getStaffInfo(id) {
+    getStaffInfo (id) {
       this.$api
         .getStaffInfo({
           id
@@ -296,7 +309,7 @@ export default {
           }
         })
     },
-    openImg(index) {
+    openImg (index) {
       let imgs = []
       this.imgData.forEach(item => {
         imgs.push(item.url)
@@ -409,7 +422,7 @@ export default {
         text-align: right;
         font-size: 0.3rem;
         color: #9e9e9e;
-        background: url('../../../assets/images/right.png') no-repeat right
+        background: url("../../../assets/images/right.png") no-repeat right
           center;
         background-size: auto 0.32rem;
       }
@@ -429,7 +442,7 @@ export default {
         position: relative;
         margin-top: 0.2rem;
         &::before {
-          content: '+';
+          content: "+";
           border: 0.02rem solid #3296fa;
           border-radius: 50%;
           line-height: 0.3rem;
@@ -456,7 +469,7 @@ export default {
           position: relative;
           i.delete {
             &::before {
-              content: '-';
+              content: "-";
               border: 0.02rem solid #3296fa;
               border-radius: 50%;
               line-height: 0.3rem;
@@ -473,7 +486,7 @@ export default {
             }
           }
           i.jump {
-            background: #f8f8f8 url('../../../assets/images/right.png')
+            background: #f8f8f8 url("../../../assets/images/right.png")
               no-repeat right center;
             background-size: auto 0.32rem;
             right: 0.4rem;

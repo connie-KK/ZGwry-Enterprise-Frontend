@@ -720,7 +720,6 @@ export default new Vuex.Store({
     toTaskEvent: '',
     toTaskEventTitle: '',
     isAddTaskState: 0,
-    initType: 'HBGJ', // HBGJ WGH
     // 任务
     allDep: [],
     gridCell: null,
@@ -755,7 +754,8 @@ export default new Vuex.Store({
       valueKey: ''
     },
     followup: [],
-    gridLevel: '' //当前登录人员对应网格等级
+    gridLevel: '', //当前登录人员对应网格等级
+    userInfo: null
   },
   mutations: {
     set_loading: (state, data) => {

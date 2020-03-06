@@ -11,7 +11,9 @@
     >
       {{ moduleName }}{{ count ? `(${count})` : '' }}
     </header-bar>
-    <div :class="[isShowSearchBox?'main-content-with-search':'','main-content']">
+    <div :class="[
+        isShowSearchBox ? 'main-content-with-search' : 'main-content', 'main-cc'
+      ]">
       <div
         class="other"
         ref="scrollbox"
@@ -43,6 +45,7 @@
 <script>
 import store from 'store'
 import moment from 'moment'
+import cookie from 'js-cookie'
 export default {
   name: 'SiteList',
   data () {
@@ -64,8 +67,8 @@ export default {
       dataState: true,
       pageType: '',
       downState: false,
-      isShowSearchIcon:true,
-      isShowSearchBox:false
+      isShowSearchIcon: true,
+      isShowSearchBox: false
     }
   },
   computed: {
@@ -100,8 +103,12 @@ export default {
   },
   methods: {
     backFun () {
-      this.$api.backHome()
-      this.$router.go(-1)
+      const isHBGJ = cookie.get('ISHBGJ')
+      if (isHBGJ == 1) {
+        this.$router.go(-1)
+      } else {
+        this.$api.backHome()
+      }
     },
     routeChange () {
       this.pageType = this.$route.params.id
@@ -186,8 +193,8 @@ export default {
         this.getList()
       })
     },
-    toToggleSearchBox(e) {
-      this.isShowSearchBox = e;
+    toToggleSearchBox (e) {
+      this.isShowSearchBox = e
     },
     toSearchList (e) {
       this.firstState = true
@@ -214,6 +221,14 @@ export default {
 <style lang="scss" scoped>
 @import "@/assets/scss/_flex.scss";
 @import "@/assets/scss/variables.scss";
+.main-content {
+  top: $header-height;
+}
+.main-cc {
+  position: absolute;
+  right: 0;
+  left: 0;
+}
 .sort_box {
   @include flexbox;
   @include align-items(center);

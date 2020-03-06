@@ -16,16 +16,16 @@
 <script>
 import cookie from 'js-cookie'
 export default {
-  name: "app",
+  name: 'app',
   data () {
     return {
-      transitionName: "fade",
+      transitionName: 'fade',
       timer: null
-    };
+    }
   },
   computed: {
     loading () {
-      return this.$store.state.loading;
+      return this.$store.state.loading
     }
   },
   mounted () {
@@ -35,24 +35,25 @@ export default {
   },
   watch: {
     loading () {
-      clearTimeout(this.timer);
+      clearTimeout(this.timer)
       if (this.loading) {
         this.timer = setTimeout(() => {
-          this.$store.commit("set_loading", false);
-        }, 10 * 1000);
+          this.$store.commit('set_loading', false)
+        }, 10 * 1000)
       }
     }
   },
   methods: {
     autoOpen () {
-      const routex = cookie.get('PushData')
+      const routex = cookie.get('linkData')
       if (routex) {
-        cookie.set('PushData', '')
+        cookie.remove('linkData')
+        cookie.remove('linkData', { path: '', domain: '183.220.144.57' })
         this.$router.push(routex.split('$').join('/'))
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>

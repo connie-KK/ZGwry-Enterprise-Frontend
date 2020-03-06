@@ -11,9 +11,16 @@
     <div class="main-content">
       <div class="box-item">
         <span class="item-title">标题</span>
-        <input type="text" placeholder="请输入标题" v-model="taskTitle" />
+        <input
+          type="text"
+          placeholder="请输入标题"
+          v-model="taskTitle"
+        />
       </div>
-      <div class="box-item" @click="popupType = true">
+      <div
+        class="box-item"
+        @click="popupType = true"
+      >
         <span class="item-title">任务性质</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">{{ taskTypeName }}</p>
       </div>
@@ -39,7 +46,10 @@
           {{ incidentTitle || '请选择事件' }}
         </p>
       </div>
-      <div class="box-item" @click="$router.push('/taskModelList')">
+      <div
+        class="box-item"
+        @click="$router.push('/taskModelList')"
+      >
         <span class="item-title">模板类型</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">
           {{ templateName || (notEdit ? '请选择模板' : '无模板') }}
@@ -63,35 +73,67 @@
       <p class="gang"></p>
       <div class="box-item">
         <span class="item-title">相关企业（{{ enters.length }}）</span>
-        <p class="addbox" @click="$router.push('/taskLinkEntList')" v-if="!id">
+        <p
+          class="addbox"
+          @click="$router.push('/taskLinkEntList')"
+          v-if="!id"
+        >
           添加企业
         </p>
         <ul class="item-ul">
-          <li v-for="item in enters" :key="item.id">
+          <li
+            v-for="item in enters"
+            :key="item.id"
+          >
             <span>{{ item.name }}</span>
-            <i class="delete" v-if="!id" @click="deleteEnter(item.id)"></i>
-            <i class="jump" v-if="id" @click="toEnterPage(item.id)"></i>
+            <i
+              class="delete"
+              v-if="!id"
+              @click="deleteEnter(item.id)"
+            ></i>
+            <i
+              class="jump"
+              v-if="id"
+              @click="toEnterPage(item.id)"
+            ></i>
           </li>
         </ul>
       </div>
       <p class="gang"></p>
       <div class="box-item">
         <span class="item-title">相关位置（{{ positions.length }}）</span>
-        <p class="addbox" @click="$router.push('/mapPosition')" v-if="!id">
+        <p
+          class="addbox"
+          @click="$router.push('/mapPosition')"
+          v-if="!id"
+        >
           添加位置
         </p>
         <ul class="item-ul item-ul2">
-          <li v-for="(item, index) in positions" :key="index + 'pop'">
+          <li
+            v-for="(item, index) in positions"
+            :key="index + 'pop'"
+          >
             <span>{{ item.title }}</span>
             <p>{{ item.lng }}E, {{ item.lat }} N</p>
-            <i class="delete" v-if="!id" @click="deletePosition(index)"></i>
-            <i class="jump" v-if="!id"></i>
+            <i
+              class="delete"
+              v-if="!id"
+              @click="deletePosition(index)"
+            ></i>
+            <i
+              class="jump"
+              v-if="!id"
+            ></i>
           </li>
         </ul>
       </div>
       <p class="gang"></p>
       <p class="item-box-top-title">指派</p>
-      <div class="box-item" @click="notEdit ? $refs.picker.open() : false">
+      <div
+        class="box-item"
+        @click="notEdit ? $refs.picker.open() : false"
+      >
         <span class="item-title">任务执行期限</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">{{ deadline }}</p>
       </div>
@@ -105,7 +147,10 @@
           :disabled="notEdit ? false : 'disabled'"
         />
       </div>
-      <div class="box-item" @click="$router.push('/taskAssign')">
+      <div
+        class="box-item"
+        @click="$router.push('/taskAssign')"
+      >
         <span class="item-title">指派给</span>
         <p class="checkbox">{{ partStaffName || '未指定' }}</p>
       </div>
@@ -121,7 +166,10 @@
           <p class="checkbox">&nbsp;</p>
         </div>
         <p class="m-title">执行记录（{{ reListX.length }}）</p>
-        <ul class="totask-list" v-if="reListX.length">
+        <ul
+          class="totask-list"
+          v-if="reListX.length"
+        >
           <li
             v-for="iit in reListX"
             :key="iit.id"
@@ -129,20 +177,25 @@
           >
             <p>{{ iit.date1 }}</p>
             <span v-if="iit.enterpriseName">{{ iit.enterpriseName }}</span>
-            <span
-              >{{ iit.parentName || '' }} {{ iit.gridName || '' }}
-              {{ getStaffName(iit.staff) || '' }}</span
-            >
+            <span>{{ iit.parentName || '' }} {{ iit.gridName || '' }}
+              {{ getStaffName(iit.staff) || '' }}</span>
           </li>
         </ul>
       </div>
-      <div class="add-btn" v-if="notEdit">
+      <div
+        class="add-btn"
+        v-if="notEdit"
+      >
         <button @click="submit">确定</button>
       </div>
     </div>
 
     <!-- control -->
-    <mt-popup position="bottom" v-model="popupType" class="popup-box">
+    <mt-popup
+      position="bottom"
+      v-model="popupType"
+      class="popup-box"
+    >
       <mt-picker
         :slots="slotsTypes"
         valueKey="name"
@@ -182,7 +235,7 @@ export default {
     'mt-datetime-picker': DatetimePicker,
     'mt-picker': Picker
   },
-  data() {
+  data () {
     return {
       id: '',
       moduleName: '',
@@ -212,29 +265,56 @@ export default {
     }
   },
   computed: {
-    taskTypes() {
-      const atct = [
-        {
+    isHBGJ () {
+      return !this.$store.state.userInfo || this.$store.state.userInfo.isHBGJ
+    },
+    gridLevel () {
+      return this.$store.state.userInfo
+        ? this.$store.state.userInfo.gridLevel
+        : 0
+    },
+    taskTypes () {
+      const atct = {
+        2: {
           code: 2,
           name: '事件处理任务'
         },
-        {
+        5: {
           code: 5,
           name: '日常巡查'
         },
-        {
+        6: {
           code: 6,
           name: '信访办理'
         },
-        {
+        7: {
           code: 7,
           name: '任务交办'
         }
-      ]
-      let temp = atct
+      }
+      let temp = []
+      if (this.isHBGJ) {
+        if (this.gridLevel == 2) {
+          temp = [atct[5], atct[7]]
+        }
+        if (this.gridLevel == 3) {
+          temp = [atct[5]]
+        }
+      } else {
+        if (this.gridLevel == 1) {
+          temp = [atct[7]]
+        }
+        if (this.gridLevel == 2) {
+          temp = [atct[5], atct[6], atct[7]]
+        }
+        if (this.gridLevel == 3) {
+          temp = [atct[5], atct[6]]
+        }
+      }
+      this.$store.state.taskParams.type = temp.length ? temp[0].code : 0
       return temp
     },
-    reListX() {
+    reListX () {
       let temp = []
       this.reList.forEach(item => {
         item.date1 = moment(item.date).format('YYYY-MM-DD HH:mm')
@@ -249,7 +329,7 @@ export default {
       })
       return temp
     },
-    slotsTypes() {
+    slotsTypes () {
       return [
         {
           values: this.taskTypes,
@@ -258,50 +338,66 @@ export default {
         }
       ]
     },
-    incidentTitle() {
+    incidentTitle () {
       return this.$store.state.taskParams.incidentTitle
     },
-    templateName() {
+    templateName () {
       return this.$store.state.taskParams.templateName
     },
-    staffName() {
+    staffName () {
       return this.$store.state.taskParams.staffName
     },
-    staffId() {
+    staffId () {
       return this.$store.state.taskParams.staff
     },
-    taskDate() {
+    taskDate () {
       return this.$store.state.taskParams.date
     },
-    taskTypeName() {
+    taskTypeName () {
       if (!this.$store.state.taskParams.type) {
         return ''
       }
-      return this.taskTypes.filter(item => {
-        return this.$store.state.taskParams.type === item.code
-      })[0].name
+      const atct = {
+        2: {
+          code: 2,
+          name: '事件处理任务'
+        },
+        5: {
+          code: 5,
+          name: '日常巡查'
+        },
+        6: {
+          code: 6,
+          name: '信访办理'
+        },
+        7: {
+          code: 7,
+          name: '任务交办'
+        }
+      }
+      return atct[this.$store.state.taskParams.type].name
     },
-    stateName() {
+    stateName () {
       return this.stateOptions.filter(item => {
         return this.$store.state.taskParams.state === item.code
       })[0].name
     },
-    taskState() {
+    taskState () {
       return this.$store.state.taskParams.state
     },
-    taskenterprises() {
+    taskenterprises () {
       return this.$store.state.taskParams.taskenterprises
     },
-    deadline() {
+    deadline () {
       return moment(this.$store.state.taskParams.deadline).format('YYYY-MM-DD')
     },
-    positions() {
+    positions () {
       return this.$store.state.taskParams.taskcoords
     },
-    mydep() {
+    mydep () {
       return this.$store.state.taskParams.dep
     },
-    depName() {
+    depName () {
       if (this.isManyCell) {
         return '多网格'
       }
@@ -333,36 +429,36 @@ export default {
       }
       return temp
     },
-    partStaffId() {
+    partStaffId () {
       return this.$store.state.taskParams.depStaff
     },
-    isManyCell() {
+    isManyCell () {
       return this.$store.state.taskParams.isManyCell
     },
-    templateId() {
+    templateId () {
       return this.$store.state.taskParams.template
     },
-    isNewTaskHandelChange() {
+    isNewTaskHandelChange () {
       return this.$store.state.isNewTaskHandelChange
     }
   },
   watch: {
-    taskTypeName() {
+    taskTypeName () {
       if (this.$store.state.taskParams.type === 2) {
         this.isEvent = true
       } else {
         this.isEvent = false
       }
     },
-    isNewTaskHandelChange() {
+    isNewTaskHandelChange () {
       this.getTaskHandleList()
     },
-    isManyCell() {
+    isManyCell () {
       if (this.isManyCell) {
         this.partStaffName = '多网格'
       }
     },
-    taskenterprises() {
+    taskenterprises () {
       let enterApis = []
       this.taskenterprises.forEach(id => {
         enterApis.push(
@@ -376,10 +472,10 @@ export default {
         this.enters = res
       })
     },
-    deadline() {
+    deadline () {
       this.pickerValue = this.deadline
     },
-    partStaffId() {
+    partStaffId () {
       if (this.partStaffId) {
         this.$api
           .getUserByArrUserID({
@@ -392,7 +488,7 @@ export default {
           })
       }
     },
-    staffId() {
+    staffId () {
       this.$api
         .getUserByArrUserID({
           items: [this.staffId]
@@ -401,7 +497,7 @@ export default {
           this.$store.state.taskParams.staffName = res[0].username
         })
     },
-    templateId() {
+    templateId () {
       if (this.templateId && this.modelList.length) {
         this.$store.state.taskParams.templateName = this.modelList.filter(
           item => {
@@ -411,7 +507,7 @@ export default {
       }
     }
   },
-  mounted() {
+  mounted () {
     this.id = this.$route.params.id
     this.setFirst()
     if (this.id === '0') {
@@ -437,7 +533,7 @@ export default {
     }
   },
   methods: {
-    setFirst() {
+    setFirst () {
       this.$store.state.allDep = []
       this.$store.state.gridCell = null
       this.$store.state.checkGridCell = []
@@ -450,7 +546,7 @@ export default {
         staffName: '',
         date: '',
         deadline: '',
-        type: 2,
+        type: 0,
         state: 0,
         taskenterprises: [],
         taskcoords: [],
@@ -463,7 +559,7 @@ export default {
         incidentTitle: ''
       }
     },
-    getTaskDetail() {
+    getTaskDetail () {
       this.$api
         .getTaskDetail({
           id: this.id
@@ -510,7 +606,7 @@ export default {
           this.getTaskHandleList()
         })
     },
-    getStaffName(staff) {
+    getStaffName (staff) {
       let temp = ''
       this.taskHandelStaffs.forEach(item => {
         if (item.id === staff) {
@@ -519,7 +615,7 @@ export default {
       })
       return temp
     },
-    getTaskHandleList() {
+    getTaskHandleList () {
       this.$api
         .getTaskHandleList({
           task: this.id,
@@ -554,7 +650,7 @@ export default {
           this.reList = res
         })
     },
-    getModel() {
+    getModel () {
       this.$api
         .getTemplateByKey({
           pageIndex: -1,
@@ -564,12 +660,12 @@ export default {
           if (res && Array.isArray(res)) this.modelList = res
         })
     },
-    getAllDep() {
+    getAllDep () {
       this.$api.getDepartmentAll().then(res => {
         this.$store.state.allDep = res
       })
     },
-    getStaffInfo(id) {
+    getStaffInfo (id) {
       this.$api
         .getStaffInfo({
           id
@@ -580,7 +676,7 @@ export default {
           }
         })
     },
-    getGridCellTree(grid) {
+    getGridCellTree (grid) {
       this.$api
         .getGridCellTree({
           grid
@@ -589,7 +685,7 @@ export default {
           this.$store.state.gridCell = res
         })
     },
-    getUser() {
+    getUser () {
       this.$api.getUser().then(res => {
         if (res) {
           this.$store.state.taskParams.staff = res.id
@@ -598,16 +694,16 @@ export default {
         }
       })
     },
-    getTaskUser(id) {
+    getTaskUser (id) {
       this.getStaffInfo(id)
     },
-    setDate() {
+    setDate () {
       this.$store.state.taskParams.date = moment().format('YYYY-MM-DD HH:mm:00')
       this.$store.state.taskParams.deadline = moment().format(
         'YYYY-MM-DD 00:00:00'
       )
     },
-    onValuesChangeType(e) {
+    onValuesChangeType (e) {
       if (e.values[0].code === 2) {
         this.isEvent = true
       } else {
@@ -615,7 +711,7 @@ export default {
       }
       this.$store.state.taskParams.type = e.values[0].code
     },
-    deleteEnter(id) {
+    deleteEnter (id) {
       MessageBox.confirm('确认删除此企业?').then(action => {
         if (action === 'confirm') {
           this.taskenterprises.forEach((item, index) => {
@@ -626,19 +722,19 @@ export default {
         }
       })
     },
-    deletePosition(index) {
+    deletePosition (index) {
       MessageBox.confirm('确认删除此位置?').then(action => {
         if (action === 'confirm') {
           this.$store.state.taskParams.taskcoords.splice(index, 1)
         }
       })
     },
-    handleConfirm(e) {
+    handleConfirm (e) {
       this.$store.state.taskParams.deadline = moment(e).format(
         'YYYY-MM-DD 00:00:00'
       )
     },
-    submitBefore(data) {
+    submitBefore (data) {
       if (!data.title) {
         return '请输入标题！'
       }
@@ -650,7 +746,7 @@ export default {
       }
       return false
     },
-    submit() {
+    submit () {
       let temp = JSON.parse(JSON.stringify(this.$store.state.taskParams))
       const id = this.$uuid()
       let params = {
@@ -690,8 +786,8 @@ export default {
                   ? 1
                   : 0
                 : item.type === 'dep'
-                ? 3
-                : 2
+                  ? 3
+                  : 2
           })
         })
       } else {
@@ -736,7 +832,7 @@ export default {
         this.$router.go(-1)
       })
     },
-    toEnterPage(id) {
+    toEnterPage (id) {
       window.location.href = `https://zsxtl.azuratech.com:8003/dashboard/#/enterInfo/${id}`
     }
   }
@@ -803,7 +899,7 @@ export default {
       text-align: right;
       font-size: 0.3rem;
       color: #9e9e9e;
-      background: url('../../../assets/images/right.png') no-repeat right center;
+      background: url("../../../assets/images/right.png") no-repeat right center;
       background-size: auto 0.32rem;
     }
     .checkbox2 {
@@ -822,7 +918,7 @@ export default {
       position: relative;
       margin-top: 0.2rem;
       &::before {
-        content: '+';
+        content: "+";
         border: 0.02rem solid #3296fa;
         border-radius: 50%;
         line-height: 0.3rem;
@@ -849,7 +945,7 @@ export default {
         position: relative;
         i.delete {
           &::before {
-            content: '-';
+            content: "-";
             border: 0.02rem solid #3296fa;
             border-radius: 50%;
             line-height: 0.3rem;
@@ -866,7 +962,7 @@ export default {
           }
         }
         i.jump {
-          background: #f8f8f8 url('../../../assets/images/right.png') no-repeat
+          background: #f8f8f8 url("../../../assets/images/right.png") no-repeat
             right center;
           background-size: auto 0.32rem;
           right: 0.4rem;
@@ -946,7 +1042,7 @@ export default {
     background: #fff;
     padding-bottom: 0.3rem;
     li {
-      background: #f8f8f8 url('../../../assets/images/right.png') no-repeat
+      background: #f8f8f8 url("../../../assets/images/right.png") no-repeat
         calc(100% - 0.25rem) center;
       background-size: auto 0.32rem;
       margin: 0 0.24rem 0.17rem 0.4rem;

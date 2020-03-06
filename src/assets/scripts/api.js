@@ -877,11 +877,9 @@ const interfaces = [
   }
 ]
 
-interfaces.forEach(method => {
-  api[method.fun] = payload => {
-    return service[method.serviceName][method.type](method.interface, payload)
-  }
-})
+import {
+  Toast
+} from 'mint-ui'
 
 api.logout = () => {
   if (window.logOut) {
@@ -908,5 +906,27 @@ api.backHome = () => {
     }
   }
 }
+
+interfaces.forEach(method => {
+  api[method.fun] = payload => {
+    return new Promise(resolve => {
+      service[method.serviceName][method.type](method.interface, payload).then(res => {
+        if (res === 'ERROR401') {
+          // 获取数据失败,正在重试...
+          api[method.fun](payload).then(sonres => {
+            if (sonres === 'ERROR401') {
+              Toast('获取数据失败, 请重新登录')
+              api.logout()
+            } else {
+              resolve(sonres)
+            }
+          })
+        } else {
+          resolve(res)
+        }
+      })
+    })
+  }
+})
 
 export default api

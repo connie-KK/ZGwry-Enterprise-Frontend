@@ -1,5 +1,8 @@
 <template>
-  <div class="x-content" id="home">
+  <div
+    class="x-content"
+    id="home"
+  >
     <header-bar>{{ moduleName }}</header-bar>
     <img
       src="@/assets/images/loginout.png"
@@ -7,15 +10,25 @@
       @click="mylogout"
     />
     <p class="company-name">{{ company }}</p>
-    <div id="enterinfo" v-cloak>
-      <mt-popup v-model="popup" position="middle" class="pick-box">
+    <div
+      id="enterinfo"
+      v-cloak
+    >
+      <mt-popup
+        v-model="popup"
+        position="middle"
+        class="pick-box"
+      >
         <div class="isdev">
           <img
             class="close"
             @click="popup = false"
             src="@/assets/images/close.png"
           />
-          <img class="dev" src="@/assets/images/isdev.png" />
+          <img
+            class="dev"
+            src="@/assets/images/isdev.png"
+          />
           <p>该模块正在开发中</p>
         </div>
       </mt-popup>
@@ -26,11 +39,23 @@
           :key="index"
         >
           <div class="module">
-            <span class="tips" v-if="item.name"></span>
-            <span class="category" v-if="item.name">{{ item.name }}</span>
+            <span
+              class="tips"
+              v-if="item.name"
+            ></span>
+            <span
+              class="category"
+              v-if="item.name"
+            >{{ item.name }}</span>
           </div>
-          <div v-for="(it, idx) in item.lists" :key="idx">
-            <div class="name" v-if="it.categoryName">{{ it.categoryName }}</div>
+          <div
+            v-for="(it, idx) in item.lists"
+            :key="idx"
+          >
+            <div
+              class="name"
+              v-if="it.categoryName"
+            >{{ it.categoryName }}</div>
             <div class="items">
               <div
                 class="item"
@@ -49,7 +74,10 @@
             </div>
           </div>
         </div>
-        <div class="hidden-dev" @click="outputMobile">
+        <div
+          class="hidden-dev"
+          @click="outputMobile"
+        >
           .
           <p v-if="mobileState">{{ mobileNumber || 'not number' }}</p>
         </div>
@@ -66,14 +94,30 @@ export default {
   components: {
     'mt-popup': Popup
   },
-  data() {
+  data () {
     return {
       popup: false,
       mobileNumber: window.mymobile,
       mobileState: false,
       moduleName: '首页',
       company: '浙江中环瑞蓝科技发展有限公司',
-      listData: [
+      isHasUserData: false
+    }
+  },
+  computed: {
+    userInfo () {
+      return this.$store.state.userInfo
+    },
+    isHBGJ () {
+      return !this.userInfo || this.userInfo.isHBGJ
+    },
+    gridLevel () {
+      return this.$store.state.userInfo
+        ? this.$store.state.userInfo.gridLevel
+        : 0
+    },
+    listData () {
+      let hxdata = [
         {
           name: '基础信息库',
           extraClass: '',
@@ -176,11 +220,28 @@ export default {
           ]
         }
       ]
+      if (!this.isHasUserData || !this.gridLevel) {
+        return [hxdata[0]]
+      }
+      if (this.isHBGJ) {
+        return [hxdata[0], hxdata[2]]
+      } else {
+        return [hxdata[0], hxdata[1]]
+      }
     }
   },
-  created() {},
+  watch: {
+    userInfo () {
+      if (this.userInfo) {
+        this.isHasUserData = true
+      }
+    }
+  },
+  created () {
+    this.getUser()
+  },
   methods: {
-    toDetail(item) {
+    toDetail (item) {
       if (!item.url && !item.redirectUrl && item.name) {
         this.popup = true
         return
@@ -194,18 +255,34 @@ export default {
         this.$store.state.initType = item.params
       }
     },
-    outputMobile() {
+    outputMobile () {
       this.mobileState = true
     },
-    mylogout() {
+    mylogout () {
       this.$api.logout()
+    },
+    getUser () {
+      this.$api.getUser().then(res => {
+        if (res && res.id) {
+          this.getStaffInfo(res.id)
+        }
+      })
+    },
+    getStaffInfo (id) {
+      this.$api.getStaffInfo({
+        id
+      }).then(res => {
+        if (res && res.id) {
+          this.$store.state.userInfo = res
+        }
+      })
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/scss/_flex.scss';
+@import "@/assets/scss/_flex.scss";
 #home {
   height: 100%;
   body {

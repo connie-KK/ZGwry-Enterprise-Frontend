@@ -1,10 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import store from '@/store'
-import {
-  Toast
-} from 'mint-ui'
-import apis from './api'
 
 const customAxios = (prefix = '') => {
   let service = null
@@ -60,10 +56,7 @@ const customAxios = (prefix = '') => {
     error => {
       store.commit("set_loading", false)
       if (error.response.status === 401) {
-        Toast('获取数据失败！')
-        setTimeout(() => {
-          apis.logout()
-        }, 1000)
+        return 'ERROR401'
       }
       return Promise.reject(error)
     })

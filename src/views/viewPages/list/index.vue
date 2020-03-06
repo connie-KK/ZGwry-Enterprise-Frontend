@@ -14,10 +14,7 @@
       </div> -->
     </header-bar>
     <div class="main-content">
-      <div
-        class="other"
-        ref="scrollbox"
-      >
+      <div class="other" ref="scrollbox">
         <div
           v-for="(item, index) in list"
           class="list-content"
@@ -25,19 +22,13 @@
           @click="toDetail(item)"
         >
           <span>{{ item.name }}</span>
-          <span
-            class="icon warning"
-            v-if="item.isWarning"
-          > </span>
+          <span class="icon warning" v-if="item.isWarning"> </span>
         </div>
       </div>
       <div v-if="list.length == 0 && !firstState">
         <div class="list-content list-tips">暂无数据</div>
       </div>
-      <p
-        class="down-tip"
-        v-if="downState"
-      >已经到底了</p>
+      <p class="down-tip" v-if="downState">已经到底了</p>
     </div>
   </div>
 </template>
@@ -45,9 +36,10 @@
 <script>
 import store from 'store'
 import moment from 'moment'
+import cookie from 'js-cookie'
 export default {
   name: 'SiteList',
-  data () {
+  data() {
     return {
       PollutionPage: '0',
       PollutionSubType: 9,
@@ -70,7 +62,7 @@ export default {
     }
   },
   computed: {
-    subType () {
+    subType() {
       if (this.pageIndex === this.WATERPage) {
         return this.WATERSubType
       } else if (this.pageIndex === this.VOCPage) {
@@ -78,11 +70,11 @@ export default {
       }
     }
   },
-  created () {
+  created() {
     this.routeChange()
     this.getAlarmCount()
   },
-  mounted () {
+  mounted() {
     window.onscroll = () => {
       const boxH = this.$refs.scrollbox ? this.$refs.scrollbox.clientHeight : 0
       const scrollH = window.scrollY
@@ -100,25 +92,29 @@ export default {
     }
   },
   methods: {
-    backFun () {
-      this.$api.backHome()
-      this.$router.go(-1)
+    backFun() {
+      const isHBGJ = cookie.get('ISHBGJ')
+      if (isHBGJ == 1) {
+        this.$router.go(-1)
+      } else {
+        this.$api.backHome()
+      }
     },
-    routeChange () {
+    routeChange() {
       this.pageType = this.$route.params.id
       this.moduleName = this.moduleList[this.pageType]
     },
-    toMap () {
+    toMap() {
       this.$router.push('/map')
     },
-    getList () {
+    getList() {
       if (this.pageType === '0') {
         this.getEnterList()
       } else if (this.pageType === '1') {
         this.getAlarmList()
       }
     },
-    getEnterList () {
+    getEnterList() {
       const payload = {
         keys: this.filter,
         pageIndex: this.pageIndex,
@@ -148,7 +144,7 @@ export default {
         }
       })
     },
-    getAlarmList () {
+    getAlarmList() {
       const payload = {
         keyword: this.filter,
         pageIndex: this.pageIndex,
@@ -179,7 +175,7 @@ export default {
         }
       })
     },
-    getAlarmCount () {
+    getAlarmCount() {
       this.$api.getAlarmCount({}).then(res => {
         if (res.items && Array.isArray(res.items)) {
           this.alarmEnters = res.items
@@ -187,7 +183,7 @@ export default {
         this.getList()
       })
     },
-    toSearchList (e) {
+    toSearchList(e) {
       this.firstState = true
       this.filter = e
       this.list = []
@@ -196,7 +192,7 @@ export default {
       this.downState = false
       this.getList()
     },
-    toDetail (item) {
+    toDetail(item) {
       // this.$store.state.clickItem = JSON.parse(JSON.stringify(item))
       // if (this.pageType === this.PollutionPage) {
       //   this.$router.push(`/enterFactor/${item.id}`)
@@ -210,8 +206,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/_flex.scss";
-@import "@/assets/scss/variables.scss";
+@import '@/assets/scss/_flex.scss';
+@import '@/assets/scss/variables.scss';
 .main-content {
   top: $header-withSearch-height;
 }
@@ -277,7 +273,7 @@ export default {
   display: inline-block;
   width: 0.36rem;
   height: 0.36rem;
-  background: url("../../../assets/images/warning.png") no-repeat center;
+  background: url('../../../assets/images/warning.png') no-repeat center;
   background-size: 100% 100%;
 }
 </style>

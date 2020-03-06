@@ -5,54 +5,51 @@
         <router-view></router-view>
       </transition>
     </navigation>
-    <img
-      src="../../assets/images/loading.svg"
-      class="loadImg"
-      v-if="loading"
-    />
+    <img src="../../assets/images/loading.svg" class="loadImg" v-if="loading" />
   </div>
 </template>
 
 <script>
 import cookie from 'js-cookie'
 export default {
-  name: "app",
-  data () {
+  name: 'app',
+  data() {
     return {
-      transitionName: "fade",
+      transitionName: 'fade',
       timer: null
-    };
-  },
-  computed: {
-    loading () {
-      return this.$store.state.loading;
     }
   },
-  mounted () {
+  computed: {
+    loading() {
+      return this.$store.state.loading
+    }
+  },
+  mounted() {
     setInterval(() => {
       this.autoOpen()
     }, 1000)
   },
   watch: {
-    loading () {
-      clearTimeout(this.timer);
+    loading() {
+      clearTimeout(this.timer)
       if (this.loading) {
         this.timer = setTimeout(() => {
-          this.$store.commit("set_loading", false);
-        }, 10 * 1000);
+          this.$store.commit('set_loading', false)
+        }, 10 * 1000)
       }
     }
   },
   methods: {
-    autoOpen () {
+    autoOpen() {
       const routex = cookie.get('PushData')
       if (routex) {
-        cookie.set('PushData', '')
+        cookie.remove('PushData')
+        cookie.remove('PushData', { path: '', domain: '183.220.144.57' })
         this.$router.push(routex.split('$').join('/'))
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>

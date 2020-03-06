@@ -151,6 +151,12 @@ html {
   outline: none;
 }
 
+//防止ios无法输入
+*:not(input, textarea) {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
 // We fix position the body and scroll `.content`.
 body {
   font-family: $font-family-default;
@@ -300,6 +306,9 @@ input[type="submit"],
   right: 0;
   left: 0;
   // background:rgba(255,255,255,1);
+}
+.main-content-with-search {
+  top: $header-withSearch-height;
 }
 
 // Utility classes

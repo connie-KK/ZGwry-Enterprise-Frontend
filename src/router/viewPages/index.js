@@ -133,7 +133,7 @@ export default new Router({
       component: () => import('@/views/viewPages/wghTask/mapPosition.vue')
     },
     {
-      path: '/eventList',
+      path: '/eventList/:id',
       name: 'eventList',
       component: () => import('@/views/viewPages/wghEvent/eventList.vue')
     },
@@ -171,6 +171,11 @@ export default new Router({
       path: '/msgDetail/:id',
       name: 'msgDetail',
       component: () => import('@/views/viewPages/wghEvent/msgDetail.vue')
+    },
+    {
+      path: '/documents',
+      name: 'documents',
+      component: () => import('@/views/viewPages/documents/index.vue')
     },
     {
       path: '*',

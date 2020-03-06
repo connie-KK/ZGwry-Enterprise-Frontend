@@ -1,6 +1,11 @@
 <template>
   <div class="content" id="eventContent">
-    <header-bar leftIcon="back" leftText="返回" :showBorder="isShowBorder">{{moduleName}}</header-bar>
+    <header-bar
+      leftIcon="back"
+      leftText="返回"
+      :showBorder="isShowBorder"
+      :customBack="goBack"
+    >{{moduleName}}</header-bar>
     <div :class="['main-content', editState? '':'main-content1']">
       <div :class="['list',item.class]" v-for="(item,index) in dataList" :key="index">
         <span>{{item.label}}</span>
@@ -8,7 +13,7 @@
           <input
             type="text"
             v-model="item.value"
-            :readonly="!editState"
+            :readonly="!editState ||item.readonly"
             :placeholder="item.placeholder"
           />
         </div>
@@ -38,15 +43,19 @@
           </span>
         </div>
         <div class="right" v-if="item.type==='img'">
-          <span class="img" @click="toImg"></span>
+          <span class="img" @click="toImg" v-if="editState"></span>
         </div>
-        <div class="img-list" v-if="item.type==='img'&&item.value.length">
-          <div v-for="(imgItem,idx) in item.value" :key="idx">
-            <div class="imgBox">
-              <img :src="imgBaseUrl+imgItem.id" :alt="imgItem.name" @click="previewImg(idx)" />
-            </div>
-            <div v-if="editState" class="icon" @click="deleteImg(imgItem)"></div>
-          </div>
+        <div class="img-list" v-if="item.type==='img'">
+          <upload-box
+            ref="upload"
+            :data="imglist"
+            :autoShow="false"
+            @upload="uploadData"
+            @deleteItem="deleteItem"
+            :showDelete="editState"
+            @clickimg="openImg"
+            :initt="initt"
+          ></upload-box>
         </div>
         <div class="child-list" v-if="item.type==='text'&&item.items">
           <div v-for="(it,idx) in item.items" :key="idx">
@@ -60,16 +69,6 @@
           </div>
         </div>
       </div>
-      <input
-        style="float: left;  display: none;"
-        type="file"
-        name="Filedata"
-        id="uploadFile"
-        accept="image/*"
-        capture="camera"
-        required="required"
-        @change="readLocalFile()"
-      />
     </div>
     <div class="footer" v-if="editState">
       <button @click="save">登记</button>
@@ -77,49 +76,29 @@
     <mt-popup v-model="popupVisible" position="bottom">
       <mt-picker :slots="slots" @change="selectValue" valueKey="valueKey"></mt-picker>
     </mt-popup>
-    <transition>
-      <div v-if="isPreviewImg" class="img-prev-box">
-        <mt-swipe
-          :auto="0"
-          :show-indicators="true"
-          :speed="50"
-          :continuous="false"
-          :defaultIndex="selectedFileId"
-          ref="mySwipe"
-          @change="handleChange"
-        >
-          <mt-swipe-item v-for="item in imglist" :key="item.key">
-            <img :src="imgBaseUrl+item.id" :alt="item.name" class="img-prev" />
-          </mt-swipe-item>
-        </mt-swipe>
-        <span @click="closeImg" class="close-img"></span>
-      </div>
-    </transition>
   </div>
 </template>
 
 <script>
+{
+  const key = "84af24a85c0ce6dbaa1dfca048fda1ae";
+  let script = document.createElement("script");
+  script.src = "https://webapi.amap.com/maps?v=1.4.15&key=" + key;
+  document.head.appendChild(script);
+}
 import moment from "moment";
-import {
-  Switch,
-  Indicator,
-  Actionsheet,
-  Popup,
-  Picker,
-  Toast,
-  Swipe,
-  SwipeItem
-} from "mint-ui";
-import { join } from "path";
+import uploadBox from "@/components/uploadBox";
+import ImagePreview from "vant/lib/image-preview";
+import "vant/lib/image-preview/style";
+import cookie from "js-cookie";
+import { Switch, Indicator, Popup, Picker, Toast } from "mint-ui";
 export default {
   name: "EventContent",
   components: {
+    uploadBox,
     "mt-switch": Switch,
-    "mt-actionsheet": Actionsheet,
     "mt-popup": Popup,
-    "mt-picker": Picker,
-    "mt-swipe": Swipe,
-    "mt-swipe-item": SwipeItem
+    "mt-picker": Picker
   },
   data() {
     return {
@@ -215,14 +194,16 @@ export default {
           key: "date",
           type: "text",
           value: moment().format("YYYY-MM-DD HH:mm:ss"),
-          class: "top-margin"
+          class: "top-margin",
+          readonly: true
         },
         {
           label: "网格员",
           key: "role",
           type: "text",
           value: "",
-          placeholder: "请输入网格员"
+          placeholder: "请输入网格员",
+          readonly: true
         },
         {
           label: "地址",
@@ -300,7 +281,8 @@ export default {
       selectedFileId: 0,
       entPageIndex: 0,
       imgBaseUrl: "/ent/Grid/GetImage/",
-      moduleId360: ""
+      moduleId360: "",
+      initt: "none"
     };
   },
   watch: {
@@ -329,7 +311,7 @@ export default {
       this.routeId = this.$route.params.id;
       if (this.routeId < 0) {
         this.editState = true;
-        this.moduleName = "登记事件";
+        this.moduleName = "事件上报";
         let sotreDataList = JSON.parse(
           JSON.stringify(this.$store.state.newDatalist)
         );
@@ -338,10 +320,9 @@ export default {
         } else {
           this.dataList = this.newDataList;
         }
-
-        this.$map.loadScript().then(AMap => {
+        setTimeout(() => {
           this.getLocation();
-        });
+        }, 1000);
         this.getSelectedEnteprise();
         this.getUserId();
       } else {
@@ -369,7 +350,7 @@ export default {
       };
       this.$api.getRolePermission(payload).then(res => {
         if (res && res.incidentType && Array.isArray(res.incidentType)) {
-          let tempArr = [];
+          let tempArr = [{ value: 0, valueKey: "请选择类型" }];
           res.incidentType.forEach(item => {
             tempArr.push({ valueKey: item.name, value: item.type });
           });
@@ -415,7 +396,7 @@ export default {
                   const lat = res.lat.toFixed(6);
                   item.value = `${lng} E,${lat} N`;
                 } else if (resKey === "attaches") {
-                  this.imglist = res[resKey]
+                  this.imglist = res[resKey];
                   item.value = res[resKey];
                 } else if (
                   resKey === "enterprise" &&
@@ -523,6 +504,10 @@ export default {
         this.slots = this.typeList;
         this.popupVisible = true;
       } else if (data.key === "enterprise") {
+        this.$store.commit(
+          "set_newDatalist",
+          JSON.parse(JSON.stringify(this.dataList))
+        );
         this.$router.push("/enterpriseList");
       }
     },
@@ -539,7 +524,27 @@ export default {
         this.$set(this.dataList, index, obj);
       }
     },
+    goBack() {
+      this.resetData();
+      if (this.editState) {
+        //登记事件
+        this.$router.push("/enList");
+      } else {
+        window.history.go(-1);
+      }
+    },
     save() {
+      //没有输入标题，无法提交
+      const title = this.dataList[0].value;
+      if (!title) {
+        Toast({
+          message: "请输入事件标题",
+          iconClass: "iconfont icon-error",
+          position: "top",
+          duration: 3000
+        });
+        return;
+      }
       let id = this.createGuid();
       let payload = {
         id: id,
@@ -567,13 +572,20 @@ export default {
         } else if (item.type === "rightArrow") {
           payload[item.key] = item.valueKey;
         } else if (item.key === "role") {
+        } else if (item.key === "results") {
+          if (item.value) {
+            //事件已自行处理
+            payload.handledate = moment().format();
+            payload.state = 3;
+          }
         } else {
           payload[item.key] = item.value;
         }
       });
       this.$api.updateincident(payload).then(res => {
         if (res === "OK") {
-          this.$router.push("/eventList");
+          this.resetData();
+          this.$router.push("/eventList/1");
         } else {
           Toast({
             message: res,
@@ -583,6 +595,15 @@ export default {
           });
         }
       });
+    },
+    resetData() {
+      this.$store.commit("set_newDatalist", []);
+      let selectedEnterprise = {
+        value: "",
+        valueKey: ""
+      };
+      this.$store.commit("set_selectedEnterprise", selectedEnterprise);
+      this.$store.commit("set_eventLatLng", []);
     },
     toTask(it) {
       this.$router.push(`/putTask/${it.id}`);
@@ -649,11 +670,72 @@ export default {
       });
     },
     toImg() {
-      if (this.editState) {
-        document.getElementById("uploadFile").click();
+      this.$refs.upload[0].addItem();
+    },
+    async uploadData(e) {
+      if (this.initt === "dingding") {
+        let imgarr = [];
+        for (let i = 0; i < e.length; i++) {
+          let x = await window.dingtalk.uploadFile({
+            url: "https://zsxt.azuratech.com:8002/api/GBM/UploadAttachment",
+            filePath: e[i],
+            fileName: "image",
+            fileType: "image",
+            header: {
+              "content-type": "multipart/form",
+              Authorization: `Bearer ${cookie.get("AzuraCookie")}`
+            }
+          });
+          if (x.data && x.data.includes("id")) {
+            let img = JSON.parse(x.data);
+            imgarr.push(img[0]);
+          }
+        }
+        imgarr.forEach(item => {
+          if (
+            item.url.includes("Content") &&
+            !item.url.includes(this.$360url)
+          ) {
+            item.url = this.$360url + item.url;
+          }
+        });
+        this.imglist.push(...imgarr);
       } else {
-        return;
+        let data = new FormData();
+        for (let i = 0; i < e.length; i++) {
+          data.append("file" + i, e[i]);
+        }
+        this.$api.uploadAttachment(data).then(res => {
+          res.forEach(item => {
+            if (
+              item.url.includes("Content") &&
+              !item.url.includes(this.$360url)
+            ) {
+              item.url = this.$360url + item.url;
+            }
+          });
+          this.imglist.push(...res);
+        });
       }
+    },
+    deleteItem(e) {
+      this.imglist.forEach((item, index) => {
+        if (item.url === e.url) {
+          this.imglist.splice(index, 1);
+        }
+      });
+    },
+    openImg(index) {
+      let imgs = [];
+      this.imglist.forEach(item => {
+        imgs.push(item.url);
+      });
+      console.log(ImagePreview);
+      ImagePreview({
+        images: imgs,
+        startPosition: index,
+        closeable: true
+      });
     },
     readLocalFile() {
       let localFile = document.getElementById("uploadFile");
@@ -683,9 +765,6 @@ export default {
             this.$set(this.dataList, 7, obj);
             this.imglist = this.dataList[7].value;
           }
-          // this.$nextTick(() => {
-          //   this.$refs.footerBox.scrollTop = this.$refs.footerBox.scrollHeight;
-          // });
         })
         .catch(err => {
           Indicator.close();
@@ -746,14 +825,14 @@ export default {
     }
     > span:first-child {
       line-height: 0.84rem;
-      width: calc(100% - 4.8rem);
+      width: calc(100% - 4.3rem);
       color: rgba(48, 48, 48, 1);
       font-size: 0.34rem;
       vertical-align: middle;
     }
     > div.right {
       float: right;
-      width: 4.8rem;
+      width: 4.3rem;
       color: rgb(157, 157, 157);
       height: 0.84rem;
       text-align: right;
@@ -905,9 +984,6 @@ export default {
       border-radius: 0.03rem;
       font-size: 0.34rem;
     }
-  }
-  .mint-popup {
-    width: 100%;
   }
   .img-prev-box {
     position: fixed;

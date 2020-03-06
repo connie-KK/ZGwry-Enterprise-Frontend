@@ -4,10 +4,11 @@
       leftIcon="back"
       leftText="返回"
       :showBorder="isShowBorder"
-      :isShowSearch="isShowSearch"
+      :isShowSearchIcon="isShowSearchIcon"
       :serachFun="toSearchList"
+      :toggleSearchBox="toToggleSearchBox"
     >{{moduleName}}</header-bar>
-    <div class="main-content">
+    <div :class="[isShowSearchBox?'main-content-with-search':'','main-content']">
       <div class="list-content" ref="scrollbox">
         <div v-for="(item,index) in dataLists" :key="index" @click="selectItem(item)">
           <p v-if="item.name">{{item.name}}</p>
@@ -27,7 +28,8 @@ export default {
     return {
       moduleName: "相关企业",
       isShowBorder: false,
-      isShowSearch: true,
+      isShowSearchIcon: true,
+      isShowSearchBox: false,
       filter: "",
       firstState: true,
       pageSize: 30,
@@ -60,7 +62,12 @@ export default {
   methods: {
     toSearchList(e) {
       this.filter = e;
+      this.pageIndex = 0;
+      this.dataLists = [];
       this.getEnterpriseList();
+    },
+    toToggleSearchBox(e) {
+      this.isShowSearchBox = e;
     },
     getEnterpriseList() {
       const payload = {
@@ -93,9 +100,6 @@ export default {
 @import "@/assets/scss/_flex.scss";
 @import "@/assets/scss/variables.scss";
 #enterpriseList {
-  .main-content {
-    top: $header-withSearch-height;
-  }
   .list-content {
     div {
       width: 100%;

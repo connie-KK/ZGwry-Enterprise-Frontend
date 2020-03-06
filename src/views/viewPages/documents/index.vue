@@ -198,6 +198,9 @@ export default {
     .name-box {
       display: inline-block;
       width: calc(100% - 1.5rem);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
     img:last-child {
       width: 0.44rem;

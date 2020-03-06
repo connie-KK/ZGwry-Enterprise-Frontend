@@ -871,7 +871,7 @@ const interfaces = [
   {
     //环境标准\检测方法\ 环境知识 相关接口
     fun: 'getDocumentList',
-    interface: 'api/modmanage/GetDocumentList',
+    interface: '/api/modmanage/GetDocumentList',
     type: 'post',
     serviceName: 'serviceMyserv'
   }

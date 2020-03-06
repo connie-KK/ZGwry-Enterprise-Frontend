@@ -5,7 +5,11 @@
         <router-view></router-view>
       </transition>
     </navigation>
-    <img src="../../assets/images/loading.svg" class="loadImg" v-if="loading" />
+    <img
+      src="../../assets/images/loading.svg"
+      class="loadImg"
+      v-if="loading"
+    />
   </div>
 </template>
 
@@ -13,24 +17,24 @@
 import cookie from 'js-cookie'
 export default {
   name: 'app',
-  data() {
+  data () {
     return {
       transitionName: 'fade',
       timer: null
     }
   },
   computed: {
-    loading() {
+    loading () {
       return this.$store.state.loading
     }
   },
-  mounted() {
+  mounted () {
     setInterval(() => {
       this.autoOpen()
     }, 1000)
   },
   watch: {
-    loading() {
+    loading () {
       clearTimeout(this.timer)
       if (this.loading) {
         this.timer = setTimeout(() => {
@@ -40,11 +44,11 @@ export default {
     }
   },
   methods: {
-    autoOpen() {
-      const routex = cookie.get('PushData')
+    autoOpen () {
+      const routex = cookie.get('linkData')
       if (routex) {
-        cookie.remove('PushData')
-        cookie.remove('PushData', { path: '', domain: '183.220.144.57' })
+        cookie.remove('linkData')
+        cookie.remove('linkData', { path: '', domain: '183.220.144.57' })
         this.$router.push(routex.split('$').join('/'))
       }
     }

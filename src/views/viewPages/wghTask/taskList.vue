@@ -10,14 +10,15 @@
     >
       {{ moduleName }}
     </header-bar>
-    <div
-      :class="[
+    <div :class="[
         isShowSearchBox ? 'main-content-with-search' : '',
         'main-content'
-      ]"
-    >
+      ]">
       <div class="filter-box">
-        <p @click="onlyMe = !onlyMe" :class="{ active: onlyMe }">
+        <p
+          @click="onlyMe = !onlyMe"
+          :class="{ active: onlyMe }"
+        >
           仅看我的任务
         </p>
         <p @click="popupVisible = true">筛选</p>
@@ -27,15 +28,18 @@
           :id="'tab' + item.code"
           v-for="(item, index) in types"
           :key="index + 'type'"
-          >{{ item.title }}</mt-tab-item
-        >
+        >{{ item.title }}</mt-tab-item>
       </mt-navbar>
       <ul
         class="tasklist-box"
         ref="srollbox"
         :class="isBack ? 'isback' : 'auto'"
       >
-        <li v-for="item in listData" :key="item.task" @click="clickItem(item)">
+        <li
+          v-for="item in listData"
+          :key="item.task"
+          @click="clickItem(item)"
+        >
           <span class="task-method">{{ taskMethodMap[item.method] }}</span>
           <p class="task-name">{{ item.name }}</p>
           <span
@@ -44,22 +48,28 @@
               color: taskStateMap[item.state].color,
               background: taskStateMap[item.state].bkColor
             }"
-            >{{
+          >{{
               taskStateMap[item.state].name === '全部'
                 ? '未发布'
                 : taskStateMap[item.state].name
-            }}</span
-          >
+            }}</span>
           <p class="task-date">执行期限：{{ item.date }}</p>
           <p class="task-type">任务性质：{{ taskTypeMap[item.type] }}</p>
           <p class="task-date1">最新执行时间：{{ item.date1 }}</p>
         </li>
       </ul>
-      <div class="add-btn" v-if="!isBack">
+      <div
+        class="add-btn"
+        v-if="!isBack"
+      >
         <button @click="$router.push('/putTask/0')">发布任务</button>
       </div>
     </div>
-    <mt-popup v-model="popupVisible" position="right" class="popup-box">
+    <mt-popup
+      v-model="popupVisible"
+      position="right"
+      class="popup-box"
+    >
       <div class="filter-content">
         <p class="filter-title">筛选</p>
         <img
@@ -77,8 +87,7 @@
                 :key="item.name"
                 :class="{ active: filterParams.state === Number(key) }"
                 @click="filterParams.state = Number(key)"
-                >{{ item.name }}</span
-              >
+              >{{ item.name }}</span>
             </div>
           </li>
           <li>
@@ -90,8 +99,7 @@
                 :key="item"
                 :class="{ active: filterParams.type === Number(key) }"
                 @click="filterParams.type = Number(key)"
-                >{{ item }}</span
-              >
+              >{{ item }}</span>
             </div>
           </li>
           <li>
@@ -101,15 +109,16 @@
                 class="tip date-tip date-tip1"
                 :class="{ active: filterParams.sDate }"
                 @click="$refs.picker1.open()"
-                >{{ d1 }}</span
-              >
-              <img src="@/assets/images/right1.png" class="right-icon" />
+              >{{ d1 }}</span>
+              <img
+                src="@/assets/images/right1.png"
+                class="right-icon"
+              />
               <span
                 class="tip date-tip date-tip2"
                 :class="{ active: filterParams.eDate }"
                 @click="$refs.picker2.open()"
-                >{{ d2 }}</span
-              >
+              >{{ d2 }}</span>
             </div>
           </li>
           <li>
@@ -133,8 +142,7 @@
                 :key="item"
                 :class="{ active: filterParams.orderBy === key }"
                 @click="filterParams.orderBy = key"
-                >{{ item }}</span
-              >
+              >{{ item }}</span>
             </div>
           </li>
           <li>
@@ -148,7 +156,10 @@
           </li>
         </ul>
         <div class="btn-box">
-          <button class="popup-btn" @click="checkFilterParams">确定</button>
+          <button
+            class="popup-btn"
+            @click="checkFilterParams"
+          >确定</button>
         </div>
       </div>
     </mt-popup>
@@ -182,7 +193,7 @@ export default {
     'mt-datetime-picker': DatetimePicker,
     checkTree
   },
-  data() {
+  data () {
     return {
       moduleName: '任务列表',
       isBack: false,
@@ -282,10 +293,7 @@ export default {
     }
   },
   computed: {
-    initType() {
-      return this.$store.state.initType
-    },
-    listData() {
+    listData () {
       let temp = []
       let list = JSON.parse(JSON.stringify(this.list))
       list.forEach(item => {
@@ -321,24 +329,23 @@ export default {
       })
       return temp
     },
-    d1() {
+    d1 () {
       return moment(this.filterParams.sDate).format('YYYY-MM-DD HH:mm:ss')
     },
-    d2() {
+    d2 () {
       return moment(this.filterParams.eDate).format('YYYY-MM-DD HH:mm:ss')
     },
-    userName() {
+    userName () {
       return ''
     },
-    gridName() {
+    gridName () {
       return ''
     },
-    gridCell() {
+    gridCell () {
       return this.$store.state.gridCell
     }
   },
-  mounted() {
-    console.log(this.initType)
+  mounted () {
     this.getList()
     this.getUser()
     const tempId = this.$route.params.id
@@ -351,7 +358,7 @@ export default {
     }
   },
   methods: {
-    clickItem(item) {
+    clickItem (item) {
       if (this.isBack) {
         this.$store.state.toEventInfo = JSON.parse(JSON.stringify(item))
         this.$router.go(-1)
@@ -359,7 +366,7 @@ export default {
         this.$router.push('/putTask/' + item.task)
       }
     },
-    getList() {
+    getList () {
       let params = {
         pageIndex: -1,
         pageSize: 100,
@@ -387,7 +394,7 @@ export default {
         this.list = res
       })
     },
-    getUser() {
+    getUser () {
       this.$api.getUser().then(res => {
         if (res) {
           this.myStaff = res.id
@@ -395,20 +402,20 @@ export default {
         }
       })
     },
-    toSearchList(e) {
+    toSearchList (e) {
       this.filterParamsTrue.seachKey = e
       this.getList()
     },
-    toToggleSearchBox(e) {
+    toToggleSearchBox (e) {
       this.isShowSearchBox = e
     },
-    isCheck(id) {
+    isCheck (id) {
       return (
         this.filterParams.checks.includes(id) ||
         this.filterParams.checkCs.includes(id)
       )
     },
-    checkB(id, state) {
+    checkB (id, state) {
       if (!state) {
         const tids = this.pars.filter(tidItem => {
           return tidItem.id === id
@@ -442,21 +449,21 @@ export default {
         }
       }
     },
-    checkFilterParams() {
+    checkFilterParams () {
       this.popupVisible = false
       this.filterParamsTrue = JSON.parse(JSON.stringify(this.filterParams))
       this.getList()
     },
-    handleConfirmDate1(e) {
+    handleConfirmDate1 (e) {
       this.filterParams.sDate = moment(e).format('YYYY-MM-DD HH:mm:ss')
     },
-    handleConfirmDate2(e) {
+    handleConfirmDate2 (e) {
       this.filterParams.eDate = moment(e).format('YYYY-MM-DD HH:mm:ss')
     },
-    checkChange(e) {
+    checkChange (e) {
       this.filterParams.checkGridCell = e
     },
-    getStaffInfo(id) {
+    getStaffInfo (id) {
       this.$api
         .getStaffInfo({
           id
@@ -467,7 +474,7 @@ export default {
           }
         })
     },
-    getGridCellTree(grid) {
+    getGridCellTree (grid) {
       this.$api
         .getGridCellTree({
           grid
@@ -514,7 +521,7 @@ export default {
         position: relative;
         background: #aab8c6;
         &::before {
-          content: '';
+          content: "";
           position: absolute;
           left: 0.18rem;
           width: 0.32rem;
@@ -527,7 +534,7 @@ export default {
           box-sizing: border-box;
         }
         &.active {
-          background: #3296fa url('../../../assets/images/ischeck.png')
+          background: #3296fa url("../../../assets/images/ischeck.png")
             no-repeat 0.18rem center;
           background-size: 0.32rem 0.32rem;
           &::before {
@@ -537,7 +544,7 @@ export default {
       }
       &:nth-child(2) {
         float: right;
-        background: url('../../../assets/images/filter.png') no-repeat left
+        background: url("../../../assets/images/filter.png") no-repeat left
           center;
         background-size: 0.32rem 0.32rem;
         line-height: 0.54rem;
@@ -558,7 +565,7 @@ export default {
       height: calc(100% - 1.9rem);
     }
     li {
-      background: #fff url('../../../assets/images/right.png') no-repeat;
+      background: #fff url("../../../assets/images/right.png") no-repeat;
       background-position: calc(100% - 0.52rem) 0.56rem;
       background-size: 0.16rem 0.31rem;
       height: 1.92rem;
@@ -634,7 +641,7 @@ export default {
       color: #fff;
       border-radius: 0.04rem;
       font-size: 0.34rem;
-      background: #3296fa url('../../../assets/images/add-cycle.png') no-repeat
+      background: #3296fa url("../../../assets/images/add-cycle.png") no-repeat
         2.3rem center;
       background-size: 0.35rem 0.35rem;
     }
@@ -735,7 +742,7 @@ export default {
               display: inline-block;
             }
             &::before {
-              content: '';
+              content: "";
               display: inline-block;
               width: 0.36rem;
               height: 0.36rem;
@@ -748,7 +755,7 @@ export default {
             }
             &.check {
               &::before {
-                background: url('../../../assets/images/check.png') no-repeat
+                background: url("../../../assets/images/check.png") no-repeat
                   50%;
                 background-size: 100% auto;
                 border: 0;

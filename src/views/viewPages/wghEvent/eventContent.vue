@@ -282,7 +282,7 @@ export default {
       entPageIndex: 0,
       imgBaseUrl: "/ent/Grid/GetImage/",
       moduleId360: "",
-      initt: "none"
+      initt: "dingding"
     };
   },
   watch: {
@@ -396,8 +396,10 @@ export default {
                   const lat = res.lat.toFixed(6);
                   item.value = `${lng} E,${lat} N`;
                 } else if (resKey === "attaches") {
-                  this.imglist = res[resKey];
-                  item.value = res[resKey];
+                  res.attaches.forEach(item => {
+                      item.url = this.imgBaseUrl + item.id;
+                      this.imglist.push(item);
+                  });
                 } else if (
                   resKey === "enterprise" &&
                   this.enterPriseList.length
@@ -559,14 +561,13 @@ export default {
           payload["lng"] = this.latLng[1];
         } else if (item.key === "imgList") {
           let tempArr = [];
-          item.value.forEach(item => {
-            let tempObj = {
+          this.imglist.forEach(item => {
+            tempArr.push({
               id: item.id,
               rowState: "add",
               lat: this.latLng[0],
               lng: this.latLng[1]
-            };
-            tempArr.push(tempObj);
+            });
           });
           payload["attachments"] = tempArr;
         } else if (item.type === "rightArrow") {
@@ -585,7 +586,7 @@ export default {
       this.$api.updateincident(payload).then(res => {
         if (res === "OK") {
           this.resetData();
-          this.$router.push("/eventList/1");
+          this.$router.push("/eventList");
         } else {
           Toast({
             message: res,
@@ -682,7 +683,7 @@ export default {
             fileName: "image",
             fileType: "image",
             header: {
-              "content-type": "multipart/form",
+              "Content-Type": "multipart/form",
               Authorization: `Bearer ${cookie.get("AzuraCookie")}`
             }
           });
@@ -825,14 +826,14 @@ export default {
     }
     > span:first-child {
       line-height: 0.84rem;
-      width: calc(100% - 4.3rem);
+      width: calc(100% - 4.5rem);
       color: rgba(48, 48, 48, 1);
       font-size: 0.34rem;
       vertical-align: middle;
     }
     > div.right {
       float: right;
-      width: 4.3rem;
+      width: 4.5rem;
       color: rgb(157, 157, 157);
       height: 0.84rem;
       text-align: right;

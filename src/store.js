@@ -718,6 +718,8 @@ export default new Vuex.Store({
     toEventInfo: null,
     // 给发布任务时的事件信息
     toTaskEvent: '',
+    followupType:"",
+    followupTask:{},
     toTaskEventTitle: '',
     isAddTaskState: 0,
     // 任务
@@ -820,6 +822,12 @@ export default new Vuex.Store({
     },
     set_toTaskEvent: (state, data) => {
       state.toTaskEvent = data
+    },
+    set_followupType: (state, data) => {
+      state.followupType = data
+    },
+    set_followupTask:(state, data) => {
+      state.followupTask = data
     },
     set_toTaskEventTitle: (state, data) => {
       state.toTaskEventTitle = data

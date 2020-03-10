@@ -5,6 +5,7 @@
       leftText="返回"
       :isShowSearchIcon="isShowSearchIcon"
       :showBorder="isShowBorder"
+      :customBack="backFun"
     >
       {{ id ? moduleName : '发布任务' }}
     </header-bar>
@@ -19,10 +20,10 @@
       </div>
       <div
         class="box-item"
-        @click="popupType = true"
+        @click="notEdit && !isEvent ? popupType = true : false"
       >
         <span class="item-title">任务性质</span>
-        <p :class="notEdit ? 'checkbox' : 'checkbox2'">{{ taskTypeName }}</p>
+        <p :class="notEdit && !isEvent ? 'checkbox' : 'checkbox2'">{{ taskTypeName }}</p>
       </div>
       <div class="box-item">
         <span class="item-title">网格/部门</span>
@@ -39,7 +40,7 @@
       <div
         class="box-item"
         v-if="isEvent"
-        @click="$router.push('/taskLinkEventList')"
+        @click="notEdit ? $router.push('/taskLinkEventList') : false"
       >
         <span class="item-title">事件</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">
@@ -48,7 +49,7 @@
       </div>
       <div
         class="box-item"
-        @click="$router.push('/taskModelList')"
+        @click="notEdit ? $router.push('/taskModelList') : false"
       >
         <span class="item-title">模板类型</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">
@@ -188,6 +189,12 @@
       >
         <button @click="submit">确定</button>
       </div>
+      <div
+        class="add-btn"
+        v-if="taskState === 4"
+      >
+        <button @click="submitFinish">任务完结</button>
+      </div>
     </div>
 
     <!-- control -->
@@ -261,13 +268,11 @@ export default {
       reList: [],
       reListEnters: [],
       taskHandelStaffs: [],
-      notEdit: true
+      notEdit: true,
+      followupType: ''
     }
   },
   computed: {
-    isHBGJ () {
-      return !this.$store.state.userInfo || this.$store.state.userInfo.isHBGJ
-    },
     gridLevel () {
       return this.$store.state.userInfo
         ? this.$store.state.userInfo.gridLevel
@@ -293,25 +298,18 @@ export default {
         }
       }
       let temp = []
-      if (this.isHBGJ) {
-        if (this.gridLevel == 2) {
-          temp = [atct[5], atct[7]]
-        }
-        if (this.gridLevel == 3) {
-          temp = [atct[5]]
-        }
-      } else {
-        if (this.gridLevel == 1) {
-          temp = [atct[7]]
-        }
-        if (this.gridLevel == 2) {
-          temp = [atct[5], atct[6], atct[7]]
-        }
-        if (this.gridLevel == 3) {
-          temp = [atct[5], atct[6]]
-        }
+      if (this.gridLevel == 1) {
+        temp = [atct[7]]
       }
-      this.$store.state.taskParams.type = temp.length ? temp[0].code : 0
+      if (this.gridLevel == 2) {
+        temp = [atct[5], atct[6], atct[7]]
+      }
+      if (this.gridLevel == 3) {
+        temp = [atct[5], atct[6]]
+      }
+      // if (!this.$store.state.taskParams.type.id) {
+      //   this.$store.state.taskParams.type = temp.length ? temp[0].code : 0
+      // }
       return temp
     },
     reListX () {
@@ -358,22 +356,13 @@ export default {
         return ''
       }
       const atct = {
-        2: {
-          code: 2,
-          name: '事件处理任务'
-        },
-        5: {
-          code: 5,
-          name: '日常巡查'
-        },
-        6: {
-          code: 6,
-          name: '信访办理'
-        },
-        7: {
-          code: 7,
-          name: '任务交办'
-        }
+        1: { code: 1, name: '日常任务' },
+        2: { code: 2, name: '事件处理任务' },
+        3: { code: 3, name: '双随机任务' },
+        4: { code: 4, name: '重污染空气' },
+        5: { code: 5, name: '日常巡查' },
+        6: { code: 6, name: '信访办理' },
+        7: { code: 7, name: '任务交办' }
       }
       return atct[this.$store.state.taskParams.type].name
     },
@@ -513,11 +502,11 @@ export default {
     if (this.id === '0') {
       this.id = ''
     } else if (this.id === '1') {
-      console.log(this.id)
       this.$store.state.taskParams.type = 2
       this.$store.state.taskParams.incident = this.$store.state.toTaskEvent
       this.$store.state.taskParams.incidentTitle = this.$store.state.toTaskEventTitle
       this.id = ''
+      this.followupType = this.$store.state.followupType
     }
     this.getAllDep()
     this.getModel()
@@ -527,12 +516,17 @@ export default {
       this.$store.state.isEdit = true
     }
     if (this.id) {
-      this.getTaskDetail()
+      this.getModel().then(() => {
+        this.getTaskDetail()
+      })
       this.notEdit = false
       this.$store.state.isEdit = false
     }
   },
   methods: {
+    backFun () {
+      this.$router.go(-1)
+    },
     setFirst () {
       this.$store.state.allDep = []
       this.$store.state.gridCell = null
@@ -546,7 +540,7 @@ export default {
         staffName: '',
         date: '',
         deadline: '',
-        type: 0,
+        type: 1,
         state: 0,
         taskenterprises: [],
         taskcoords: [],
@@ -651,14 +645,17 @@ export default {
         })
     },
     getModel () {
-      this.$api
-        .getTemplateByKey({
-          pageIndex: -1,
-          pageSize: 10
-        })
-        .then(res => {
-          if (res && Array.isArray(res)) this.modelList = res
-        })
+      return new Promise(resove => {
+        this.$api
+          .getTemplateByKey({
+            pageIndex: -1,
+            pageSize: 10
+          })
+          .then(res => {
+            if (res && Array.isArray(res)) this.modelList = res
+            resove(true)
+          })
+      })
     },
     getAllDep () {
       this.$api.getDepartmentAll().then(res => {
@@ -671,6 +668,9 @@ export default {
           id
         })
         .then(res => {
+          if (res && res.id) {
+            this.$store.state.userInfo = res
+          }
           if (res) {
             this.getGridCellTree(res.grid)
           }
@@ -704,12 +704,17 @@ export default {
       )
     },
     onValuesChangeType (e) {
-      if (e.values[0].code === 2) {
+      if (!this.notEdit) {
+        return
+      }
+      if (e.values[0] && e.values[0].code === 2) {
         this.isEvent = true
       } else {
         this.$store.state.taskParams.incident = ''
       }
-      this.$store.state.taskParams.type = e.values[0].code
+      if (e.values[0]) {
+        this.$store.state.taskParams.type = e.values[0].code
+      }
     },
     deleteEnter (id) {
       MessageBox.confirm('确认删除此企业?').then(action => {
@@ -752,7 +757,7 @@ export default {
       let params = {
         id,
         rowState: 'add',
-        incident: null, // 事件
+        incident: temp.incident || null, // 事件
         staff: temp.staff,
         template: temp.template,
         title: this.taskTitle,
@@ -827,6 +832,12 @@ export default {
         Toast(text)
         return false
       }
+      if (this.followupType === "add") {
+        this.$store.commit("set_followupTask", params)
+        this.$store.state.isAddTaskState = Math.random()
+        this.$router.go(-1)
+        return
+      }
       this.$api.updatetask(params).then(res => {
         this.$store.state.isAddTaskState = Math.random()
         this.$router.go(-1)
@@ -834,6 +845,22 @@ export default {
     },
     toEnterPage (id) {
       window.location.href = `https://zsxtl.azuratech.com:8003/dashboard/#/enterInfo/${id}`
+    },
+    submitFinish () {
+      this.$api.updateTaskStateToComplete({
+        id: this.id
+      }).then(res => {
+        if (res === 'OK') {
+          Toast('任务已完满执行')
+          this.setFirst()
+          this.getAllDep()
+          this.getModel()
+          this.setDate()
+          this.getTaskDetail()
+          this.notEdit = false
+          this.$store.state.isEdit = false
+        }
+      })
     }
   }
 }

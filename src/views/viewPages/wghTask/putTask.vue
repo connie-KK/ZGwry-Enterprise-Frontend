@@ -19,7 +19,7 @@
       </div>
       <div
         class="box-item"
-        @click="popupType = true"
+        @click="notEdit ? popupType = true : false"
       >
         <span class="item-title">任务性质</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">{{ taskTypeName }}</p>
@@ -39,7 +39,7 @@
       <div
         class="box-item"
         v-if="isEvent"
-        @click="$router.push('/taskLinkEventList')"
+        @click="notEdit ? $router.push('/taskLinkEventList') : false"
       >
         <span class="item-title">事件</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">
@@ -48,7 +48,7 @@
       </div>
       <div
         class="box-item"
-        @click="$router.push('/taskModelList')"
+        @click="notEdit ? $router.push('/taskModelList') : false"
       >
         <span class="item-title">模板类型</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">
@@ -187,6 +187,12 @@
         v-if="notEdit"
       >
         <button @click="submit">确定</button>
+      </div>
+      <div
+        class="add-btn"
+        v-if="taskState === 4"
+      >
+        <button @click="submitFinish">任务完结</button>
       </div>
     </div>
 
@@ -704,7 +710,10 @@ export default {
       )
     },
     onValuesChangeType (e) {
-      if (e.values[0].code === 2) {
+      if (!this.notEdit) {
+        return
+      }
+      if (e.values[0].code && e.values[0].code === 2) {
         this.isEvent = true
       } else {
         this.$store.state.taskParams.incident = ''
@@ -834,6 +843,22 @@ export default {
     },
     toEnterPage (id) {
       window.location.href = `https://zsxtl.azuratech.com:8003/dashboard/#/enterInfo/${id}`
+    },
+    submitFinish () {
+      this.$api.updateTaskStateToComplete({
+        id: this.id
+      }).then(res => {
+        if (res === 'OK') {
+          Toast('任务已完满执行')
+          this.setFirst()
+          this.getAllDep()
+          this.getModel()
+          this.setDate()
+          this.getTaskDetail()
+          this.notEdit = false
+          this.$store.state.isEdit = false
+        }
+      })
     }
   }
 }

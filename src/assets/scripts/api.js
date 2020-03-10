@@ -874,6 +874,13 @@ const interfaces = [
     interface: '/api/modmanage/GetDocumentList',
     type: 'post',
     serviceName: 'serviceMyserv'
+  },
+  {
+    //任务完结
+    fun: 'updateTaskStateToComplete',
+    interface: '/api/GBM/UpdateTaskStateToComplete',
+    type: 'post',
+    serviceName: 'serviceEnt'
   }
 ]
 

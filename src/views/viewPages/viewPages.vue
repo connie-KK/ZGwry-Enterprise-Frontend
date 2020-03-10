@@ -15,12 +15,14 @@
 
 <script>
 import cookie from 'js-cookie'
+import { Toast } from 'mint-ui'
 export default {
   name: 'app',
   data () {
     return {
       transitionName: 'fade',
-      timer: null
+      timer: null,
+      timer2: null
     }
   },
   computed: {
@@ -29,9 +31,7 @@ export default {
     }
   },
   mounted () {
-    setInterval(() => {
-      this.autoOpen()
-    }, 1000)
+    this.xhOp()
   },
   watch: {
     loading () {
@@ -44,11 +44,29 @@ export default {
     }
   },
   methods: {
+    xhOp () {
+      this.timer2 = setInterval(() => {
+        this.autoOpen()
+      }, 1000)
+    },
     autoOpen () {
-      const routex = cookie.get('linkData')
+      const keya = 'linkData'
+      const keyb = 'LinkData'
+      let routex = cookie.get(keya)
+      if (!routex) {
+        routex = document.cookie.split(`${keyb}=`)[1].split(';')[0]
+      }
+      Toast(routex)
       if (routex) {
-        cookie.remove('linkData')
-        cookie.remove('linkData', { path: '', domain: '183.220.144.57' })
+        cookie.remove(keya)
+        cookie.remove(keya, { path: '', domain: '183.220.144.57' })
+        // a
+        {
+          let cookie = document.cookie
+          if (cookie.indexOf(routex) > -1) {
+            document.cookie = cookie.split(routex).join('')
+          }
+        }
         this.$router.push(routex.split('$').join('/'))
       }
     }

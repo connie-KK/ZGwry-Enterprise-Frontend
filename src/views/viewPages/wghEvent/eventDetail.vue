@@ -152,7 +152,8 @@ export default {
       followup: {},
       detailData: {},
       incidentId: "",
-      editState: false
+      editState: false,
+      hasLevel1Followup:false
     };
   },
   watch: {
@@ -239,6 +240,14 @@ export default {
             this.getUserByid();
           }
           this.$set(this.detailData, "gridName", res.gridName);
+          if(res.followup){
+            res.followup.forEach(item => {
+              if(item.level === 1){
+                this.hasLevel1Followup = true
+                this.editState = false
+              }
+            })
+          }
         }
       });
     },
@@ -272,9 +281,15 @@ export default {
     toContent() {
       this.$router.push(`/eventContent/${this.incidentId}`);
     },
-    toPhonetoPhone(type) {
+    async toPhone(type) {
       if (this.detailData.telephone) {
-        window.location.href = "tel:" + this.detailData.telephone;
+        await window.dingtalk.showCallMenu({
+          phoneNumber: this.detailData.telephone, // 期望拨打的电话号码
+          code: "+86", // 国家代号，中国是+86
+          showDingCall: true, // 是否显示钉钉电话
+          success: function(res) {},
+          fail: function(err) {}
+        });
       } else {
         this.tips("未获取到审核人手机号码", "iconfont icon-error");
       }
@@ -315,8 +330,10 @@ export default {
       }
     },
     selectTreatment() {
-      this.toSelect = true;
-      this.popupVisible = true;
+      if (this.editState) {
+        this.toSelect = true;
+        this.popupVisible = true;
+      }
     },
     handleTreat(picker) {
       if (this.toSelect) {
@@ -453,6 +470,7 @@ export default {
       background: url("../../../assets/images/phone.png") no-repeat left center;
       background-size: 0.32rem 0.31rem;
       margin-right: 0.16rem;
+      margin: 0 0.16rem 0 0.32rem;
     }
     .right-icon {
       display: inline-block;

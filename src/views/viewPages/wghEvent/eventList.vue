@@ -112,25 +112,15 @@ export default {
         {
           name: "已解决"
         }
-      ],
-      routeId: ""
+      ]
     };
   },
   created() {
-    this.routeId = this.$route.params.id;
-    let index;
-    if (this.routeId > 0) {
-      //获取全部
-      index = 0;
-    } else {
-      //未完成
-      index = 1;
-    }
-    this.changeState(index);
     this.getUserId();
     this.getHandleEventLists();
     this.getmodsList();
   },
+  mounted() {},
   methods: {
     setListData() {
       if (this.selected === 0) {
@@ -365,41 +355,49 @@ export default {
         this.$router.push(`/eventContent/${item.id}`);
       } else {
         //跳转处理事件页面
-        if (
-          this.gridLevel === 1 &&
-          Array.isArray(item.followup) &&
-          item.followup.length
-        ) {
+        if (this.gridLevel === 1) {
           //1级网格（登录人的网格）,跳转到1级followup
-          this.$store.commit("set_followup", item.followup);
-          let toLevel1Followup = false;
-          item.followup.forEach(followItem => {
-            // if (followItem.level === 1) {
-            //   toLevel1Followup = true;
-            this.$router.push(`/eventDetailLevel1/${followItem.id}`);
-            // }
-          });
-          // if (!toLevel1Followup) {
-          //   item.followup.forEach(followItem => {
-          //     if (followItem.level === 2) {
-          //       this.$router.push(`/eventDetail/${followItem.id}`);
-          //     }
-          //   });
-          // }
+          if (Array.isArray(item.followup) && item.followup.length) {
+            this.$store.commit("set_followup", item.followup);
+            let hasLevel1Followup = false;
+            item.followup.forEach(followItem => {
+              if (followItem.level === 1) {
+                hasLevel1Followup = true;
+                this.$router.push(`/eventDetailLevel1/${followItem.id}`);
+              }
+            });
+            if (!hasLevel1Followup) {
+              //没有level 1 followup
+              this.toFollowup(item);
+            }
+          } else {
+            //没有followup
+            this.toFollowup(item);
+          }
         } else if (
           this.gridLevel === 2 &&
           Array.isArray(item.followup) &&
           item.followup.length
         ) {
+          let hasLevel2Followup = false;
           item.followup.forEach(followItem => {
             if (followItem.level === 2) {
+              hasLevel2Followup = true;
               this.$router.push(`/eventDetail/${followItem.id}`);
             }
           });
+          if (!hasLevel2Followup) {
+            this.$router.push(`/eventDetail/${item.id}`);
+          }
         } else {
           this.$router.push(`/eventDetail/${item.id}`);
         }
       }
+    },
+    toFollowup(item) {
+      item.followup.incident = item.id;
+      this.$store.commit("set_followup", item.followup);
+      this.$router.push(`/eventDetailLevel1/0`);
     }
   }
 };

@@ -114,7 +114,8 @@ export default {
       ],
       followup: [],
       followupLeve2: false,
-      incidentId: ""
+      incidentId: "",
+      canEdit: ""
     };
   },
   computed: {
@@ -124,13 +125,26 @@ export default {
   },
   watch: {
     isAddTaskState() {
-      this.getIncidentFollowupDetail();
+      if (this.$store.state.followupType === "add") {
+        let task = this.$store.state.followupTask;
+        task.name = task.title;
+        this.detailData.tasks = [task];
+        this.setTask([task]);
+      } else {
+        this.getIncidentFollowupDetail();
+      }
     }
   },
   created() {
     this.routerId = this.$route.params.id;
     this.getFollowup();
-    this.getIncidentFollowupDetail();
+    if (this.routerId !== "0") {
+      this.getIncidentFollowupDetail();
+    } else {
+      this.canEdit = true;
+      this.incidentId = this.$store.state.followup.incident;
+      this.getIncidentDetail();
+    }
   },
   methods: {
     getFollowup() {
@@ -152,9 +166,7 @@ export default {
           this.incidentId = res.incident;
           tempObj.date = moment(res.date).format("YYYY-MM-DD HH:mm");
           if (res.tasks && Array.isArray(res.tasks) && res.tasks.length) {
-            tempObj.tasks = res.tasks;
-            let tasksItem = this.dataList[5];
-            tasksItem.label = `${tasksItem.label}（${tempObj.tasks.length}）`;
+            this.setTask(res.tasks);
           }
           this.detailData = tempObj;
           this.staffId = res.staff;
@@ -163,12 +175,29 @@ export default {
         }
       });
     },
+    setTask(tasks) {
+      let tasksItem = this.dataList[5];
+      tasksItem.label = `分派任务（${tasks.length}）`;
+      this.$set(this.dataList, 5, tasksItem);
+    },
     getIncidentDetail() {
       const payload = {
         id: this.incidentId
       };
       this.$api.getIncidentDetail(payload).then(res => {
         if (res) {
+          if (this.canEdit) {
+            let tempObj = {};
+            tempObj.date = moment(res.date).format("YYYY-MM-DD HH:mm");
+            tempObj.incidentTitle = res.title;
+            tempObj.id = this.$uuid();
+            tempObj.state = res.state;
+            tempObj.level = 1;
+            tempObj.staff = res.staff;
+            this.detailData = tempObj;
+            this.staffId = res.staff;
+            this.getUserByid();
+          }
           if (res.state === 3 || res.state === 4) {
             //已完成或虚假时不可编辑，页面底部的确定按钮用来更新followup
             this.editState = false;
@@ -194,7 +223,7 @@ export default {
       });
     },
     toContent() {
-      this.$router.push(`/eventContent/${this.detailData.incident}`);
+      this.$router.push(`/eventContent/${this.incidentId}`);
     },
     toNextGrid() {
       if (this.followupLeve2) {
@@ -206,7 +235,6 @@ export default {
       }
     },
     save() {
-      this.detailData.rowState = "upd";
       if (this.detailData.results) {
         //事件处理完毕，需要把事件状态变成完成
         const payload = {
@@ -219,7 +247,8 @@ export default {
           .then(resx => {
             if (resx[0] && resx[0] === "OK" && resx[1] && resx[1] === "OK") {
               this.tips("提交成功", "iconfont icon-success");
-              this.$router.push("/eventList/1");
+              this.$store.commit("set_followupType", "");
+              this.$router.push("/eventList");
             } else {
               this.tips("提交失败", "iconfont icon-error");
             }
@@ -228,11 +257,19 @@ export default {
             this.tips(e, "iconfont icon-error");
           });
       } else {
+        this.detailData.incident = this.incidentId;
+        if(this.canEdit){
+          this.detailData.rowState = "add";
+        }else{
+          this.detailData.rowState = "upd";
+        }
         this.$api
           .updateincidentfollowup(this.detailData)
           .then(res => {
             if (res === "OK") {
               this.tips("提交成功", "iconfont icon-success");
+              this.$store.commit("set_followupType", "");
+              this.$router.push("/eventList");
             } else {
               this.tips(res, "iconfont icon-error");
             }
@@ -243,6 +280,13 @@ export default {
       }
     },
     toTask() {
+      let followupType;
+      if (this.routerId === "0") {
+        followupType = "add";
+      } else {
+        followupType = "upd";
+      }
+      this.$store.commit("set_followupType", followupType);
       this.$store.commit("set_toTaskEvent", this.detailData.id);
       this.$store.commit("set_toTaskEventTitle", this.detailData.incidentTitle);
       this.$router.push("/putTask/1");
@@ -283,14 +327,14 @@ export default {
     }
     > span:first-child {
       line-height: 0.84rem;
-      width: calc(100% - 4.8rem);
+      width: calc(100% - 4.5rem);
       color: rgba(48, 48, 48, 1);
       font-size: 0.34rem;
       vertical-align: middle;
     }
     > div.right {
       float: right;
-      width: 4.8rem;
+      width: 4.5rem;
       color: rgb(157, 157, 157);
       height: 0.84rem;
       line-height: 0.4rem;

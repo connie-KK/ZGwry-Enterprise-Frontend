@@ -1,17 +1,20 @@
 <template>
-  <div
-    class="navBar-box"
-    ref="navbox"
-  >
-    <div :style="{ width: myWidth + 'px' }">
-      <mt-navbar v-model="mySelected">
-        <mt-tab-item
-          v-for="item in list"
-          :ref="'item' + item.id"
-          :key="item.id"
-          :id="item.id"
-        >{{ item.name }}</mt-tab-item>
-      </mt-navbar>
+  <div class="navBar-box">
+    <div style="height:1.04rem;"></div>
+    <div
+      class="my-nav"
+      ref="navbox"
+    >
+      <div :style="{ width: myWidth + 'px' }">
+        <mt-navbar v-model="mySelected">
+          <mt-tab-item
+            v-for="item in list"
+            :ref="'item' + item.id"
+            :key="item.id"
+            :id="item.id"
+          >{{ item.name }}</mt-tab-item>
+        </mt-navbar>
+      </div>
     </div>
   </div>
 </template>
@@ -30,7 +33,7 @@ export default {
       default: 1
     }
   },
-  data () {
+  data() {
     return {
       mySelected: this.selected,
       list: [
@@ -44,7 +47,7 @@ export default {
     }
   },
   computed: {
-    myWidth () {
+    myWidth() {
       let text = ''
       this.list.forEach(item => {
         text += item.name
@@ -53,7 +56,7 @@ export default {
     }
   },
   watch: {
-    mySelected () {
+    mySelected() {
       this.deFirFun()
       let router =
         this.list.filter(item => {
@@ -65,11 +68,11 @@ export default {
       this.$router.replace(router)
     }
   },
-  mounted () {
+  mounted() {
     this.deFirFun()
   },
   methods: {
-    deFirFun () {
+    deFirFun() {
       let wWidth = document.body.clientWidth
       let mLeft = this.$refs['item' + this.mySelected][0].$el.offsetLeft
       let mWidth = this.$refs['item' + this.mySelected][0].$el.clientWidth
@@ -80,12 +83,17 @@ export default {
 </script>
 <style lang="scss">
 .navBar-box {
-  overflow-x: auto;
   .mint-navbar .mint-tab-item.is-selected {
     margin-bottom: 0;
   }
   .mint-tab-item-label {
     font-size: 0.3rem;
+  }
+  .my-nav {
+    position: fixed;
+    top: 1.29rem;
+    overflow-x: auto;
+    width: 100%;
   }
 }
 </style>

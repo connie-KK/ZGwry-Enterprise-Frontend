@@ -1,7 +1,13 @@
 <template>
   <div>
-    <header-bar leftIcon="back" leftText="返回">{{ moduleName }}</header-bar>
-    <div class="main-content" id="homepage">
+    <header-bar
+      leftIcon="back"
+      leftText="返回"
+    >{{ moduleName }}</header-bar>
+    <div
+      class="main-content"
+      id="homepage"
+    >
       <nav-bar :selected="1"></nav-bar>
       <div class="main-content-box">
         <div v-if="datalist">
@@ -17,39 +23,39 @@
               class="info"
               v-if="!item.type"
             />
-            <select v-model="item.value" v-if="item.type === 'select'">
-              <option
-                v-for="ite in item.options"
-                :key="ite.name"
-                :value="ite.code"
-                >{{ ite.name }}</option
-              >
-            </select>
-            <div v-if="item.type === 'time'">
-              <div @click="openPicker(item.picker)">
-                <input
-                type="text"
-                :value="
-                  item.value ? moment(item.value).format('YYYY-MM-DD') : ''
-                "
-                class="info selectbox"
-                disabled="disabled"
-              />
-              </div>
-              <mt-datetime-picker
-                :ref="item.picker"
-                type="date"
-                year-format="{value} 年"
-                month-format="{value} 月"
-                date-format="{value} 日"
-                v-model="item.value"
-              >
-              </mt-datetime-picker>
-            </div>
+            <my-select
+              :field-lable="item.label"
+              :data="item.options"
+              val-key="code"
+              val-name="name"
+              v-model="item.value"
+              v-if="item.type === 'select'"
+            ></my-select>
+            <my-area
+              v-if="item.type === 'area'"
+              :value="item.value"
+              @submit="getArea"
+            ></my-area>
+            <my-datetime-picker
+              v-if="item.type === 'time'"
+              v-model="item.value"
+              type="date"
+              field-lable="时间"
+              format="YYYY-MM-DD"
+            ></my-datetime-picker>
+            <my-lng-lat
+              v-if="item.type === 'lnglat'"
+              :lng="item.value ? item.value[0] : 0"
+              :lat="item.value ? item.value[1] : 0"
+              @submit="submitLngLat"
+            ></my-lng-lat>
           </div>
         </div>
         <div class="lists list-header">
-          <span v-for="(item, index) in listHeader" :key="index">
+          <span
+            v-for="(item, index) in listHeader"
+            :key="index"
+          >
             {{ item }}
           </span>
         </div>
@@ -62,7 +68,10 @@
           <span>{{ item.name }}</span>
           <span>{{ item.value }}{{ item.unit }}</span>
         </div>
-        <div class="add-item-box" v-if="productItemsState">
+        <div
+          class="add-item-box"
+          v-if="productItemsState"
+        >
           <input
             style="width:30%;"
             v-model="proItemData.name"
@@ -81,7 +90,10 @@
           <button @click="addProItem">确定</button>
         </div>
         <div class="listBtnGroup">
-          <div class="addBtn listBtn" @click="productItemsState = true">
+          <div
+            class="addBtn listBtn"
+            @click="productItemsState = true"
+          >
             <span></span>
             <span>添加</span>
           </div>
@@ -94,7 +106,10 @@
           </div>
         </div>
         <div class="lists list-header second-header">
-          <span v-for="(item, index) in listHeaderFactor" :key="index">
+          <span
+            v-for="(item, index) in listHeaderFactor"
+            :key="index"
+          >
             {{ item }}
           </span>
         </div>
@@ -108,7 +123,10 @@
           <span>{{ item.name }}</span>
           <span>{{ item.value }}{{ item.unit }}</span>
         </div>
-        <div class="add-item-box" v-if="materialItmesState">
+        <div
+          class="add-item-box"
+          v-if="materialItmesState"
+        >
           <input
             style="width:30%;"
             v-model="matItemData.name"
@@ -127,7 +145,10 @@
           <button @click="addMatItem">确定</button>
         </div>
         <div class="listBtnGroup">
-          <div class="addBtn listBtn" @click="materialItmesState = true">
+          <div
+            class="addBtn listBtn"
+            @click="materialItmesState = true"
+          >
             <span></span>
             <span>添加</span>
           </div>
@@ -139,11 +160,16 @@
             <span>删除</span>
           </div>
         </div>
-        <div class="footer">
-          <div class="submitBtn" @click="submitBtn">确定</div>
-        </div>
+        <div style="height:1.28rem;"></div>
+      </div>
+      <div class="footer">
+        <div
+          class="submitBtn"
+          @click="submitBtn"
+        >确定</div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -254,6 +280,10 @@ export default {
       }
       this.temp = JSON.parse(JSON.stringify(this.list))
       for (let key in this.temp) {
+        if (this.temp[key].key === 'area') {
+          this.temp[key].value = ['', '', '']
+          break
+        }
         this.temp[key].value = null
       }
       this.datalist = JSON.parse(JSON.stringify(this.temp))
@@ -270,15 +300,18 @@ export default {
             } else if (item.key === 'lng') {
               item.value = `${res['lng']}E，${res['lat']}N`
             }
-            if (item.key === 'province') {
-              item.options = this.pd
+            if (item.key === 'area') {
+              item.value = [res.province, res.city, res.district]
             }
-            if (item.key === 'city') {
-              item.options = this.cd
+            if (item.key === 'lnglat') {
+              item.value = [Number(res.lng), Number(res.lat)]
             }
-            if (item.key === 'district') {
-              item.options = this.dd
-            }
+            // if (item.key === 'city') {
+            //   item.options = this.cd
+            // }
+            // if (item.key === 'district') {
+            //   item.options = this.dd
+            // }
             if (item.value && typeof item.value === 'string') {
               item.value = item.value.replace(null, '')
               item.value = item.value.replace(undefined, '')
@@ -354,11 +387,14 @@ export default {
         level: 0
       }
       this.datalist.forEach(item => {
-        if (item.key === 'lng') {
-          item.value = Number(item.value)
+        if (item.key === 'area') {
+          params.province = item.value[0]
+          params.city = item.value[1]
+          params.district = item.value[2]
         }
-        if (item.key === 'lat') {
-          item.value = Number(item.value)
+        if (item.key === 'lnglat') {
+          params.lng = Number(item.value[0])
+          params.lat = Number(item.value[1])
         }
         if (params[item.key] === '' || params[item.key] === 0) {
           params[item.key] = item.value
@@ -500,13 +536,27 @@ export default {
     },
     openPicker(picker) {
       this.$refs[picker][0].open()
+    },
+    getArea(e) {
+      this.datalist.forEach(item => {
+        if (item.key === 'area') {
+          item.value = e
+        }
+      })
+    },
+    submitLngLat(e) {
+      this.datalist.forEach(item => {
+        if (item.key === 'lnglat') {
+          item.value = [e.lng, e.lat]
+        }
+      })
     }
   }
 }
 </script>
 
 <style lang="scss">
-@import '@/assets/scss/_flex.scss';
+@import "@/assets/scss/_flex.scss";
 #homepage {
   .picker-toolbar {
     display: none;
@@ -514,8 +564,9 @@ export default {
   &.main-content {
     height: calc(100% - 1.29rem);
     .main-content-box {
-      height: calc(100% - 50px);
+      height: calc(100% - 55px);
       overflow-y: auto;
+      border-top: 0.02rem solid #e0e0e0;
     }
   }
   p {
@@ -662,8 +713,8 @@ export default {
     @include flexbox;
     @include align-items(center);
     @include justify-content(center);
-    // position: fixed;
-    // bottom: 0;
+    position: fixed;
+    bottom: 0;
     height: 1.28rem;
     background: rgba(255, 255, 255, 1);
     width: 100%;
@@ -712,7 +763,7 @@ export default {
 .bke {
   position: relative;
   ::after {
-    content: 'E';
+    content: "E";
     position: absolute;
     right: 0.32rem;
     bottom: 0.14rem;
@@ -724,7 +775,7 @@ export default {
 .bkn {
   position: relative;
   ::after {
-    content: 'N';
+    content: "N";
     position: absolute;
     right: 0.32rem;
     bottom: 0.14rem;
@@ -733,8 +784,10 @@ export default {
     color: #333;
   }
 }
-select, .selectbox{
-  background: #fff url('../../../assets/images/down-c.png') no-repeat right center !important;
+select,
+.selectbox {
+  background: #fff url("../../../assets/images/down-c.png") no-repeat right
+    center !important;
   background-size: 0.4rem !important;
 }
 </style>

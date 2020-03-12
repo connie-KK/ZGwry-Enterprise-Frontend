@@ -25,6 +25,9 @@ import '@/assets/scss/base.scss'
 
 import 'mint-ui/lib/style.css'
 
+// vant css
+import 'vant/lib/index.css'
+
 //icon
 import icon from '@/components/aepIcon.vue'
 Vue.component('icon', icon)
@@ -35,7 +38,15 @@ import '@/assets/icons/attachment'
 import '@/assets/icons/search'
 
 import HeaderBar from '@/components/HeaderBar.vue'
+import Select from '@/components/Select.vue'
+import Area from '@/components/Area.vue'
+import DatePicker from '@/components/DatePicker.vue'
+import LngLat from '@/components/LngLat.vue'
 Vue.component('HeaderBar', HeaderBar)
+Vue.component('MySelect', Select)
+Vue.component('MyArea', Area)
+Vue.component('MyDatetimePicker', DatePicker)
+Vue.component('MyLngLat', LngLat)
 
 // api接口
 import api from '@/assets/scripts/api'
@@ -61,6 +72,14 @@ new Vue({
   router,
   store
 })
+
+{
+  const url = 'https://webapi.amap.com/maps?v=1.4.15&key=84af24a85c0ce6dbaa1dfca048fda1ae'
+  const jsapi = document.createElement('script')
+  jsapi.charset = 'utf-8'
+  jsapi.src = url
+  document.head.appendChild(jsapi)
+}
 
 // 模拟登录
 import axios from 'axios'

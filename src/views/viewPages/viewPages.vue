@@ -54,9 +54,9 @@ export default {
       const keyb = 'LinkData'
       let routex = cookie.get(keya)
       if (!routex) {
-        routex = document.cookie.split(`${keyb}=`)[1].split(';')[0]
+        let c = document.cookie.split(`${keyb}=`)[1]
+        routex = c ? c.split(';')[0] : ''
       }
-      Toast(routex)
       if (routex) {
         cookie.remove(keya)
         cookie.remove(keya, { path: '', domain: '183.220.144.57' })

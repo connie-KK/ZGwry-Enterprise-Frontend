@@ -129,24 +129,23 @@ export default new Vuex.Store({
         ]
       },
       {
-        key: 'province',
+        key: 'area',
         label: '地区',
         class: 'interval',
-        type: 'select',
-        options: []
+        type: 'area'
       },
-      {
-        key: 'city',
-        label: '',
-        type: 'select',
-        options: []
-      },
-      {
-        key: 'district',
-        label: '',
-        type: 'select',
-        options: []
-      },
+      // {province
+      //   key: 'city',
+      //   label: '',
+      //   type: 'select',
+      //   options: []
+      // },
+      // {
+      //   key: 'district',
+      //   label: '',
+      //   type: 'select',
+      //   options: []
+      // },
       {
         key: 'town',
         label: '乡镇/街道'
@@ -180,14 +179,10 @@ export default new Vuex.Store({
         label: '网址'
       },
       {
-        key: 'lng',
+        key: 'lnglat',
         label: '经纬度',
-        class: 'interval bke'
-      },
-      {
-        key: 'lat',
-        label: '',
-        class: 'bkn'
+        class: 'interval',
+        type: 'lnglat'
       },
       {
         key: 'legal',
@@ -718,8 +713,8 @@ export default new Vuex.Store({
     toEventInfo: null,
     // 给发布任务时的事件信息
     toTaskEvent: '',
-    followupType:"",
-    followupTask:{},
+    followupType: "",
+    followupTask: {},
     toTaskEventTitle: '',
     isAddTaskState: 0,
     // 任务
@@ -826,7 +821,7 @@ export default new Vuex.Store({
     set_followupType: (state, data) => {
       state.followupType = data
     },
-    set_followupTask:(state, data) => {
+    set_followupTask: (state, data) => {
       state.followupTask = data
     },
     set_toTaskEventTitle: (state, data) => {

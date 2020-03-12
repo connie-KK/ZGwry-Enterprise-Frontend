@@ -371,6 +371,7 @@
             </li>
           </ul>
         </div>
+        <div style="height: 1.28rem;"></div>
         <input
           type="file"
           @change="filesSelected"
@@ -396,7 +397,7 @@ export default {
     'mt-popup': Popup,
     'mt-picker': Picker
   },
-  data () {
+  data() {
     return {
       moduleName: '企业信息',
       value: false,
@@ -547,7 +548,7 @@ export default {
     }
   },
   computed: {
-    slots1 () {
+    slots1() {
       return [
         {
           flex: 1,
@@ -556,7 +557,7 @@ export default {
         }
       ]
     },
-    slots2 () {
+    slots2() {
       return [
         {
           flex: 1,
@@ -565,7 +566,7 @@ export default {
         }
       ]
     },
-    slots3 () {
+    slots3() {
       return [
         {
           flex: 1,
@@ -574,7 +575,7 @@ export default {
         }
       ]
     },
-    slots4 () {
+    slots4() {
       return [
         {
           flex: 1,
@@ -583,7 +584,7 @@ export default {
         }
       ]
     },
-    slots5 () {
+    slots5() {
       return [
         {
           flex: 1,
@@ -592,7 +593,7 @@ export default {
         }
       ]
     },
-    defaultIndex1 () {
+    defaultIndex1() {
       let index = 0
       this.pros.forEach((item, i) => {
         if (item.code === this.autoParams.waterprotectionlevel) {
@@ -601,7 +602,7 @@ export default {
       })
       return index
     },
-    defaultIndex2 () {
+    defaultIndex2() {
       let index = 0
       this.funs.forEach((item, i) => {
         if (item.code === this.autoParams.waterfunctionlevel) {
@@ -610,7 +611,7 @@ export default {
       })
       return index
     },
-    defaultIndex3 () {
+    defaultIndex3() {
       let index = 0
       this.noises.forEach((item, i) => {
         if (item.code === this.autoParams.noisefunctionlevel) {
@@ -619,7 +620,7 @@ export default {
       })
       return index
     },
-    defaultIndex4 () {
+    defaultIndex4() {
       let index = 0
       this.airs.forEach((item, i) => {
         if (item.code === this.autoParams.airfunctionlevel) {
@@ -628,7 +629,7 @@ export default {
       })
       return index
     },
-    defaultIndex5 () {
+    defaultIndex5() {
       let index = 0
       this.intLevels.forEach((item, i) => {
         if (item.code === this.autoParams.integritylevel) {
@@ -637,7 +638,7 @@ export default {
       })
       return index
     },
-    defaultName1 () {
+    defaultName1() {
       let name = ''
       this.pros.forEach(item => {
         if (item.code === this.autoParams.waterprotectionlevel) {
@@ -646,7 +647,7 @@ export default {
       })
       return name
     },
-    defaultName2 () {
+    defaultName2() {
       let name = ''
       this.funs.forEach(item => {
         if (item.code === this.autoParams.waterfunctionlevel) {
@@ -655,7 +656,7 @@ export default {
       })
       return name
     },
-    defaultName3 () {
+    defaultName3() {
       let name = ''
       this.noises.forEach(item => {
         if (item.code === this.autoParams.noisefunctionlevel) {
@@ -664,7 +665,7 @@ export default {
       })
       return name
     },
-    defaultName4 () {
+    defaultName4() {
       let name = ''
       this.airs.forEach(item => {
         if (item.code === this.autoParams.airfunctionlevel) {
@@ -673,7 +674,7 @@ export default {
       })
       return name
     },
-    defaultName5 () {
+    defaultName5() {
       let name = ''
       this.intLevels.forEach(item => {
         if (item.code === this.autoParams.integritylevel) {
@@ -683,11 +684,11 @@ export default {
       return name
     }
   },
-  mounted () {
+  mounted() {
     this.getData()
   },
   methods: {
-    filesSelected (e) {
+    filesSelected(e) {
       let files = e.target.files
       let formData = new FormData()
       for (let i = 0; i < files.length; i++) {
@@ -696,7 +697,7 @@ export default {
       }
       this.uploadEntExtendAttachment(formData)
     },
-    uploadEntExtendAttachment (files) {
+    uploadEntExtendAttachment(files) {
       this.$api.uploadEntExtendAttachment(files).then(res => {
         res.forEach(item => {
           item.rowState = 'add'
@@ -704,7 +705,7 @@ export default {
         this.autoParams.attachments.push(...res)
       })
     },
-    getData () {
+    getData() {
       this.$api
         .getZGEnvironmentalProps({
           enterid: this.$store.state.enterId
@@ -725,7 +726,7 @@ export default {
           this.autoParams = JSON.parse(JSON.stringify(data))
         })
     },
-    upDate () {
+    upDate() {
       let params = JSON.parse(JSON.stringify(this.autoParams))
       for (let key in params) {
         if (params[key] === true) {
@@ -743,17 +744,17 @@ export default {
         this.getData()
       })
     },
-    deleteFile (index) {
+    deleteFile(index) {
       this.autoParams.attachments.splice(index, 1)
     },
-    ifDownLoad (item) {
+    ifDownLoad(item) {
       MessageBox.confirm('确认下载此文件?').then(action => {
         if (action === 'confirm') {
           this.download(item.id, item.title)
         }
       })
     },
-    download (id, name) {
+    download(id, name) {
       const url = '/ent/api/ZGEntExtend/DownAttachmentFiles?id=' + id
       const a = document.createElement('a')
       a.href = url
@@ -761,19 +762,19 @@ export default {
       document.body.appendChild(a)
       a.click()
     },
-    onValuesChange1 (e) {
+    onValuesChange1(e) {
       this.autoParams.waterprotectionlevel = e.values[0].code
     },
-    onValuesChange2 (e) {
+    onValuesChange2(e) {
       this.autoParams.waterfunctionlevel = e.values[0].code
     },
-    onValuesChange3 (e) {
+    onValuesChange3(e) {
       this.autoParams.noisefunctionlevel = e.values[0].code
     },
-    onValuesChange4 (e) {
+    onValuesChange4(e) {
       this.autoParams.airfunctionlevel = e.values[0].code
     },
-    onValuesChange5 (e) {
+    onValuesChange5(e) {
       this.autoParams.integritylevel = e.values[0].code
     }
   }
@@ -939,6 +940,9 @@ textarea:-ms-input-placeholder {
   margin-top: 0.41rem;
   border-top: 0.01rem solid #e0e0e0;
   background: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   button {
     display: block;
     background: #3296fa;

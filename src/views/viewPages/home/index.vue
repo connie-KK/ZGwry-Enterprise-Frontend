@@ -10,6 +10,7 @@
       @click="mylogout"
     />
     <p class="company-name">{{ company }}</p>
+    <p class="version-name">当前版本：{{ Version }}</p>
     <div
       id="enterinfo"
       v-cloak
@@ -88,6 +89,7 @@
 
 <script>
 import store from 'store'
+import cookie from 'js-cookie'
 import { Popup } from 'mint-ui'
 export default {
   name: 'Home',
@@ -101,7 +103,8 @@ export default {
       mobileState: false,
       moduleName: '首页',
       company: '浙江中环瑞蓝科技发展有限公司',
-      isHasUserData: false
+      isHasUserData: false,
+      Version: '0.1'
     }
   },
   computed: {
@@ -239,6 +242,7 @@ export default {
   },
   created () {
     this.getUser()
+    this.Version = cookie.get('Version')
   },
   methods: {
     toDetail (item) {
@@ -415,6 +419,17 @@ export default {
     z-index: 999;
   }
   .company-name {
+    position: fixed;
+    line-height: 0.3rem;
+    font-size: 0.22rem;
+    color: #aab1b9;
+    width: 100%;
+    text-align: center;
+    bottom: 0.4rem;
+    left: 0;
+    z-index: 999;
+  }
+  .version-name {
     position: fixed;
     line-height: 0.3rem;
     font-size: 0.22rem;

@@ -214,6 +214,7 @@
             </li>
           </ul>
         </div>
+        <div style="height:1.28rem;"></div>
         <input
           type="file"
           @change="filesSelected1"
@@ -261,7 +262,7 @@ export default {
     'mt-switch': Switch,
     'mt-datetime-picker': DatetimePicker
   },
-  data () {
+  data() {
     return {
       moduleName: '企业信息',
       moment: moment,
@@ -292,27 +293,27 @@ export default {
     }
   },
   watch: {
-    'data.issuedate' () {
+    'data.issuedate'() {
       this.pickerValue1 = new Date(this.data.issuedate)
     },
-    'data.enddate' () {
+    'data.enddate'() {
       this.pickerValue2 = new Date(this.data.enddate)
     }
   },
-  mounted () {
+  mounted() {
     this.getPollpermitsByid()
   },
   methods: {
-    datePicker (state) {
+    datePicker(state) {
       this.$refs[`datePicker${state}`].open()
     },
-    handleConfirm1 (e) {
+    handleConfirm1(e) {
       this.data.issuedate = moment(e).format('YYYY-MM-DD')
     },
-    handleConfirm2 (e) {
+    handleConfirm2(e) {
       this.data.enddate = moment(e).format('YYYY-MM-DD')
     },
-    getPollpermitsByid () {
+    getPollpermitsByid() {
       this.$api
         .getPollpermitsByid({
           params: {
@@ -334,25 +335,25 @@ export default {
           this.drawingItems = res.drawingItems
         })
     },
-    filesSelected1 (e) {
+    filesSelected1(e) {
       this.filesSelected(e, 'pdocItems', 'uploadPollFiles', 24)
     },
-    filesSelected2 (e) {
+    filesSelected2(e) {
       this.filesSelected(e, 'emergplanItems', 'uploadEmergplanFiles', 0)
     },
-    filesSelected3 (e) {
+    filesSelected3(e) {
       this.filesSelected(e, 'attachmentItems', 'uploadAttachmentFiles', 0)
     },
-    filesSelected4 (e) {
+    filesSelected4(e) {
       this.filesSelected(e, 'drawingItems', 'uploadEntdrawingFiles', 1)
     },
-    filesSelected (e, type, fun, etype) {
+    filesSelected(e, type, fun, etype) {
       let files = e.target.files
       let formData = new FormData()
       formData.append('file', files[0])
       this.uploadFiles(formData, type, fun, etype)
     },
-    uploadFiles (formData, type, fun, etype) {
+    uploadFiles(formData, type, fun, etype) {
       formData.append('year', moment().format('YYYY'))
       formData.append('etype', etype)
       formData.append('pmitid', this.$store.state.enterId)
@@ -360,7 +361,7 @@ export default {
         this.getPollpermitsByid()
       })
     },
-    deleteFiles (id, fun) {
+    deleteFiles(id, fun) {
       MessageBox.confirm('确认删除此文件?').then(action => {
         if (action === 'confirm') {
           axios.post(`/ent/api/enterprise/${fun}/${id}`).then(res => {
@@ -371,14 +372,14 @@ export default {
         }
       })
     },
-    ifDownload (id, name, fun) {
+    ifDownload(id, name, fun) {
       MessageBox.confirm('确认下载此文件?').then(action => {
         if (action === 'confirm') {
           this.download(id, name, fun)
         }
       })
     },
-    download (id, name, fun) {
+    download(id, name, fun) {
       const url = `http://localhost:30016/api/enterprise/${fun}?id=${id}`
       const a = document.createElement('a')
       a.href = url
@@ -386,10 +387,10 @@ export default {
       document.body.appendChild(a)
       a.click()
     },
-    openImg (src) {
+    openImg(src) {
       ImagePreview([src])
     },
-    updatePollpermits () {
+    updatePollpermits() {
       let data = JSON.parse(JSON.stringify(this.data))
       data.enddate = data.enddate
         ? moment(data.enddate).format('YYYY-MM-DD HH:mm:ss')
@@ -580,6 +581,9 @@ textarea:-ms-input-placeholder {
   margin-top: 0.41rem;
   border-top: 0.01rem solid #e0e0e0;
   background: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   button {
     display: block;
     background: #3296fa;

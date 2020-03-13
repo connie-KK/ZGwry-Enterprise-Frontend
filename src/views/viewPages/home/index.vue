@@ -9,8 +9,8 @@
       class="loginout"
       @click="mylogout"
     />
-    <p class="company-name">{{ company }}</p>
-    <p class="version-name">当前版本：{{ Version }}</p>
+    <p class="user-name">{{ userName }}</p>
+    <p class="company-name">{{ company }} {{ Version }}</p>
     <div
       id="enterinfo"
       v-cloak
@@ -96,7 +96,7 @@ export default {
   components: {
     'mt-popup': Popup
   },
-  data () {
+  data() {
     return {
       popup: false,
       mobileNumber: window.mymobile,
@@ -104,22 +104,23 @@ export default {
       moduleName: '首页',
       company: '浙江中环瑞蓝科技发展有限公司',
       isHasUserData: false,
-      Version: '0.1'
+      Version: '0.1',
+      userName: ''
     }
   },
   computed: {
-    userInfo () {
+    userInfo() {
       return this.$store.state.userInfo
     },
-    isHBGJ () {
+    isHBGJ() {
       return !this.userInfo || this.userInfo.isHBGJ
     },
-    gridLevel () {
+    gridLevel() {
       return this.$store.state.userInfo
         ? this.$store.state.userInfo.gridLevel
         : 0
     },
-    listData () {
+    listData() {
       let hxdata = [
         {
           name: '基础信息库',
@@ -234,18 +235,18 @@ export default {
     }
   },
   watch: {
-    userInfo () {
+    userInfo() {
       if (this.userInfo) {
         this.isHasUserData = true
       }
     }
   },
-  created () {
+  created() {
     this.getUser()
     this.Version = cookie.get('Version')
   },
   methods: {
-    toDetail (item) {
+    toDetail(item) {
       if (!item.url && !item.redirectUrl && item.name) {
         this.popup = true
         return
@@ -259,20 +260,21 @@ export default {
         this.$store.state.initType = item.params
       }
     },
-    outputMobile () {
+    outputMobile() {
       this.mobileState = true
     },
-    mylogout () {
+    mylogout() {
       this.$api.logout()
     },
-    getUser () {
+    getUser() {
       this.$api.getUser().then(res => {
         if (res && res.id) {
+          this.userName = res.username
           this.getStaffInfo(res.id)
         }
       })
     },
-    getStaffInfo (id) {
+    getStaffInfo(id) {
       this.$api.getStaffInfo({
         id
       }).then(res => {
@@ -425,20 +427,20 @@ export default {
     color: #aab1b9;
     width: 100%;
     text-align: center;
-    bottom: 0.4rem;
-    left: 0;
-    z-index: 999;
-  }
-  .version-name {
-    position: fixed;
-    line-height: 0.3rem;
-    font-size: 0.22rem;
-    color: #aab1b9;
-    width: 100%;
-    text-align: center;
     bottom: 0.1rem;
     left: 0;
     z-index: 999;
+  }
+  .user-name {
+    position: fixed;
+    top: 0.46rem;
+    z-index: 999;
+    right: 0.8rem;
+    height: 0.4rem;
+    line-height: 0.4rem;
+    font-size: 0.36rem;
+    text-align: right;
+    color: #3296fa;
   }
 }
 </style>

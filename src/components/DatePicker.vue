@@ -14,6 +14,7 @@
         v-model="myval"
         :type="type"
         @confirm="onConfirm"
+        @cancel="showPicker = false"
       />
     </van-popup>
   </div>

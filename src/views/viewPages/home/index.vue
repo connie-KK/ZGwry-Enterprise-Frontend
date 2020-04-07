@@ -10,7 +10,7 @@
       @click="mylogout"
     />
     <p class="user-name">{{ userName }}</p>
-    <p class="company-name">{{ company }} {{ Version }}</p>
+    <p class="company-name">{{ company }} V{{ Version }}</p>
     <div
       id="enterinfo"
       v-cloak

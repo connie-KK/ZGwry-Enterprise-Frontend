@@ -19,6 +19,14 @@
 </template>
 
 <script>
+{
+  if(!AMap){
+    const key = "84af24a85c0ce6dbaa1dfca048fda1ae";
+    let script = document.createElement("script");
+    script.src = "https://webapi.amap.com/maps?v=1.4.15&key=" + key;
+    document.head.appendChild(script);
+  }
+}
 export default {
   name: "detailMap",
   data() {
@@ -92,32 +100,28 @@ export default {
       }).addTo(this.map);
     },
     getCurrentPosition() {
-      this.$map.loadScript().then(AMap => {
-        AMap.plugin("AMap.Geolocation", () => {
-          var geolocation = new AMap.Geolocation({
-            enableHighAccuracy: true, //是否使用高精度定位，默认:true
-            timeout: 10000 //超过10秒后停止定位，默认：5s
-          });
-          geolocation.getCurrentPosition((status, result) => {
-            if (status == "complete") {
-              //解析定位结果
-              if (result.position) {
-                this.location = `${result.position.lng} E,${result.position.lat} N`;
-                this.centerLocation = [
-                  result.position.lat,
-                  result.position.lng
-                ];
-                if (this.map) {
-                  this.addMarker();
-                } else {
-                  this.initMap();
-                }
+      AMap.plugin("AMap.Geolocation", () => {
+        var geolocation = new AMap.Geolocation({
+          enableHighAccuracy: true, //是否使用高精度定位，默认:true
+          timeout: 10000 //超过10秒后停止定位，默认：5s
+        });
+        geolocation.getCurrentPosition((status, result) => {
+          if (status == "complete") {
+            //解析定位结果
+            if (result.position) {
+              this.location = `${result.position.lng} E,${result.position.lat} N`;
+              this.centerLocation = [result.position.lat, result.position.lng];
+              if (this.map) {
+                this.addMarker();
+              } else {
+                this.initMap();
               }
-            } else {
-              //解析定位错误信息
-              console.error(result);
             }
-          });
+          } else {
+            //解析定位错误信息
+            console.error(result);
+            this.getCurrentPosition();
+          }
         });
       });
     },

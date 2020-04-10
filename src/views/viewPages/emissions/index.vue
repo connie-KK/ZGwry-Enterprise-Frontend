@@ -3,6 +3,7 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
+      :customBack="backFun"
     >{{ moduleName }}</header-bar>
     <div class="main-content">
       <nav-bar
@@ -159,6 +160,9 @@ export default {
       const select = `${this.selectedTab}-${this.selectedSubTab}`;
       store.set("pageType", select);
       this.$router.push(`/emissionsDetail/0`);
+    },
+    backFun(){
+      this.$router.push("/entlist")
     }
   }
 };

@@ -1,6 +1,7 @@
 <template>
   <div>
     <header-bar leftIcon="back"
+                :customBack="backFun"
                 leftText="返回">{{ moduleName }}</header-bar>
     <div class="main-content">
       <mt-popup v-model="popupVisible1"
@@ -128,9 +129,14 @@ export default {
       }
     },
     waterTypeName () {
-      return this.waterTypes.filter(item => {
+      let waterSelected = this.waterTypes.filter(item => {
         return this.autoParams.wastewatercategory === item.id
-      })[0].name
+      })
+      if(Array.isArray(waterSelected) && waterSelected.length == 1){
+        return waterSelected[0].name
+      }else{
+        return ""
+      }
     },
     slots1 () {
       return [
@@ -176,14 +182,16 @@ export default {
     }
   },
   created () {
-    let id = this.$route.params.id
-    if (id.includes('add')) {
-      this.selectTab = Number(id.split('add')[1])
+    this.id = this.$route.params.id
+    if (this.id.includes('add')) {
+      this.selectTab = Number(this.id.split('add')[1])
       this.moduleName = this.tabList.filter(item => {
         return this.selectTab === item.id
       })[0].name
       this.autoParams.category = this.selectTab
       this.getZGOutputList()
+    }else{
+      this.getZGTreatFacilityDetail();
     }
   },
   methods: {
@@ -197,7 +205,7 @@ export default {
         .getZGOutputList({
           enterid: this.$store.state.enterId,
           category: this.selectTab,
-          pageIndex: -1,
+          pageIndex: 0,
           pageSize: 100
         })
         .then(res => {
@@ -238,9 +246,12 @@ export default {
       this.$api.updateZGTreatFacility(data).then(res => {
         if (res === true) {
           Toast('保存成功')
-          this.$router.go(-1)
+          this.$router.push("/pollution")
         }
       })
+    },
+    backFun(){
+      this.$router.push("/emissions");
     }
   }
 }

@@ -41,27 +41,31 @@
           <span @click="deleteFile(item)"></span>
         </div>
       </div>
-      <div class="factor-list" v-if="selectedTab===4">
+      <div class="factor-list" v-if="showList">
         <div class="list-header factor">
-          <span v-for="(item,index) in listHeader" :key="index">{{item}}</span>
+          <span v-for="(item,index) in listHeader" :key="index">{{item.name}}</span>
         </div>
         <div
-          v-for="(item,index) in factors"
-          :key="index"
-          @click="selectItem(factors,index)"
-          :class="['list-content','factor',item.class]"
+          v-for="(fitem,findex) in factors"
+          :key="findex"
+          @click="selectItem(factors,findex)"
+          :class="['list-content','factor',fitem.class]"
         >
-          <span>
-            <input type="text" v-if="item.newAdd" v-model="item.factorname" />
-            <span v-else>{{item.factorname}}</span>
-          </span>
-          <span>
-            <input type="text" v-if="item.newAdd" v-model="item.standardlimit" />
-            <span v-else>{{item.standardlimit}}</span>
-          </span>
-          <span>
-            <input type="text" v-if="item.newAdd" v-model="item.unitname" />
-            <span v-else>{{item.unitname}}</span>
+          <span v-for="itemHeader in listHeader" :key="itemHeader.key">
+            <input
+              type="text"
+              v-if="fitem.rowState === 'add' && itemHeader.key !== 'standardName'"
+              v-model="fitem[itemHeader.key]"
+              :placeholder="itemHeader.name"
+            />
+            <input
+              type="text"
+              v-if="fitem.rowState === 'add' && itemHeader.key === 'standardName'"
+              v-model="fitem[itemHeader.key]"
+              :placeholder="itemHeader.name"
+              @click="setStandardid(findex)"
+            />
+            <span v-if="fitem.rowState !== 'add'">{{fitem[itemHeader.key]}}</span>
           </span>
         </div>
         <div class="listBtnGroup">
@@ -87,20 +91,22 @@
       @change="readLocalFile()"
     />
     <mt-popup v-model="popupVisible" position="bottom">
-      <mt-picker :slots="slots" @change="setType" valueKey="valueKey"></mt-picker>
+      <mt-picker :slots="slots" @change="setSelectedData" valueKey="valueKey"></mt-picker>
     </mt-popup>
+    <mt-datetime-picker ref="datePicker" type="date" v-model="dateVal" @confirm="handleConfirmDate"></mt-datetime-picker>
   </div>
 </template>    
 <script>
 import store from "store";
 import moment from "moment";
-import { Popup, Picker, Switch } from "mint-ui";
+import { Popup, Toast, Picker, Switch, DatetimePicker } from "mint-ui";
 export default {
   name: "detail",
   components: {
     "mt-popup": Popup,
     "mt-picker": Picker,
-    "mt-switch": Switch
+    "mt-switch": Switch,
+    "mt-datetime-picker": DatetimePicker
   },
   data() {
     return {
@@ -113,7 +119,54 @@ export default {
       list: [],
       attachments: [],
       factors: [],
-      listHeader: ["污染物", "排放标准限值", "排放标准单位"],
+      listHeader1: [
+        {
+          name: "污染物",
+          key: "factorname"
+        },
+        {
+          name: "排放标准限值",
+          key: "standardlimit"
+        },
+        {
+          name: "排放标准单位",
+          key: "unitname"
+        }
+      ],
+      factorData1: [
+        {
+          key: "factorname",
+          label: "污染物"
+        },
+        {
+          key: "standardlimit",
+          label: "排放标准限值"
+        },
+        {
+          key: "unitname",
+          label: "排放标准单位"
+        }
+      ],
+      factorData2: [
+        {
+          key: "location",
+          label: "监测点位置"
+        },
+        {
+          key: "standardid",
+          label: "适用标准id"
+        }
+      ],
+      listHeader2: [
+        {
+          name: "测点位置",
+          key: "location"
+        },
+        {
+          name: "适用标准",
+          key: "standardName"
+        }
+      ],
       processingmodeArr: ["填埋", "暂存", "自行处置", "转移给有资质单位处置"],
       destinationcategoryArr: [
         { id: 0, name: "直接进入海域" },
@@ -130,8 +183,33 @@ export default {
         { id: 1, name: "有规律间段排放" },
         { id: 2, name: "不规律间段排放" }
       ],
+      //燃料种类
+      fueltypeArr: [
+        { id: 0, name: "其他" },
+        { id: 1, name: "煤炭" },
+        { id: 2, name: "煤矸石" },
+        { id: 3, name: "天然气" },
+        { id: 4, name: "生物质燃料" },
+        { id: 5, name: "木屑" },
+        { id: 6, name: "木炭" },
+        { id: 7, name: "煤气" },
+        { id: 8, name: "沼气" },
+        { id: 9, name: "汽油" },
+        { id: 10, name: "柴油" },
+        { id: 11, name: "醇类燃料" }
+      ],
+      processingmodesArr: [
+        { id: 0, name: "填埋" },
+        { id: 1, name: "暂存" },
+        { id: 2, name: "自行处置" },
+        { id: 3, name: "转移给有资质单位处置" }
+      ],
       outputStandardArr: [],
-      protectionmeasuresArr: ["防流失", "防渗漏", "防扬散"],
+      protectionmeasuresArr: [
+        { id: 0, name: "防流失" },
+        { id: 1, name: "防渗漏" },
+        { id: 2, name: "防扬散" }
+      ],
       popupVisible: false,
       slots: [
         {
@@ -144,7 +222,8 @@ export default {
       ],
       detailData: {},
       selectKey: "",
-      latLngArr: []
+      latLngArr: [],
+      dateVal: moment().format("YYYY-MM-DD")
     };
   },
   computed: {
@@ -159,6 +238,24 @@ export default {
         return this.$store.state.outputRes;
       } else {
         return this.$store.state.treatRes;
+      }
+    },
+    showList() {
+      if (this.selectedTab === 4) {
+        if (this.selectedSubTab === 0) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    },
+    listHeader() {
+      if (this.selectedTab === 4) {
+        if (this.selectedSubTab === 6) {
+          return this.listHeader2;
+        } else {
+          return this.listHeader1;
+        }
       }
     }
   },
@@ -200,12 +297,12 @@ export default {
           if (this.id !== "0" && this.reRequest) {
             this.getZGOutputDetail();
           } else {
-            const tempData = this.$store.state.tempData;
-            if (tempData.attachments) {
-              this.attachments = tempData.attachments;
+            const tempDataExt = this.$store.state.tempData;
+            if (tempDataExt.attachments) {
+              this.attachments = tempDataExt.attachments;
             }
-            if (tempData.factors) {
-              this.factors = tempData.factors;
+            if (tempDataExt.factors) {
+              this.factors = tempDataExt.factors;
             }
             this.setLatLng();
           }
@@ -239,86 +336,13 @@ export default {
     }
   },
   mounted() {
-    this.id = this.$route.params.id;
     this.handleRequest();
     this.getZGStandardList();
   },
   methods: {
-    handleContent() {
-      if (this.selectedTab === 4) {
-        if (this.selectedSubTab === 0) {
-          //根据id获取监测数据详情
-          this.moduleName = "监测数据";
-          this.list = JSON.parse(
-            JSON.stringify(this.$store.state.monitorHeader)
-          );
-          if (this.id !== "0") {
-            this.getZGDataDetail();
-          }
-        } else {
-          //根据id获取排放口信息
-          if (this.selectedSubTab === 2) {
-            this.moduleName = "废水";
-            this.list = JSON.parse(
-              JSON.stringify(this.$store.state.wasteWaterHeader)
-            );
-          } else if (this.selectedSubTab === 1) {
-            this.moduleName = "废气";
-            this.list = JSON.parse(
-              JSON.stringify(this.$store.state.exhaustGasHeader)
-            );
-          } else if (this.selectedSubTab === 6) {
-            this.moduleName = "噪声";
-            this.list = JSON.parse(
-              JSON.stringify(this.$store.state.noiseHeader)
-            );
-          } else if (this.selectedSubTab === 7) {
-            this.moduleName = "固危废堆场点";
-            this.list = JSON.parse(
-              JSON.stringify(this.$store.state.solidDangerHeader)
-            );
-          }
-          if (this.id !== "0" && this.reRequest) {
-            this.getZGOutputDetail();
-          } else {
-            const tempData = this.$store.state.tempData;
-            if (tempData.attachments) {
-              this.attachments = tempData.attachments;
-            }
-            if (tempData.factors) {
-              this.factors = tempData.factors;
-            }
-            this.setLatLng();
-          }
-        }
-        if (this.id === "0") {
-          this.setLatLng();
-        }
-      } else if (this.selectedTab === 5) {
-        //根据id获取企业污染治理设施详情
-        //根据id获取排放口信息
-        if (this.selectedSubTab === 2) {
-          this.moduleName = "废水";
-          this.list = JSON.parse(
-            JSON.stringify(this.$store.state.controWaterHeader)
-          );
-        } else if (this.selectedSubTab === 1) {
-          this.moduleName = "废气";
-          this.list = JSON.parse(
-            JSON.stringify(this.$store.state.controExhaustGasHeader)
-          );
-        } else if (this.selectedSubTab === 7) {
-          this.moduleName = "固危废堆场点";
-          this.list = JSON.parse(
-            JSON.stringify(this.$store.state.controSolidDangerHeader)
-          );
-        }
-        if (this.id !== "0") {
-          this.getZGTreatFacilityDetail();
-        }
-      }
-    },
     handleRequest() {
+      this.id =
+        this.$route.params.id === "0" ? this.$uuid() : this.$route.params.id;
       this.payload = {
         id: this.id
       };
@@ -339,7 +363,7 @@ export default {
               item.key === "isidentificationmark" ||
               item.key === "isstored"
             ) {
-              // item.value = res[item.key] ? "是" : "否";
+              item.value = res[item.key] ? true : false;
             } else if (item.key.includes("standard")) {
               item.value = res["standard"] ? res["standard"].name : "";
               item.keyValue = res["standard"].id;
@@ -349,9 +373,12 @@ export default {
             } else if (item.key === "wastedischargelaw") {
               item.value = this.wastedischargelawArr[res[item.key]].name;
               item.keyValue = res[item.key];
+            } else if (item.key === "fueltypes") {
+              item.value = this.fueltypeArr[res[item.key]].name;
+              item.keyValue = res[item.key];
             } else if (item.key === "lat-lng") {
               item.value = `${res["lat"]} E,${res["lng"]} N`;
-            } else if (item.key === "inriverlng-inriverlat") {
+            } else if (item.key === "inriverlat-inriverlng") {
               item.value = `${res["inriverlat"]} E,${res["inriverlng"]} N`;
             } else if (item.key === "processingmode") {
               if (typeof res[item.key] === "string") {
@@ -369,13 +396,17 @@ export default {
             } else if (item.key === "protectionmeasures") {
               if (typeof res[item.key] === "string") {
                 item.value = "";
-                let tempArr = res[item.key].split(",");
-                tempArr.forEach((it, idx) => {
-                  item.value +=
-                    idx === 0
-                      ? this.protectionmeasuresArr[it]
-                      : `,${this.protectionmeasuresArr[it]}`;
-                });
+                if (res[item.key].includes(",")) {
+                  let tempArr = res[item.key].split(",");
+                  tempArr.forEach((it, idx) => {
+                    item.value +=
+                      idx === 0
+                        ? this.protectionmeasuresArr[it].name
+                        : `,${this.protectionmeasuresArr[it].name}`;
+                  });
+                }else{
+                  item.value = this.protectionmeasuresArr[res[item.key]].name
+                }
               } else {
                 item.value = this.protectionmeasuresArr[res[item.key]];
               }
@@ -385,7 +416,20 @@ export default {
             this.$set(this.list, index, item);
           });
           this.attachments = res.attachments;
-          this.factors = res.factors;
+          if (this.selectedSubTab === 6) {
+            let stationsArr = [];
+            res.stations.forEach(sItem => {
+              stationsArr.push({
+                id: sItem.id,
+                location: sItem.location,
+                standardid: sItem.standard[0].id,
+                standardName: sItem.standard[0].name
+              });
+            });
+            this.factors = stationsArr;
+          } else {
+            this.factors = res.factors;
+          }
           this.setLatLng();
         }
       });
@@ -456,8 +500,10 @@ export default {
     },
     download(item) {
       let a = document.createElement("a");
-      a.href = `/api/ZGEntExtend/DownAttachmentFiles?id=${item.id}`;
+      a.href = `http://183.220.144.57:30002/api/ZGEntExtend/DownAttachmentFiles?id=${item.id}`;
+      a.download = item.title;
       a.click();
+      document.body.removeChild(a);
     },
     selectIcon(item) {
       if (item.icon === "select") {
@@ -467,8 +513,14 @@ export default {
           arr = this.destinationcategoryArr;
         } else if (item.key === "wastedischargelaw") {
           arr = this.wastedischargelawArr;
-        } else if (item.key === "standard") {
+        } else if (item.key === "standardid") {
           arr = this.outputStandardArr;
+        } else if (item.key === "fueltypes") {
+          arr = this.fueltypeArr;
+        } else if (item.key === "processingmode") {
+          arr = this.processingmodesArr;
+        } else if (item.key === "protectionmeasures") {
+          arr = this.protectionmeasuresArr;
         }
         arr.forEach((it, idx) => {
           tempArr.push({ valueKey: it.name, value: it.id });
@@ -487,47 +539,77 @@ export default {
         });
 
         this.$store.commit("set_latLng", this.latLngArr);
-        this.$store.commit(
-          "set_wasteWaterHeader",
-          JSON.parse(JSON.stringify(this.list))
-        );
+        this.storeListData();
+
         this.$store.commit("set_reRequest", false);
-        if (this.selectedTab === 4) {
-          if (this.selectedSubTab === 2) {
-            const tempData = {
-              id: this.id,
-              attachments: this.attachments,
-              factors: this.factors
-            };
-            console.log(tempData);
-            this.$store.commit("set_tempData", tempData);
-          }
-        }
+        const tempDataExt = {
+          id: this.id,
+          attachments: this.attachments,
+          factors: this.factors
+        };
+        this.$store.commit("set_tempData", tempDataExt);
         this.$router.replace(`/emissionsMap/${this.id}`);
+      } else if (item.icon === "date") {
+        this.$refs.datePicker.open();
       }
     },
-    setType(picker) {
+    setStandardid(findex) {
+      let tempArr = [];
+      this.setFactorIndex = findex;
+      this.outputStandardArr.forEach((it, idx) => {
+        tempArr.push({ valueKey: it.name, value: it.id });
+      });
+      this.slots[0].values = tempArr;
+      this.popupVisible = true;
+    },
+    storeListData() {
+      let keyName;
+      if (this.selectedTab === 4) {
+        if (this.selectedSubTab === 2) {
+          keyName = "set_wasteWaterHeader";
+        } else if (this.selectedSubTab === 1) {
+          keyName = "set_exhaustGasHeader";
+        }
+      }
+      this.$store.commit(keyName, JSON.parse(JSON.stringify(this.list)));
+    },
+    setSelectedData(picker) {
       const selectedVal = picker.getValues();
       if (selectedVal instanceof Array && selectedVal.length === 1) {
         const keyValue = selectedVal[0].value;
-        this.list.forEach((item, index) => {
-          if (item.key === this.selectKey) {
-            if (item.key === "destinationcategory") {
-              item.value = this.destinationcategoryArr[keyValue].name;
-            } else if (item.key === "wastedischargelaw") {
-              item.value = this.wastedischargelawArr[keyValue].name;
-            } else if (item.key === "standard") {
-              this.outputStandardArr.forEach(outItem => {
-                if (outItem.id === keyValue) {
-                  item.value = outItem.name;
-                }
-              });
+        if (this.setFactorIndex >= 0) {
+          this.outputStandardArr.forEach(outItem => {
+            if (outItem.id === keyValue) {
+              let fItem = this.factors[this.setFactorIndex];
+              fItem.standardName = outItem.name;
+              fItem.standardid = keyValue;
             }
-            item.keyValue = keyValue;
-            this.$set(this.list, index, item);
-          }
-        });
-        // this.detailData[this.selectKey] = keyValue;
+          });
+        } else {
+          this.list.forEach((item, index) => {
+            if (item.key === this.selectKey) {
+              if (item.key === "destinationcategory") {
+                item.value = this.destinationcategoryArr[keyValue].name;
+              } else if (item.key === "wastedischargelaw") {
+                item.value = this.wastedischargelawArr[keyValue].name;
+              } else if (item.key === "fueltypes") {
+                item.value = this.fueltypeArr[keyValue].name;
+              } else if (item.key === "processingmode") {
+                item.value = this.processingmodesArr[keyValue].name;
+              } else if (item.key === "protectionmeasures") {
+                item.value = this.protectionmeasuresArr[keyValue].name;
+              } else if (item.key === "standardid") {
+                this.outputStandardArr.forEach(outItem => {
+                  if (outItem.id === keyValue) {
+                    item.value = outItem.name;
+                  }
+                });
+              }
+              item.keyValue = keyValue;
+              this.$set(this.list, index, item);
+            }
+          });
+        }
       }
     },
     uploadFile() {
@@ -543,7 +625,8 @@ export default {
       for (let i = 0; i < files.length; i++) {
         data.append("file" + i, files[i]);
       }
-      this.$api.uploadAttachment(data).then(res => {
+      this.$api.uploadEntExtendAttachment(data).then(res => {
+        res.forEach(item => (item.rowState = "add"));
         this.attachments.push(...res);
       });
     },
@@ -562,22 +645,30 @@ export default {
       });
     },
     addItem() {
-      let item, header;
+      let newItem = {};
       if (this.selectedTab === 4) {
-        if (this.selectedSubTab === 2) {
-          item = {
-            category: null,
-            factorname: "",
-            harmfulingredient: null,
-            id: this.createGuid(),
-            standardlimit: "",
-            unitname: "",
-            newAdd: true
-          };
-          header = this.$store.state.waterFactor;
-          this.factors.push(item);
+        let header;
+        if (this.selectedSubTab === 6) {
+          header = this.factorData2;
+        } else {
+          header = this.factorData1;
         }
+        header.forEach(item => {
+          newItem[item.key] = "";
+        });
+        newItem.id = this.$uuid();
+        newItem.rowState = "add";
+        this.factors.push(newItem);
       }
+    },
+    handleConfirmDate(e) {
+      this.dateVal = moment(e).format("YYYY-MM-DD");
+      this.list.forEach((item, index) => {
+        if (item.icon === "date") {
+          item.value = this.dateVal;
+          this.$set(this.list, index, item);
+        }
+      });
     },
     selectItem(arr, index) {
       let selecteItem = arr[index];
@@ -589,27 +680,38 @@ export default {
     },
     backFun() {
       this.resetData();
-      window.history.go(-1);
+      this.$router.push("/emissions");
     },
     save() {
-      // let detailData = {};
-      this.resDetail.id = this.id;
-      this.resDetail.enterpriseid = this.enterid;
+      this.factors.forEach(item => {
+        delete item.class;
+      });
+      let detailData = {
+        attachments: this.attachments,
+        id: this.id,
+        enterpriseid: this.enterid
+      };
+      if (this.selectedSubTab === 6) {
+        detailData.stations = this.factors;
+      } else if(this.selectedSubTab > 0){
+        detailData.factors = this.factors;
+      }
       this.list.forEach(item => {
         if (item.icon && item.icon === "select") {
-          this.resDetail[item.key] = item.keyValue;
+          detailData[item.key] = item.keyValue;
         } else if (item.icon && item.icon === "map") {
-          this.hanleLatlng(this.resDetail, item);
+          this.hanleLatlng(detailData, item);
         } else if (item.type && item.type === "boolean") {
-          this.resDetail[item.key] = item.value === "是" ? 0 : 1;
+          detailData[item.key] =
+            item.value === "是" || item.value === true ? 1 : 0;
         } else {
-          this.resDetail[item.key] = item.value;
+          detailData[item.key] = item.value;
         }
       });
-      this.resDetail.attachments = this.attachments;
-      this.resDetail.factors = this.factors;
-      this.resDetail.category = this.selectedSubTab;
-      console.log(this.resDetail);
+
+      if (detailData.protectionmeasures > 0) {
+        detailData.protectionmeasures = [detailData.protectionmeasures];
+      }
 
       let apiName;
       if (this.selectedTab === 4) {
@@ -617,16 +719,30 @@ export default {
       } else {
         apiName = "updateZGTreatFacility";
       }
-      this.$api[apiName](this.resDetail).then(res => {});
+      if(this.selectedSubTab > 0){
+        detailData.category = this.selectedSubTab;
+      }
+      this.$api[apiName](detailData).then(res => {
+        if (res === true) {
+          Toast("保存成功");
+          this.$router.replace(`/emissionsDetail/${detailData.id}`);
+          //处理新添加表格数据
+          this.factors.forEach((item, index) => {
+            delete item.rowState;
+            this.$set(this.factors, index, item);
+          });
+        }
+      });
     },
     hanleLatlng(obj, item) {
-      debugger;
-      const keyArr = item.key.split("-");
-      if (Array.isArray(keyArr) && keyArr.length === 2) {
-        let valueArr = item.value.split(",");
-        if (Array.isArray(valueArr) && valueArr.length === 2) {
-          obj[keyArr[0]] = valueArr[1].split(" N")[0];
-          obj[keyArr[1]] = valueArr[0].split(" E")[0];
+      if (item.value) {
+        const keyArr = item.key.split("-");
+        if (Array.isArray(keyArr) && keyArr.length === 2) {
+          let valueArr = item.value.split(",");
+          if (Array.isArray(valueArr) && valueArr.length === 2) {
+            obj[keyArr[0]] = valueArr[1].split(" N")[0];
+            obj[keyArr[1]] = valueArr[0].split(" E")[0];
+          }
         }
       }
     },
@@ -645,19 +761,15 @@ export default {
             "set_wasteWaterHeader",
             JSON.parse(JSON.stringify(this.list))
           );
+        } else if (this.selectedSubTab === 1) {
+          this.$store.commit(
+            "set_exhaustGasHeader",
+            JSON.parse(JSON.stringify(this.list))
+          );
         }
       }
       this.$store.commit("set_latLng", []);
       this.$store.commit("set_reRequest", true);
-    },
-    createGuid() {
-      let guid = "";
-      for (let i = 1; i <= 32; i++) {
-        const n = Math.floor(Math.random() * 16.0).toString(16);
-        guid += n;
-        if (i == 8 || i == 12 || i == 16 || i == 20) guid += "-";
-      }
-      return guid;
     }
   }
 };
@@ -673,6 +785,7 @@ p {
   margin: 0;
 }
 .list {
+  min-height: 0.9rem;
   background: rgba(255, 255, 255, 1);
   padding: 0 0.41rem 0 0.32rem;
   border-bottom: solid 1px #e0e0e0;
@@ -719,9 +832,11 @@ p {
     }
     .icon {
       display: inline-block;
-      width: 0.32rem;
-      height: 0.64rem;
-      background: url(../../../assets/images/right.png) no-repeat;
+      width: 0.18rem;
+      height: 0.32rem;
+      background: #fff url("../../../assets/images/right.png") no-repeat right
+        center;
+      background-size: 0.2rem;
     }
   }
   input.info {
@@ -780,6 +895,9 @@ p {
     }
     span:first-child {
       flex: 5;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       svg {
         fill: #3296fa;
       }
@@ -805,10 +923,19 @@ p {
       text-align: left;
       input {
         width: 90%;
+        border: 0;
+        font-size: 0.28rem;
       }
     }
     span:nth-child(2) {
       @include flex(1.5);
+      span {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 4.2rem;
+      }
     }
   }
   .list-header {

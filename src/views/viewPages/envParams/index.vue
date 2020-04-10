@@ -3,6 +3,7 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
+      :customBack="backFun"
     >{{ moduleName }}</header-bar>
     <div class="main-content">
       <nav-bar :selected="3"></nav-bar>
@@ -771,6 +772,9 @@ export default {
     },
     onValuesChange5(e) {
       this.autoParams.integritylevel = e.values[0].code
+    },
+    backFun(){
+      this.$router.push("/entlist")
     }
   }
 }

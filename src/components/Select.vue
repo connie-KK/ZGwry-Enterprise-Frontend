@@ -90,6 +90,7 @@ export default {
     },
     myname() {
       let temp = ''
+      this.myval = this.fromval
       this.columns.forEach(item => {
         if (item[this.valKey] === this.myval) {
           temp = item[this.valName]

@@ -335,7 +335,7 @@ export default new Vuex.Store({
         icon: 'map'
       },
       {
-        key: 'inriverlng-inriverlat',
+        key: 'inriverlat-inriverlng',
         label: '入河口经纬度',
         icon: 'map'
       },
@@ -359,11 +359,13 @@ export default new Vuex.Store({
       },
       {
         key: 'isonlinemonitoring',
-        label: '是否安装在线监控设备'
+        label: '是否安装在线监控设备',
+        type: 'boolean'
       },
       {
         key: 'standardid',
-        label: '废气排放标准'
+        label: '废气排放标准',
+        icon: 'select'
       },
       {
         key: 'height',
@@ -371,15 +373,18 @@ export default new Vuex.Store({
       },
       {
         key: '',
-        label: '排放口经纬度'
+        label: '排放口经纬度',
+        icon: 'map'
       },
       {
-        key: 'lat-lng',
-        label: '燃料种类'
+        key: 'fueltypes',
+        label: '燃料种类',
+        icon: 'select'
       },
       {
         key: 'wastedischargelaw',
-        label: '废气排放规律'
+        label: '废气排放规律',
+        icon: 'select'
       },
       {
         key: 'remark',
@@ -392,7 +397,8 @@ export default new Vuex.Store({
       },
       {
         key: 'standardid',
-        label: '排放标准'
+        label: '排放标准',
+        icon: 'select'
       },
       {
         key: 'address',
@@ -413,23 +419,28 @@ export default new Vuex.Store({
       },
       {
         key: 'processingmode',
-        label: '处理方式'
+        label: '处理方式',
+        icon: 'select'
       },
       {
         key: 'isidentificationmark',
-        label: '是否涉及危险废物识别标志'
+        label: '是否涉及危险废物识别标志',
+        type: 'boolean'
       },
       {
         key: 'isstored',
-        label: '是否贮存危险物'
+        label: '是否贮存危险物',
+        type: 'boolean'
       },
       {
         key: 'isdangerorwaste',
-        label: '是否危废'
+        label: '是否危废',
+        type: 'boolean'
       },
       {
         key: 'protectionmeasures',
-        label: '污染防护措施'
+        label: '污染防护措施',
+        icon: 'select'
       },
       {
         key: 'remark',
@@ -438,7 +449,8 @@ export default new Vuex.Store({
     ],
     monitorHeader: [{
         key: 'monitordate',
-        label: '监测日期'
+        label: '监测日期',
+        icon: 'date'
       },
       {
         key: 'factorname',
@@ -540,175 +552,6 @@ export default new Vuex.Store({
     airList: [],
     ariLoaction: [],
     loading: false,
-    standardLists: [{
-        id: '12c183f9-d9ab-4af9-b73c-0653cc6a9f16',
-        name: '水温（°C）',
-        alarmValue: '25',
-        earlyAlarmValue: '22.5'
-      },
-      {
-        id: 'cdfc3c0a-838f-4467-9817-b4d7a17a093d',
-        name: 'PH（无量纲）',
-        alarmValue: '14',
-        earlyAlarmValue: '12.6'
-      },
-      {
-        id: '145c7c84-e14b-40e1-91f1-9762c4a986aa',
-        name: '溶解氧（mg/L）',
-        alarmValue: '6',
-        earlyAlarmValue: '5.4'
-      },
-      {
-        id: 'a39c1438-03a3-4f27-849f-a62b70548dd2',
-        name: '高锰酸盐指数（mg/L）',
-        alarmValue: '6',
-        earlyAlarmValue: '5.4'
-      },
-      {
-        id: '0271198a-ca6e-4b2d-ba84-8872fc9ee9d9',
-        name: '氨氮（mg/L）',
-        alarmValue: '1',
-        earlyAlarmValue: '0.9'
-      },
-      {
-        id: '6207934d-3a8c-4e0c-acdf-779510a4f1b5',
-        name: '总磷（mg/L）',
-        alarmValue: '0.2',
-        earlyAlarmValue: '0.18'
-      },
-      {
-        id: '8a3cb141-ec13-4dec-9d98-704e8e738fdc',
-        name: '总氮（mg/L）',
-        alarmValue: '1',
-        earlyAlarmValue: '0.9'
-      },
-      {
-        id: '14462309-55b7-451c-8d4a-a8bd0e16c982',
-        name: '总汞（mg/L）',
-        alarmValue: '0.0001',
-        earlyAlarmValue: '0.00009'
-      },
-      {
-        id: '60836fa6-bfae-44b3-a8f8-6d0ea52ec38e',
-        name: '挥发酚（mg/L）',
-        alarmValue: '0.005',
-        earlyAlarmValue: '0.0045'
-      },
-      {
-        id: 'c1effa5a-38fb-406a-89da-401693dbd264',
-        name: '总铅（mg/L）',
-        alarmValue: '0.05',
-        earlyAlarmValue: '0.045'
-      },
-      {
-        id: 'e501fed3-a28e-4b16-82d9-df747ba40418',
-        name: '电导率（ms/m）',
-        alarmValue: '15',
-        earlyAlarmValue: '13.5'
-      },
-      {
-        id: 'b77e6cc2-3a1c-4457-b4d8-1ca6b7a6d880',
-        name: '叶绿素a（mg/L）',
-        alarmValue: '',
-        earlyAlarmValue: ''
-      },
-      {
-        id: '2eb67d22-55b4-4187-9959-60a95ffad9e2',
-        name: '浊度（null）',
-        alarmValue: '',
-        earlyAlarmValue: ''
-      },
-      {
-        id: 'E809661B-A83C-484D-8C82-0783548EC559',
-        name: '阴离子表面活性剂',
-        alarmValue: '0.2',
-        earlyAlarmValue: '0.18'
-      },
-      {
-        id: 'FA02F0AB-47A8-4C71-A587-1D6AE6E5509A',
-        name: '铜',
-        alarmValue: '1',
-        earlyAlarmValue: '0.9'
-      },
-      {
-        id: '140CE880-6D70-4892-AA77-218B75E96E7B',
-        name: '粪大肠菌群',
-        alarmValue: '10000',
-        earlyAlarmValue: '9000'
-      },
-      {
-        id: 'C9CCDB96-EED8-4D52-A197-2BDB00BDE868',
-        name: '镉',
-        alarmValue: '0.005',
-        earlyAlarmValue: '0.0045'
-      },
-      {
-        id: 'ABFFF4A7-19A5-4049-B7E5-2D82ACE48FAC',
-        name: '氟化物',
-        alarmValue: '0.2',
-        earlyAlarmValue: '0.18'
-      },
-      {
-        id: '17B87BED-8064-453F-9716-3D4476EF38B2',
-        name: '硒',
-        alarmValue: '0.01',
-        earlyAlarmValue: '0.009'
-      },
-      {
-        id: 'B11F20D2-6937-4029-9C24-560E933C53DD',
-        name: 'BOD5',
-        alarmValue: '4',
-        earlyAlarmValue: '3.6'
-      },
-      {
-        id: '850BA8BF-7D25-4FA6-988E-5FEB229D8C9F',
-        name: '石油类',
-        alarmValue: '0.05',
-        earlyAlarmValue: '0.045'
-      },
-      {
-        id: 'B4AB920A-2297-4F23-BD1B-84D04E75B6EE',
-        name: '锌',
-        alarmValue: '1',
-        earlyAlarmValue: '0.9'
-      },
-      {
-        id: 'CCC034C4-F78A-4094-85CD-A74E8F35108C',
-        name: 'COD',
-        alarmValue: '20',
-        earlyAlarmValue: '18'
-      },
-      {
-        id: '1E5C2CF3-C949-4908-958F-CF9E8C2AFFD6',
-        name: '六价铬',
-        alarmValue: '0.05',
-        earlyAlarmValue: '0.045'
-      },
-      {
-        id: 'C78CFD3A-0327-4268-83C7-E11849C1CDF9',
-        name: '砷',
-        alarmValue: '0.05',
-        earlyAlarmValue: '0.045'
-      },
-      {
-        id: '47311F80-D965-43ED-8DA2-E29A99E256E3',
-        name: '生化需氧量',
-        alarmValue: '20',
-        earlyAlarmValue: '18'
-      },
-      {
-        id: 'BA8C019F-0228-47C1-8E65-E2ABDAF97C0E',
-        name: '硫化物',
-        alarmValue: '0.2',
-        earlyAlarmValue: '0.18'
-      },
-      {
-        id: '8D4A4D36-FD95-4D18-B49D-EA745BD461F8',
-        name: '氰化物',
-        alarmValue: '0.2',
-        earlyAlarmValue: '0.18'
-      }
-    ],
     // 给事件选择任务
     toEventInfo: null,
     // 给发布任务时的事件信息
@@ -766,6 +609,9 @@ export default new Vuex.Store({
     },
     set_wasteWaterHeader: (state, data) => {
       state.wasteWaterHeader = data
+    },
+    set_exhaustGasHeader: (state, data) => {
+      state.exhaustGasHeader = data
     },
     set_tempData: (state, data) => {
       state.tempData = data

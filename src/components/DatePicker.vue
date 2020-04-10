@@ -53,13 +53,15 @@ export default {
   },
   data() {
     return {
-      myval: this.fromval ? new Date(this.fromval) : new Date(),
+      myval: "",
       showPicker: false,
-      trueVal: this.fromval ? new Date(this.fromval) : ''
+      trueVal: ""
     }
   },
   computed: {
     mydate() {
+      this.myval = this.fromval ? new Date(this.fromval) : new Date();
+      this.trueVal = this.fromval ? new Date(this.fromval) : '';
       return this.trueVal ? moment(this.trueVal).format(this.format) : ''
     }
   },

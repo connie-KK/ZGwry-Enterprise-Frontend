@@ -150,13 +150,6 @@ const interfaces = [
     type: 'post',
     serviceName: 'serviceStoken'
   },
-  // 上传附件
-  {
-    fun: 'uploadAttachment',
-    interface: '/api/ZGEntExtend/UploadEntExtendAttachment',
-    type: 'post',
-    serviceName: 'serviceEnt'
-  },
   // 新增更新自贡企业环境属性
   {
     fun: 'updateZGEnviromentalProps',

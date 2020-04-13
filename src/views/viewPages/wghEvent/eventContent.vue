@@ -282,7 +282,7 @@ export default {
       entPageIndex: 0,
       imgBaseUrl: "/ent/Grid/GetImage/",
       moduleId360: "",
-      initt: "dingding"
+      initt: "none"
     };
   },
   watch: {
@@ -712,7 +712,7 @@ export default {
               item.url.includes("Content") &&
               !item.url.includes(this.$360url)
             ) {
-              item.url = this.$360url + item.url;
+              // item.url = this.$360url + item.url;
             }
           });
           this.imglist.push(...res);

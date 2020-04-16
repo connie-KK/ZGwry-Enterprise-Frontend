@@ -15,6 +15,7 @@
         :type="type"
         @confirm="onConfirm"
         @cancel="showPicker = false"
+        :min-date="startDate"
       />
     </van-popup>
   </div>
@@ -55,7 +56,9 @@ export default {
     return {
       myval: "",
       showPicker: false,
-      trueVal: ""
+      trueVal: "",
+      //设置开始时间，默认是十年
+      startDate:new Date('1950-01-01')
     }
   },
   computed: {

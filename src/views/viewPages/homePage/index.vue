@@ -175,13 +175,12 @@
 <script>
 import navBar from '@/components/navBar.vue'
 import moment from 'moment'
-import { Toast, DatetimePicker } from 'mint-ui'
+import { Toast } from 'mint-ui'
 import pca from '@/assets/scripts/pca.js'
 export default {
   name: 'home',
   components: {
-    'nav-bar': navBar,
-    'mt-datetime-picker': DatetimePicker
+    'nav-bar': navBar
   },
   data() {
     return {

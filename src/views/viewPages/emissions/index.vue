@@ -162,7 +162,7 @@ export default {
       this.$router.push(`/emissionsDetail/0`);
     },
     backFun(){
-      this.$router.push("/entlist")
+      this.$router.push("/entlist/0")
     }
   }
 };

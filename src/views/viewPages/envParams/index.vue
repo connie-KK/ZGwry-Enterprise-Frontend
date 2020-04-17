@@ -774,7 +774,7 @@ export default {
       this.autoParams.integritylevel = e.values[0].code
     },
     backFun(){
-      this.$router.push("/entlist")
+      this.$router.push("/entlist/0")
     }
   }
 }

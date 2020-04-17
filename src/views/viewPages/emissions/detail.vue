@@ -336,13 +336,13 @@ export default {
     }
   },
   mounted() {
+    debugger
     this.handleRequest();
     this.getZGStandardList();
   },
   methods: {
     handleRequest() {
-      this.id =
-        this.$route.params.id === "0" ? this.$uuid() : this.$route.params.id;
+      this.id = this.$route.params.id;
       this.payload = {
         id: this.id
       };
@@ -377,9 +377,9 @@ export default {
               item.value = this.fueltypeArr[res[item.key]].name;
               item.keyValue = res[item.key];
             } else if (item.key === "lat-lng") {
-              item.value = `${res["lat"]} E,${res["lng"]} N`;
+              item.value = `${res["lng"]} E,${res["lat"]} N`;
             } else if (item.key === "inriverlat-inriverlng") {
-              item.value = `${res["inriverlat"]} E,${res["inriverlng"]} N`;
+              item.value = `${res["inriverlng"]} E,${res["inriverlat"]} N`;
             } else if (item.key === "processingmode") {
               if (typeof res[item.key] === "string") {
                 item.value = "";
@@ -629,6 +629,7 @@ export default {
         res.forEach(item => (item.rowState = "add"));
         this.attachments.push(...res);
       });
+      e.value = ""
     },
     deleteFile(e) {
       this.attachments.forEach((item, index) => {
@@ -688,7 +689,7 @@ export default {
       });
       let detailData = {
         attachments: this.attachments,
-        id: this.id,
+        id: this.id === "0" ? this.$uuid() : this.id,
         enterpriseid: this.enterid
       };
       if (this.selectedSubTab === 6) {
@@ -711,6 +712,8 @@ export default {
 
       if (detailData.protectionmeasures > 0) {
         detailData.protectionmeasures = [detailData.protectionmeasures];
+      }else{
+        detailData.protectionmeasures = []
       }
 
       let apiName;
@@ -725,12 +728,10 @@ export default {
       this.$api[apiName](detailData).then(res => {
         if (res === true) {
           Toast("保存成功");
+          this.$store.commit("set_reRequest",true)
           this.$router.replace(`/emissionsDetail/${detailData.id}`);
-          //处理新添加表格数据
-          this.factors.forEach((item, index) => {
-            delete item.rowState;
-            this.$set(this.factors, index, item);
-          });
+        }else{
+          Toast(res);
         }
       });
     },
@@ -770,6 +771,7 @@ export default {
       }
       this.$store.commit("set_latLng", []);
       this.$store.commit("set_reRequest", true);
+      this.$store.commit("set_tempData",{})
     }
   }
 };

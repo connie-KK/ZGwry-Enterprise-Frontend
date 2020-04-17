@@ -352,6 +352,7 @@ export default {
       let formData = new FormData()
       formData.append('file', files[0])
       this.uploadFiles(formData, type, fun, etype)
+      e.target.value = ""
     },
     uploadFiles(formData, type, fun, etype) {
       formData.append('year', moment().format('YYYY'))

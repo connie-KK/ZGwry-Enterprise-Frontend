@@ -84,7 +84,9 @@ module.exports = {
     // 设置打包的样式是否内联（false 为内联）
     extract: true
   },
-  publicPath: '/',
+  publicPath: process.env.NODE_ENV === 'production'
+  ? '/content/APPmobile'
+  : '/',
   chainWebpack: config => {
     config.module.rules.delete('eslint')
   }

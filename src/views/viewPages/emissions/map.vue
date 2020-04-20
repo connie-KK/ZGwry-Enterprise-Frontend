@@ -35,23 +35,22 @@ export default {
       isShowBorder: false,
       moduleName: "选取位置",
       location: "",
-      centerLocation: [],
       markers: {},
       routerId: "",
       latLngObj: {},
       latLngArr: [],
-      zoom: 17,
+      zoom: 15,
       lat: 0,
       lng: 0
     };
   },
   watch: {
     lat() {
-      this.location = `${this.lng} E,${this.lng} N`;
+      this.location = `${this.lng} E,${this.lat} N`;
       this.map.setCenter([this.lng, this.lat]);
     },
     lng() {
-      this.location = `${this.lng} E,${this.lng} N`;
+      this.location = `${this.lng} E,${this.lat} N`;
       this.map.setCenter([this.lng, this.lat]);
     }
   },
@@ -77,23 +76,22 @@ export default {
     getLocation() {
       let tempArr = this.location.split(",");
       if (Array.isArray(tempArr) && tempArr.length === 2) {
-        let lat = tempArr[1].split(" N")[0];
-        let lng = tempArr[0].split(" E")[0];
-        this.centerLocation = [lat, lng];
-        this.addMarker();
+        this.lat = tempArr[1].split(" N")[0];
+        this.lng = tempArr[0].split(" E")[0];
       }
     },
     initMap() {
       this.map = new AMap.Map("map-container", {
         zoom: this.zoom
       });
-      this.getCenter();
+      
       if (
         !this.location ||
         !this.location.length ||
         this.location === "0E，0N"
       ) {
         this.getMyPosition();
+        this.getCenter();
       } else {
         this.getLocation();
       }

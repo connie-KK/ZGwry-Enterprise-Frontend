@@ -134,7 +134,7 @@
           </button>
           <ul class="file-list">
             <li
-              v-for="(item, index) in pdocItems"
+              v-for="item in pdocItems"
               :key="item.id"
             >
               <p @click="ifDownload(item.id, item.name, 'DownPollFiles')">
@@ -154,7 +154,7 @@
           </button>
           <ul class="file-list">
             <li
-              v-for="(item, index) in emergplanItems"
+              v-for="item in emergplanItems"
               :key="item.id"
             >
               <p @click="ifDownload(item.id, item.name, 'DownEmergplanFiles')">
@@ -174,7 +174,7 @@
           </button>
           <ul class="file-list">
             <li
-              v-for="(item, index) in attachmentItems"
+              v-for="item in attachmentItems"
               :key="item.id"
             >
               <p @click="ifDownload(item.id, item.name, 'DownAttachmentFiles')">
@@ -192,7 +192,7 @@
           </button>
           <ul class="file-list pic-list">
             <li
-              v-for="(item, index) in drawingItems"
+              v-for="item in drawingItems"
               :key="item.id"
             >
               <div
@@ -407,6 +407,8 @@ export default {
         if (res === true) {
           Toast('保存成功')
           this.getPollpermitsByid()
+        }else{
+          Toast(res)
         }
       })
     }

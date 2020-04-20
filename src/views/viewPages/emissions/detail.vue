@@ -63,6 +63,7 @@
               v-if="fitem.rowState === 'add' && itemHeader.key === 'standardName'"
               v-model="fitem[itemHeader.key]"
               :placeholder="itemHeader.name"
+              readonly
               @click="setStandardid(findex)"
             />
             <span v-if="fitem.rowState !== 'add'">{{fitem[itemHeader.key]}}</span>
@@ -223,7 +224,8 @@ export default {
       detailData: {},
       selectKey: "",
       latLngArr: [],
-      dateVal: moment().format("YYYY-MM-DD")
+      dateVal: moment().format("YYYY-MM-DD"),
+      setFactorIndex: -1 //噪声添加列表数据时id
     };
   },
   computed: {
@@ -336,7 +338,6 @@ export default {
     }
   },
   mounted() {
-    debugger
     this.handleRequest();
     this.getZGStandardList();
   },
@@ -404,8 +405,8 @@ export default {
                         ? this.protectionmeasuresArr[it].name
                         : `,${this.protectionmeasuresArr[it].name}`;
                   });
-                }else{
-                  item.value = this.protectionmeasuresArr[res[item.key]].name
+                } else {
+                  item.value = this.protectionmeasuresArr[res[item.key]].name;
                 }
               } else {
                 item.value = this.protectionmeasuresArr[res[item.key]];
@@ -527,6 +528,10 @@ export default {
         });
         this.slots[0].values = tempArr;
         this.selectKey = item.key;
+
+        //噪声
+        this.setFactorIndex >= 0 ? (this.setFactorIndex = -1) : "";
+
         this.popupVisible = true;
       } else if (item.icon === "map") {
         this.latLngArr.forEach(liItem => {
@@ -629,7 +634,7 @@ export default {
         res.forEach(item => (item.rowState = "add"));
         this.attachments.push(...res);
       });
-      e.value = ""
+      e.value = "";
     },
     deleteFile(e) {
       this.attachments.forEach((item, index) => {
@@ -694,7 +699,7 @@ export default {
       };
       if (this.selectedSubTab === 6) {
         detailData.stations = this.factors;
-      } else if(this.selectedSubTab > 0){
+      } else if (this.selectedSubTab > 0) {
         detailData.factors = this.factors;
       }
       this.list.forEach(item => {
@@ -712,25 +717,30 @@ export default {
 
       if (detailData.protectionmeasures > 0) {
         detailData.protectionmeasures = [detailData.protectionmeasures];
-      }else{
-        detailData.protectionmeasures = []
+      }
+      if (this.selectedSubTab !== 0) {
+        detailData.protectionmeasures = [];
+      } else {
+        delete detailData.attachments;
       }
 
       let apiName;
       if (this.selectedTab === 4) {
-        apiName = "updateZGOutput";
+        this.selectedSubTab === 0
+          ? (apiName = "updateZGData")
+          : (apiName = "updateZGOutput");
       } else {
         apiName = "updateZGTreatFacility";
       }
-      if(this.selectedSubTab > 0){
+      if (this.selectedSubTab > 0) {
         detailData.category = this.selectedSubTab;
       }
       this.$api[apiName](detailData).then(res => {
         if (res === true) {
           Toast("保存成功");
-          this.$store.commit("set_reRequest",true)
+          this.$store.commit("set_reRequest", true);
           this.$router.replace(`/emissionsDetail/${detailData.id}`);
-        }else{
+        } else {
           Toast(res);
         }
       });
@@ -771,7 +781,7 @@ export default {
       }
       this.$store.commit("set_latLng", []);
       this.$store.commit("set_reRequest", true);
-      this.$store.commit("set_tempData",{})
+      this.$store.commit("set_tempData", {});
     }
   }
 };

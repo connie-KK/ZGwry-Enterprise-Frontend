@@ -412,6 +412,8 @@ export default {
         // console.log(res)
         if (res === true) {
           Toast('保存成功')
+        }else{
+          Toast(res)
         }
       })
     },
@@ -450,10 +452,11 @@ export default {
         }
       })
       params.number = Number(params.number)
-      console.log(params)
       this.$api.updateZGEnterpriseExtend(params).then(res => {
         if (res === true) {
           Toast('保存成功')
+        }else{
+          Toast(res)
         }
       })
     },
@@ -471,10 +474,11 @@ export default {
           this.$api[method]({
             id: item.id
           }).then(res => {
-            // console.log(res)
             if (res === true) {
               Toast('保存成功')
               this.getPollSourceList()
+            }else{
+              Toast(res)
             }
           })
         }

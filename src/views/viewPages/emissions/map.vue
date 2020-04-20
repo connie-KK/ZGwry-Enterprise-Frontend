@@ -3,9 +3,10 @@
     <header-bar leftIcon="back" leftText="返回" :showBorder="isShowBorder">{{moduleName}}</header-bar>
     <div class="map-container">
       <div id="map-container"></div>
+       <img class="center-position" src="@/assets/images/location2.png" />
     </div>
     <div class="footer">
-      <button @click="getCurrentPosition">
+      <button @click="getMyPosition">
         <span class="leftImg"></span>
         <span>定位当前</span>
       </button>
@@ -14,13 +15,13 @@
         <span>确定位置</span>
       </button>
     </div>
-    <div class="location-tips">{{this.location}}</div>
+    <div class="location-tips">{{ location }}</div>
   </div>
 </template>
 
 <script>
 {
-  if(!AMap){
+  if (!AMap) {
     const key = "84af24a85c0ce6dbaa1dfca048fda1ae";
     let script = document.createElement("script");
     script.src = "https://webapi.amap.com/maps?v=1.4.15&key=" + key;
@@ -38,90 +39,82 @@ export default {
       markers: {},
       routerId: "",
       latLngObj: {},
-      latLngArr: []
+      latLngArr: [],
+      zoom: 17,
+      lat: 0,
+      lng: 0
     };
   },
   watch: {
-    location() {}
+    lat() {
+      this.location = `${this.lng} E,${this.lng} N`;
+      this.map.setCenter([this.lng, this.lat]);
+    },
+    lng() {
+      this.location = `${this.lng} E,${this.lng} N`;
+      this.map.setCenter([this.lng, this.lat]);
+    }
   },
   mounted() {
     this.routerId = this.$route.params.id;
-    this.latLngArr = JSON.parse(JSON.stringify(this.$store.state.latLngArr));
-    this.latLngArr.forEach(lItem => {
-      if (lItem.selected) {
-        this.latLngObj = lItem;
-      }
-    });
-    this.location = this.latLngObj.value;
-    if (!this.location || !this.location.length || this.location === "0E，0N") {
-      this.getCurrentPosition();
-    } else {
-      this.getLocation();
+    this.getStoreData();
+    setTimeout(() => {
       this.initMap();
-    }
+    }, 1000);
   },
   methods: {
+    getStoreData() {
+      this.latLngArr = JSON.parse(JSON.stringify(this.$store.state.latLngArr));
+      this.latLngArr.forEach(lItem => {
+        if (lItem.selected) {
+          this.latLngObj = lItem;
+          if (lItem.value) {
+            this.location = this.latLngObj.value;
+          }
+        }
+      });
+    },
     getLocation() {
       let tempArr = this.location.split(",");
       if (Array.isArray(tempArr) && tempArr.length === 2) {
         let lat = tempArr[1].split(" N")[0];
         let lng = tempArr[0].split(" E")[0];
         this.centerLocation = [lat, lng];
+        this.addMarker();
       }
     },
     initMap() {
-      this.map = this.$map.createMap("map-container", {
-        zoomControl: false,
-        attributionControl: false
+      this.map = new AMap.Map("map-container", {
+        zoom: this.zoom
       });
-      // 加载 open street map 图层服务
-      this.$map.createTileLayer(this.map);
-      this.addMarker();
-      this.map.on("click", e => {
-        const lng = e.latlng.lng.toFixed(5);
-        const lat = e.latlng.lat.toFixed(5);
-        this.location = `${lng} E,${lat} N`;
-        this.centerLocation = [lat, lng];
-        this.addMarker();
-      });
-    },
-    addMarker() {
-      // 设施地图视图 中心位置
-      if (this.markers) {
-        this.map.removeLayer(this.markers);
+      this.getCenter();
+      if (
+        !this.location ||
+        !this.location.length ||
+        this.location === "0E，0N"
+      ) {
+        this.getMyPosition();
+      } else {
+        this.getLocation();
       }
-      this.map.setView(this.centerLocation, 16);
-      const icon = L.icon({
-        iconUrl: require("@/assets/images/location2.png"),
-        iconSize: [16, 22.2]
+      this.map.on("moveend", () => {
+        this.getCenter();
       });
-      this.markers = L.marker(this.centerLocation, {
-        icon: icon
-      }).addTo(this.map);
     },
-    getCurrentPosition() {
+    getCenter() {
+      const p = this.map.getCenter();
+      this.lat = p.lat;
+      this.lng = p.lng;
+    },
+    getMyPosition() {
       AMap.plugin("AMap.Geolocation", () => {
-        var geolocation = new AMap.Geolocation({
-          enableHighAccuracy: true, //是否使用高精度定位，默认:true
-          timeout: 10000 //超过10秒后停止定位，默认：5s
+        let geolocation = new AMap.Geolocation({
+          enableHighAccuracy: true,
+          timeout: 10000
         });
-        geolocation.getCurrentPosition((status, result) => {
-          if (status == "complete") {
-            //解析定位结果
-            if (result.position) {
-              this.location = `${result.position.lng} E,${result.position.lat} N`;
-              this.centerLocation = [result.position.lat, result.position.lng];
-              if (this.map) {
-                this.addMarker();
-              } else {
-                this.initMap();
-              }
-            }
-          } else {
-            //解析定位错误信息
-            console.error(result);
-            this.getCurrentPosition();
-          }
+        AMap.event.addListener(geolocation, "complete", e => {
+          this.lat = e.position.lat;
+          this.lng = e.position.lng;
         });
       });
     },
@@ -153,6 +146,16 @@ export default {
       width: 100%;
       height: 100%;
     }
+  }
+  .center-position {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 2.32rem;
+    bottom: 1.69rem;
+    margin: auto;
+    height: 0.44rem;
+    width: 0.3rem;
   }
   .footer {
     position: fixed;
@@ -218,5 +221,9 @@ export default {
     color: rgba(50, 150, 250, 1);
     font-size: 0.34rem;
   }
+}
+.amap-copyright,
+.amap-logo {
+  display: none !important;
 }
 </style>

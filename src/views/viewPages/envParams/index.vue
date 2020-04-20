@@ -736,8 +736,12 @@ export default {
       params.id = params.id || this.$uuid()
       params.enterpriseid = this.$store.state.enterId
       this.$api.updateZGEnviromentalProps(params).then(res => {
-        Toast('保存成功')
-        this.getData()
+        if(res === true){
+          Toast('保存成功')
+          this.getData()
+        }else{
+          Toast(res)
+        }
       })
     },
     deleteFile(index) {

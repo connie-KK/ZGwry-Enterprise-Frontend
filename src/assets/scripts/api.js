@@ -171,6 +171,13 @@ const interfaces = [
     type: 'post',
     serviceName: 'serviceEnt'
   },
+  // 新增更新自贡企业排放口信息
+  {
+    fun: 'updateZGData',
+    interface: '/api/ZGEntExtend/UpdateZGData',
+    type: 'post',
+    serviceName: 'serviceEnt'
+  },
   // 新增更新企业污染治理设施
   {
     fun: 'updateZGTreatFacility',

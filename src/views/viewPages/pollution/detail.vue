@@ -46,13 +46,13 @@
           </div>
           <div class="item-box"
                v-if="isT([1, 2])">
-            <span>是否安装专用电表</span>
+            <span class="switch-label">是否安装专用电表</span>
             <mt-switch class="my-switch"
                        v-model="autoParams.iselectricitymeter"></mt-switch>
           </div>
           <div class="item-box"
                v-if="isT([2])">
-            <span>是否安装回用电水表</span>
+            <span class="switch-label">是否安装回用电水表</span>
             <mt-switch class="my-switch"
                        v-model="autoParams.isreusewatermeter"></mt-switch>
           </div>
@@ -185,14 +185,14 @@ export default {
     this.id = this.$route.params.id
     if (this.id.includes('add')) {
       this.selectTab = Number(this.id.split('add')[1])
-      this.moduleName = this.tabList.filter(item => {
-        return this.selectTab === item.id
-      })[0].name
       this.autoParams.category = this.selectTab
       this.getZGOutputList()
     }else{
       this.getZGTreatFacilityDetail();
     }
+    this.moduleName = this.tabList.filter(item => {
+      return this.selectTab === item.id
+    })[0].name
   },
   methods: {
     isT (arr) {
@@ -246,7 +246,9 @@ export default {
       this.$api.updateZGTreatFacility(data).then(res => {
         if (res === true) {
           Toast('保存成功')
-          this.$router.push("/pollution")
+          this.$router.replace(`/pollutionDetail/${data.id}`)
+        }else{
+          Toast(res)
         }
       })
     },
@@ -331,6 +333,9 @@ p {
       float: right;
       top: 0.2rem;
     }
+  }
+  .switch-label{
+    font-size: 0.34rem;
   }
 }
 .mint-popup-bottom {

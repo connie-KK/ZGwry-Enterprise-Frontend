@@ -84,7 +84,6 @@ export default {
       this.map = new AMap.Map("map-container", {
         zoom: this.zoom
       });
-      
       if (
         !this.location ||
         !this.location.length ||

@@ -5,6 +5,7 @@
       :value="myval2"
       readonly="readonly"
       @click="showMap = true"
+      v-if="inputState"
     />
     <van-popup
       v-model="showMap"
@@ -20,7 +21,7 @@
         ></div>
         <van-button
           type="default"
-          @click="showMap = false"
+          @click="onCancel"
           class="cancel-btn"
         >取消</van-button>
         <van-button
@@ -67,6 +68,14 @@ export default {
     lat: {
       type: [String, Number],
       default: 36.675807
+    },
+    inputState: {
+      type: Boolean,
+      default: true
+    },
+    toShowMap:{
+      type: Boolean,
+      default:false
     }
   },
   data() {
@@ -111,6 +120,9 @@ export default {
     lat() {
       this.mylng = this.wgs84togcj02(this.lng, this.lat)[0].toFixed(8)
       this.mylat = this.wgs84togcj02(this.lng, this.lat)[1].toFixed(8)
+    },
+    toShowMap(){
+      this.showMap = this.toShowMap;
     }
   },
   methods: {
@@ -127,6 +139,10 @@ export default {
       let data = this.map.getCenter()
       this.mylng = data.lng
       this.mylat = data.lat
+    },
+    onCancel(){
+      this.$emit('cancel')
+      this.showMap = false
     },
     onConfirm() {
       this.$emit('submit', this.trueLngLat)

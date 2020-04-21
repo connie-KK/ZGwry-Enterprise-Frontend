@@ -844,11 +844,11 @@ p {
     }
     .icon {
       display: inline-block;
-      width: 0.18rem;
+      width: 0.4rem;
       height: 0.32rem;
-      background: #fff url("../../../assets/images/right.png") no-repeat right
+      background: #fff url("../../../assets/images/down-c.png") no-repeat right
         center;
-      background-size: 0.2rem;
+      background-size: 0.4rem;
     }
   }
   input.info {

@@ -43,12 +43,13 @@
               field-lable="时间"
               format="YYYY-MM-DD"
             ></my-datetime-picker>
-            <my-lng-lat
+            <input
+              class="selectbox"
+              :value="lnglatValue"
+              readonly="readonly"
+              @click="showMap = true"
               v-if="item.type === 'lnglat'"
-              :lng="item.value ? item.value[0] : 0"
-              :lat="item.value ? item.value[1] : 0"
-              @submit="submitLngLat"
-            ></my-lng-lat>
+            />
           </div>
         </div>
         <div class="lists list-header">
@@ -168,6 +169,14 @@
           @click="submitBtn"
         >确定</div>
       </div>
+      <my-lng-lat
+        :lng="lnglatArr ? lnglatArr[0] : 0"
+        :lat="lnglatArr ? lnglatArr[1] : 0"
+        @cancel="cancelLngLat"
+        @submit="submitLngLat"
+        :input-state="false"
+        :to-show-map="showMap"
+      ></my-lng-lat>
     </div>
   </div>
 </template>
@@ -207,7 +216,9 @@ export default {
         unit: ''
       },
       productItemsState: false,
-      materialItmesState: false
+      materialItmesState: false,
+      lnglatArr:[],
+      showMap:false
     }
   },
   computed: {
@@ -259,6 +270,9 @@ export default {
         }
       })
       return temp
+    },
+    lnglatValue(){
+      return `${this.lnglatArr[0]} E, ${this.lnglatArr[1]} N`
     }
   },
   created() {
@@ -302,7 +316,8 @@ export default {
               item.value = [res.province, res.city, res.district]
             }
             if (item.key === 'lnglat') {
-              item.value = [Number(res.lng), Number(res.lat)]
+              item.value = [Number(res.lng), Number(res.lat)];
+              this.lnglatArr = item.value
             }
             // if (item.key === 'city') {
             //   item.options = this.cd
@@ -546,10 +561,15 @@ export default {
         }
       })
     },
+    cancelLngLat(){
+      this.showMap = false
+    },
     submitLngLat(e) {
+      this.showMap = false
       this.datalist.forEach(item => {
         if (item.key === 'lnglat') {
-          item.value = [e.lng, e.lat]
+          item.value = [e.lng, e.lat],
+          this.lnglatArr = item.value
         }
       })
     }
@@ -788,6 +808,13 @@ export default {
 }
 select,
 .selectbox {
+  width: 100%;
+  border: 0;
+  line-height: 0.48rem;
+  min-height: 0.48rem;
+  font-size: 0.34rem;
+  color: #3d3d3d;
+  padding: 0.01rem 0 0.14rem 0;
   background: #fff url("../../../assets/images/down-c.png") no-repeat right
     center !important;
   background-size: 0.4rem !important;

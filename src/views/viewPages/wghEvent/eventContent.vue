@@ -80,12 +80,6 @@
 </template>
 
 <script>
-{
-  const key = "84af24a85c0ce6dbaa1dfca048fda1ae";
-  let script = document.createElement("script");
-  script.src = "https://webapi.amap.com/maps?v=1.4.15&key=" + key;
-  document.head.appendChild(script);
-}
 import moment from "moment";
 import uploadBox from "@/components/uploadBox";
 import ImagePreview from "vant/lib/image-preview";

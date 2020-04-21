@@ -3,6 +3,7 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
+      :customBack="backFun"
     >{{ moduleName }}</header-bar>
     <div class="main-content">
       <nav-bar :selected="6"></nav-bar>
@@ -95,6 +96,9 @@ export default {
         })
         this.users = JSON.parse(JSON.stringify(data))
       })
+    },
+    backFun(){
+      this.$router.push("/entlist/0")
     }
   }
 }

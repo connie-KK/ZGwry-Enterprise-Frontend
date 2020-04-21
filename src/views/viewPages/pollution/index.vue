@@ -3,6 +3,7 @@
     <header-bar
       leftIcon="back"
       leftText="返回"
+      :customBack="backFun"
     >{{ moduleName }}</header-bar>
     <div class="main-content">
       <nav-bar
@@ -128,6 +129,9 @@ export default {
         id: 'add' + this.selectedSubTab
       }
       this.toDetail(e)
+    },
+    backFun(){
+      this.$router.push("/entlist/0")
     }
   }
 }

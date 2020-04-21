@@ -378,9 +378,13 @@ export default {
               item.value = this.fueltypeArr[res[item.key]].name;
               item.keyValue = res[item.key];
             } else if (item.key === "lat-lng") {
-              item.value = `${res["lng"]} E,${res["lat"]} N`;
+              const lng = res["lng"] ? res["lng"] : 0
+              const lat = res["lat"] ? res["lat"] : 0
+              item.value = `${lng} E,${lat} N`;
             } else if (item.key === "inriverlat-inriverlng") {
-              item.value = `${res["inriverlng"]} E,${res["inriverlat"]} N`;
+              const inriverlng = res["inriverlng"] ? res["inriverlng"] : 0
+              const inriverlat = res["inriverlat"] ? res["inriverlat"] : 0
+              item.value = `${inriverlng} E,${inriverlat} N`;
             } else if (item.key === "processingmode") {
               if (typeof res[item.key] === "string") {
                 item.value = "";
@@ -688,7 +692,23 @@ export default {
       this.resetData();
       this.$router.push("/emissions");
     },
+    precheck(index){
+      const text = this.$submitBefore(this.list[0], "value");
+      if (text) {
+        Toast(text);
+        return false;
+      }
+      return true
+    },
     save() {
+     for(let i=0;i<this.list.length;i++){
+       if((this.selectedSubTab !== 0 && i===0) || this.selectedSubTab === 0){
+          let result = this.precheck(i)
+          if(!result){
+            return
+          }
+       }
+     }
       this.factors.forEach(item => {
         delete item.class;
       });
@@ -751,8 +771,8 @@ export default {
         if (Array.isArray(keyArr) && keyArr.length === 2) {
           let valueArr = item.value.split(",");
           if (Array.isArray(valueArr) && valueArr.length === 2) {
-            obj[keyArr[0]] = valueArr[1].split(" N")[0];
-            obj[keyArr[1]] = valueArr[0].split(" E")[0];
+            obj[keyArr[0]] = valueArr[1].split(" N")[0] ? valueArr[1].split(" N")[0] : null;
+            obj[keyArr[1]] = valueArr[0].split(" E")[0] ? valueArr[0].split(" E")[0] : null;
           }
         }
       }

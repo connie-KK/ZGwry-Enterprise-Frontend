@@ -393,6 +393,11 @@ export default {
     },
     updatePollpermits() {
       let data = JSON.parse(JSON.stringify(this.data))
+      const text = this.$submitBefore(data,"name","单位名称");
+      if (text) {
+        Toast(text);
+        return false;
+      }
       data.enddate = data.enddate
         ? moment(data.enddate).format('YYYY-MM-DD HH:mm:ss')
         : null

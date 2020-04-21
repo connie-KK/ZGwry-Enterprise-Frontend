@@ -226,6 +226,7 @@ export default {
           id: this.id
         })
         .then(res => {
+          res.state = res.state ? true : false
           this.autoParams = res
           this.autoParams.outputid = this.autoParams.output.id
           this.selectTab = this.autoParams.category
@@ -238,6 +239,12 @@ export default {
     },
     updateData () {
       let data = JSON.parse(JSON.stringify(this.autoParams))
+      const text = this.$submitBefore(data,"facilityname","设施名称");
+      if (text) {
+        Toast(text);
+        return false;
+      }
+      data.state = data.state ? 1 : 0;
       data.enterpriseid = this.$store.state.enterId
       data.rowState = data.id ? 'upd' : 'add'
       data.id = data.id || this.$uuid()
@@ -253,7 +260,7 @@ export default {
       })
     },
     backFun(){
-      this.$router.push("/emissions");
+      this.$router.push("/pollution");
     }
   }
 }

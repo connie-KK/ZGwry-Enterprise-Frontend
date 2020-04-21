@@ -26,3 +26,16 @@
       color: #3296fa;
     }
   }
+  .mint-switch-core{
+    width: 0.9rem !important;
+    height: 0.5rem !important;
+  }
+  .mint-switch-core::before {
+    width: 0.46rem !important;
+    height: 0.46rem !important;
+    background:none !important;
+  }
+  .mint-switch-core::after {
+    width: 0.46rem !important;
+    height: 0.46rem !important;
+  }

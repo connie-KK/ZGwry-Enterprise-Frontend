@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="envParams">
     <header-bar
       leftIcon="back"
       leftText="返回"
@@ -391,7 +391,7 @@
 import navBar from '@/components/navBar.vue'
 import { Switch, Popup, Picker, MessageBox, Toast } from 'mint-ui'
 export default {
-  name: 'license',
+  name: 'envParams',
   components: {
     'nav-bar': navBar,
     'mt-switch': Switch,
@@ -784,7 +784,8 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
+#envParams{
 .main-content {
   height: calc(100% - 1.29rem);
   .main-content-box {
@@ -978,5 +979,6 @@ textarea:-ms-input-placeholder {
 .file-upload-box {
   float: left;
   display: none;
+}
 }
 </style>

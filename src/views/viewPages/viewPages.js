@@ -60,6 +60,14 @@ Vue.prototype.$uuid = () => {
   })
 }
 
+Vue.prototype.$submitBefore = (data,key,label) => {
+  if (!data[key]) {
+    const text = data.label ? `请输入${data.label}！` : `请输入${label}！`
+    return text;
+  }
+  return false;
+},
+
 Vue.prototype.$360url = '/ent/'
 
 /* eslint-disable no-new */

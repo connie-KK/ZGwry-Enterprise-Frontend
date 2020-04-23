@@ -168,9 +168,9 @@ export default {
                   params: 'WGH'
                 },
                 {
-                  name: '',
-                  imgUrl: '',
-                  url: ''
+                  name: '任务考核',
+                  imgUrl: require("@/assets/images/taskassess.png"),
+                  url: '/taskAssess/0'
                 },
                 {
                   name: '待办事件',
@@ -188,6 +188,17 @@ export default {
                   name: '事件上报',
                   imgUrl: require('@/assets/images/b6.png'),
                   url: '/eventContent/-1',
+                  params: 'WGH'
+                },
+                {
+                  name: '',
+                  imgUrl: '',
+                  url: ''
+                },
+                {
+                  name: '消息通知',
+                  imgUrl: require("@/assets/images/newnotice.png"),
+                  url: '/noticeList',
                   params: 'WGH'
                 }
               ]
@@ -217,6 +228,18 @@ export default {
                   name: '发布任务',
                   imgUrl: require('@/assets/images/c3.png'),
                   url: '/putTask/0',
+                  params: 'HBGJ'
+                },
+                 {
+                  name: '任务考核',
+                  imgUrl: require("@/assets/images/taskassess.png"),
+                  url: '/taskAssess/0',
+                  params: 'HBGJ'
+                },
+                 {
+                  name: '消息通知',
+                  imgUrl: require("@/assets/images/newnotice.png"),
+                  url: '/noticeList',
                   params: 'HBGJ'
                 }
               ]

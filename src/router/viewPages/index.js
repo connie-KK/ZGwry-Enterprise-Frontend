@@ -133,6 +133,11 @@ export default new Router({
       component: () => import('@/views/viewPages/wghTask/taskTransfer.vue')
     },
     {
+      path: '/noticeList',
+      name: 'noticeList',
+      component: () => import('@/views/viewPages/wghTask/noticeList.vue')
+    },
+    {
       path: '/taskMoreAssign',
       name: 'taskMoreAssign',
       component: () => import('@/views/viewPages/wghTask/taskMoreAssign.vue')

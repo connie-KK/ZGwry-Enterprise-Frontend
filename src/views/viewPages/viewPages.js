@@ -90,12 +90,17 @@ new Vue({
 }
 
 // 模拟登录
+
+// yi/Aa111111
+// er/Aa111111
+// san/Aa111111
+
 import axios from 'axios'
 if (process.env.NODE_ENV === 'development') {
   cookie.set('ISHBGJ', 1)
   axios.post('http://183.220.144.57:30000//token', {
-    userid: 'admin',
-    password: '123456',
+    userid: 'yi',
+    password: 'Aa111111',
     'grant_type': 'password'
   }).then(res => {
     if (res.data && res.data.access_token) {

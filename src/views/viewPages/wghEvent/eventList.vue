@@ -11,6 +11,10 @@
     >{{moduleName}}</header-bar>
     <div :class="[isShowSearchBox?'main-content-with-search':'','main-content']">
       <div class="content-header">
+        <div class="filter-box">
+          <p @click="onlyMe = !onlyMe" :class="{ active: onlyMe }">仅看我的待办事件</p>
+          <p id="okbf" @click="popupVisible = true">筛选</p>
+        </div>
         <div class="sort-box">
           <div
             v-for="(item,index) in sortBox"
@@ -32,36 +36,114 @@
           <div>{{listData.length}}</div>
         </div>
       </div>
-      <div v-for="(item,index) in listData" :key="index" class="list" @click="toDetail(item)">
-        <div class="left">
-          <div :class="item.class">
-            <span class="direction" v-if="item.directionInfo">{{item.directionInfo}}</span>
-            <span class="title">{{item.title}}</span>
-            <span class="info">{{item.stateInfo}}</span>
+      <div class="list-container">
+        <div v-for="(item,index) in listData" :key="index" class="list" @click="toDetail(item)">
+          <div class="left">
+            <div :class="item.class">
+              <span class="direction" v-if="item.directionInfo">{{item.directionInfo}}</span>
+              <span class="title">{{item.title}}</span>
+              <span class="info">{{item.stateInfo}}</span>
+            </div>
+            <div>
+              <span>添加日期：{{item.showDate}}</span>
+              <span>{{item.typeInfo}}</span>
+            </div>
+            <div v-if="item.showTaskhandletime">最新执行时间：{{item.showTaskhandletime}}</div>
           </div>
-          <div>
-            <span>添加日期：{{item.showDate}}</span>
-            <span>{{item.typeInfo}}</span>
+          <div class="right">
+            <icon name="right" scale="1"></icon>
           </div>
-          <div v-if="item.showTaskhandletime">最新执行时间：{{item.showTaskhandletime}}</div>
         </div>
-        <div class="right">
-          <icon name="right" scale="1"></icon>
-        </div>
+        <p class="nodata-tips" v-if="!listData.length&&!firstState">暂无数据</p>
       </div>
-      <p class="tips" v-if="!listData.length&&!firstState">暂无数据</p>
+      <mt-datetime-picker
+        ref="picker1"
+        type="datetime"
+        v-model="filterParams.sDate"
+        @confirm="handleConfirmDate1"
+      ></mt-datetime-picker>
+      <mt-datetime-picker
+        ref="picker2"
+        type="datetime"
+        v-model="filterParams.eDate"
+        @confirm="handleConfirmDate2"
+      ></mt-datetime-picker>
     </div>
+    <mt-popup v-model="popupVisible" position="right" class="popup-box">
+      <div class="filter-content">
+        <p class="filter-title">筛选</p>
+        <img @click="popupVisible = false" src="@/assets/images/close.png" class="close-btn" />
+        <ul>
+          <li>
+            <p>状态</p>
+            <div>
+              <span
+                class="tip"
+                v-for="(item, key) in eventStateMap"
+                :key="item.name"
+                :class="{ active: filterParams.state === Number(key) }"
+                @click="filterParams.state = Number(key)"
+              >{{ item.name }}</span>
+            </div>
+          </li>
+          <li>
+            <p>类型</p>
+            <div>
+              <span
+                class="tip tip1"
+                v-for="(item, key) in eventTypeMap"
+                :key="item.name"
+                :class="{ active: filterParams.type === Number(key) }"
+                @click="filterParams.type = Number(key)"
+              >{{ item }}</span>
+            </div>
+          </li>
+          <li>
+            <p>来源</p>
+            <div>
+              <span
+                class="tip tip1"
+                v-for="(item, key) in eventSourceMap"
+                :key="item.name"
+                :class="{ active: filterParams.direction === key }"
+                @click="filterParams.direction = key"
+              >{{ item.name }}</span>
+            </div>
+          </li>
+          <li>
+            <p>添加时间</p>
+            <div>
+              <span class="tip date-tip date-tip1" @click="$refs.picker1.open()">{{ d1 }}</span>
+              <img src="@/assets/images/right1.png" class="right-icon" />
+              <span class="tip date-tip date-tip2" @click="$refs.picker2.open()">{{ d2 }}</span>
+            </div>
+          </li>
+          <li>
+            <p>地点名称</p>
+            <div>
+              <input type="text" class="area-input" v-model="filterParams.area" placeholder="请输入地点" />
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="btn-box">
+        <button class="popup-btn" @click="resetFilterParams">重置</button>
+        <button class="popup-btn" @click="checkFilterParams">确定</button>
+      </div>
+    </mt-popup>
   </div>
 </template>
 
 <script>
 import moment from "moment";
+import { Navbar, TabItem, Popup, DatetimePicker } from "mint-ui";
 export default {
   name: "EventList",
-  watch: {
-    selected() {
-      this.setListData();
-    }
+  components: {
+    "mt-navbar": Navbar,
+    "mt-tab-item": TabItem,
+    "mt-popup": Popup,
+    "mt-datetime-picker": DatetimePicker
   },
   data() {
     return {
@@ -72,8 +154,7 @@ export default {
       isShowBorder: true,
       isShowSearchIcon: true,
       isShowSearchBox: false,
-      filter: "",
-      selected: "",
+      selected: 0,
       tabData: ["全部事件", "未完成事件", "已解决事件"],
       userId: "",
       grid: "",
@@ -97,7 +178,7 @@ export default {
           key: "date"
         },
         {
-          name: "最新执行时间",
+          name: "最新进展时间",
           key: "handledate"
         }
       ],
@@ -112,23 +193,105 @@ export default {
         {
           name: "已解决"
         }
-      ]
+      ],
+      popupVisible: false,
+      onlyMe: "",
+      eventStateMap: {
+        2: {
+          name: "处理中"
+        },
+        1: {
+          name: "上报中"
+        },
+        3: {
+          name: "已完成"
+        },
+        4: {
+          name: "虚假"
+        }
+      },
+      eventTypeMap: {},
+      eventSourceMap: {
+        issued: {
+          name: "发出事件"
+        },
+        received: {
+          name: "收到事件"
+        }
+      },
+      filterParams: {
+        seachKey: "",
+        state: null,
+        type: null,
+        sDate: moment()
+          .subtract(30, "days")
+          .format("YYYY-MM-DD"),
+        eDate: moment()
+          .add(1, "days")
+          .format("YYYY-MM-DD 23:59:59"),
+        area: "",
+        direction: ""
+      },
+      filterParamsStatic: {},
+      eventListPageType: ""
     };
   },
-  created() {
-    this.getUserId();
-    this.getHandleEventLists();
-    this.getmodsList();
+  watch: {
+    selected() {
+      this.setListData();
+    },
+    onlyMe() {
+      if (this.onlyMe) {
+        this.getOnlyMyIncidents();
+      } else {
+        this.getHandleEventLists();
+        this.getIncidentsByKey();
+      }
+    }
   },
-  mounted() {},
+  computed: {
+    d1() {
+      if (this.filterParams.sDate) {
+        return moment(this.filterParams.sDate).format("YYYY-MM-DD HH:mm:ss");
+      } else {
+        return "";
+      }
+    },
+    d2() {
+      if (this.filterParams.eDate) {
+        return moment(this.filterParams.eDate).format("YYYY-MM-DD HH:mm:ss");
+      } else {
+        return "";
+      }
+    }
+  },
+  created() {
+    this.eventListPageType = JSON.parse(this.$route.params.id);
+    this.$store.commit("set_eventListPageType", this.eventListPageType);
+    if (this.eventListPageType === 0) {
+      this.onlyMe = true;
+    } else if (this.eventListPageType === 1) {
+      this.onlyMe = false;
+      this.getHandleEventLists();
+    }
+    this.getUserId();
+    this.getmodsList();
+    this.filterParamsStatic = JSON.parse(JSON.stringify(this.filterParams));
+  },
   methods: {
     setListData() {
-      if (this.selected === 0) {
+      if (this.selected === 0 && !this.filterParams.state) {
         const tempArr = [...this.listAll, ...this.listComplate];
         this.listData = JSON.parse(JSON.stringify(tempArr));
-      } else if (this.selected === 1) {
+      } else if (
+        (this.selected === 1 ||
+          this.filterParams.state === 1 ||
+          this.filterParams.state === 2 ||
+          this.filterParams.state === 4) &&
+        this.selected !== 2
+      ) {
         this.listData = JSON.parse(JSON.stringify(this.listAll));
-      } else if (this.selected === 2) {
+      } else if (this.selected === 2 || this.filterParams.state === 3) {
         this.listData = JSON.parse(JSON.stringify(this.listComplate));
       }
       this.sortList();
@@ -150,17 +313,25 @@ export default {
           this.grid = res.grid;
           this.gridLevel = res.gridLevel;
           this.$store.commit("set_gridLevel", this.gridLevel);
-          this.getIncidentsByKey();
+          if (!this.onlyMe) {
+            this.getIncidentsByKey();
+          }
         }
       });
     },
     getIncidentsByKey() {
       const payload = {
         grid: this.grid,
-        searchKey: this.filter,
         pageIndex: -1,
         pageSize: 10,
-        type: 2
+        type: 2,
+        searchKey: this.filterParams.searchKey,
+        direction: this.filterParams.direction,
+        startDate: this.filterParams.sDate ? this.filterParams.sDate : null,
+        endDate: this.filterParams.eDate ? this.filterParams.eDate : null,
+        incidentType: this.filterParams.type,
+        addr: this.filterParams.area,
+        state: this.filterParams.state
       };
       this.$api.getIncidentsByKey(payload).then(res => {
         if (this.firstState) {
@@ -170,23 +341,28 @@ export default {
         this.listAll = this.handleListData(res);
         this.setListData();
       });
+      // this.$api.getIncidentCount(payload).then(res => {});
     },
     //已完成事件参数
     getHandleEventLists() {
       const payload = {
-        searchKey: this.filter,
+        searchKey: this.filterParams.searchKey,
         pageIndex: -1,
-        pageSize: 10
+        pageSize: 10,
+        sDate: this.filterParams.sDate ? this.filterParams.sDate : null,
+        eDate: this.filterParams.eDate ? this.filterParams.eDate : null,
+        state: this.filterParams.state,
+        addr: this.filterParams.area,
+        incidentType: this.filterParams.type,
+        direction: this.filterParams.direction
       };
       this.$api.getHandleEventLists(payload).then(res => {
         if (res && Array.isArray(res)) {
-          res.forEach(item => {
-            item.state = 3;
-          });
           this.listComplate = this.handleListData(res);
           this.setListData();
         }
       });
+      // this.$api.getHandledIncidentsCount(payload).then(res => {});
     },
     handleListData(arr) {
       if (arr && Array.isArray(arr)) {
@@ -237,12 +413,35 @@ export default {
         return JSON.parse(JSON.stringify(tempArr));
       }
     },
+    getOnlyMyIncidents() {
+      const payload = {
+        pageIndex: -1,
+        pageSize: 10,
+        searchKey: this.filterParams.searchKey,
+        startDate: this.filterParams.sDate ? this.filterParams.sDate : null,
+        endDate: this.filterParams.eDate ? this.filterParams.eDate : null,
+        incidentType: this.filterParams.type,
+        addr: this.filterParams.area,
+        state: this.filterParams.state
+      };
+      this.$api.getPendingIncidents(payload).then(res => {
+        this.firstState = false;
+        if (res && res.incidentList) {
+          this.listAll = this.handleListData(res.incidentList);
+        } else {
+          this.listAll = [];
+        }
+        this.listComplate = [];
+        this.setListData();
+      });
+    },
     getmodsList() {
       this.$api.getmodsList().then(res => {
         if (res && Array.isArray(res)) {
           res.forEach(item => {
             if (item.name === "企业360模块") {
               this.moduleId360 = item.id;
+              this.$store.commit("set_moduleId360", this.moduleId360);
             }
           });
           this.getRolePermission();
@@ -256,6 +455,12 @@ export default {
       this.$api.getRolePermission(payload).then(res => {
         if (res && res.incidentType) {
           this.types = res.incidentType;
+          let tempTypeObj = {};
+          this.types.forEach(item => {
+            tempTypeObj[item.type] = item.name;
+          });
+          this.eventTypeMap = tempTypeObj;
+          this.$store.commit("set_eventTypeList", res.incidentType);
           const tempArr = [...this.listAll, ...this.listComplate];
           tempArr.forEach((itemData, itemIndex) => {
             if (
@@ -273,8 +478,28 @@ export default {
         }
       });
     },
+    handleConfirmDate1(e) {
+      this.filterParams.sDate = moment(e).format("YYYY-MM-DD HH:mm:ss");
+    },
+    handleConfirmDate2(e) {
+      this.filterParams.eDate = moment(e).format("YYYY-MM-DD HH:mm:ss");
+    },
+    resetFilterParams() {
+      this.filterParams = JSON.parse(JSON.stringify(this.filterParamsStatic));
+    },
+    checkFilterParams() {
+      if (this.onlyMe) {
+        this.getOnlyMyIncidents();
+      } else {
+        this.getIncidentsByKey();
+        this.getHandleEventLists();
+      }
+      //展示全部
+      this.changeState(0);
+      this.popupVisible = false;
+    },
     toSearchList(e) {
-      this.filter = e;
+      this.filterParams.searchKey = e;
       if (this.selected === 0) {
         this.getIncidentsByKey();
         this.getHandleEventLists();
@@ -350,46 +575,16 @@ export default {
       this.selected = index;
     },
     toDetail(item) {
-      if (item.state === 3 || this.gridLevel === 3) {
-        //已完成或者三级网格员，跳转事件内容页面
+      if (item.state === 3 && item.followup.length === 0) {
+        //事件已自行处理
         this.$router.push(`/eventContent/${item.id}`);
       } else {
-        //跳转处理事件页面
-        if (this.gridLevel === 1) {
-          //1级网格（登录人的网格）,跳转到1级followup
-          if (Array.isArray(item.followup) && item.followup.length) {
-            this.$store.commit("set_followup", item.followup);
-            let hasLevel1Followup = false;
-            item.followup.forEach(followItem => {
-              if (followItem.level === 1) {
-                hasLevel1Followup = true;
-                this.$router.push(`/eventDetailLevel1/${followItem.id}`);
-              }
-            });
-            if (!hasLevel1Followup) {
-              //没有level 1 followup
-              this.toFollowup(item);
-            }
-          } else {
-            //没有followup
-            this.toFollowup(item);
-          }
-        } else if (
-          this.gridLevel === 2 &&
-          Array.isArray(item.followup) &&
-          item.followup.length
-        ) {
-          let hasLevel2Followup = false;
-          item.followup.forEach(followItem => {
-            if (followItem.level === 2) {
-              hasLevel2Followup = true;
-              this.$router.push(`/eventDetail/${followItem.id}`);
-            }
-          });
-          if (!hasLevel2Followup) {
-            this.$router.push(`/eventDetail/${item.id}`);
-          }
-        } else {
+        if (this.gridLevel === 3) {
+          //三级网格员，跳转事件内容页面
+          this.$router.push(`/eventContent/${item.id}`);
+        } else if (this.gridLevel === 1) {
+          this.$router.push(`/eventDetailLevel1/${item.id}`);
+        } else if (this.gridLevel === 2) {
           this.$router.push(`/eventDetail/${item.id}`);
         }
       }
@@ -409,6 +604,7 @@ export default {
 #eventList {
   .content-header {
     .sort-box {
+      width: 100%;
       height: 0.64rem;
       background: rgba(255, 255, 255, 1);
       @include flexbox;
@@ -442,6 +638,57 @@ export default {
         color: rgba(50, 150, 250, 1);
       }
     }
+    .filter-box {
+      background: rgba(255, 255, 255, 1);
+      padding: 0.21rem 0.32rem;
+      height: 0.96rem;
+      width: 100%;
+      border-bottom: solid 1px #e3e3e3;
+      p {
+        margin: 0;
+        &:nth-child(1) {
+          float: left;
+          line-height: 0.54rem;
+          height: 0.54rem;
+          padding: 0 0.2rem 0 0.63rem;
+          color: #fff;
+          border-radius: 0.1rem;
+          position: relative;
+          background: #aab8c6;
+          &::before {
+            content: "";
+            position: absolute;
+            left: 0.18rem;
+            width: 0.32rem;
+            height: 0.32rem;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            box-sizing: border-box;
+          }
+          &.active {
+            background: #3296fa url("../../../assets/images/ischeck.png")
+              no-repeat 0.18rem center;
+            background-size: 0.32rem 0.32rem;
+            &::before {
+              display: none;
+            }
+          }
+        }
+        &:nth-child(2) {
+          float: right;
+          background: url("../../../assets/images/filterBlack.png") no-repeat
+            left center;
+          background-size: 0.32rem 0.32rem;
+          line-height: 0.54rem;
+          padding-left: 0.4rem;
+          color: #303030;
+          font-size: 0.3rem;
+        }
+      }
+    }
     .state-box {
       @include flexbox;
       @include flex-direction(row);
@@ -473,28 +720,9 @@ export default {
       }
     }
   }
-  .e-nav {
-    width: 100%;
-    height: 1rem;
-    overflow-x: auto;
-  }
-  .mint-navbar {
-    width: 100%;
-    justify-content: space-around;
-    border-bottom: solid 1px #e0e0e0;
-    height: 0.96rem;
-    .mint-tab-item-label {
-      font-size: 0.3rem;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 1);
-    }
-    .is-selected {
-      border-bottom: 0.04rem solid #3296fa;
-      margin: 0 5px;
-      .mint-tab-item-label {
-        color: rgba(50, 150, 250, 1);
-      }
-    }
+  .list-container {
+    height: calc(100% - 2.74rem);
+    overflow-y: auto;
   }
   .list {
     padding: 0.26rem 0.3rem 0.16rem 0.32rem;
@@ -606,13 +834,157 @@ export default {
   .list:last-child {
     border: 0;
   }
-  .tips {
-    line-height: 0.4rem;
-    font-size: 0.24rem;
-    color: #999;
-    text-align: center;
-    margin: 0;
-    padding: 0.2rem;
+  .mint-popup {
+    width: auto;
+  }
+  .mint-popup-bottom {
+    width: 100%;
+  }
+  .popup-box {
+    height: 100%;
+    p {
+      padding: 0;
+      margin: 0;
+    }
+    .filter-content {
+      width: 5.9rem;
+      height: calc(100% - 1.2rem);
+      overflow: auto;
+      background: #fff;
+      padding: 0.32rem;
+      position: relative;
+      .filter-title {
+        font-size: 0.34rem;
+        font-weight: 500;
+        margin-bottom: 0.2rem;
+      }
+      .close-btn {
+        width: 0.28rem;
+        height: 0.28rem;
+        position: absolute;
+        right: 0.32rem;
+        top: 0.42rem;
+      }
+    }
+    ul {
+      height: calc(100% - 0.7rem);
+      overflow-y: auto;
+      li {
+        p {
+          font-size: 0.32rem;
+          color: #6f6f6f;
+          margin-top: 0.3rem;
+          margin-bottom: 0.2rem;
+        }
+        div {
+          overflow: hidden;
+        }
+        .right-icon {
+          float: left;
+          width: 0.18rem;
+          height: 0.32rem;
+          margin-top: 0.09rem;
+        }
+        .area-input {
+          border: 1px solid rgba(170, 184, 198, 1);
+          font-size: 0.3rem;
+          padding-left: 0.3rem;
+          height: 0.54rem;
+          width: 5.23rem;
+          color: rgba(48, 48, 48, 1);
+          border-radius: 0.06rem;
+        }
+        input::-webkit-input-placeholder,
+        textarea::-webkit-input-placeholder {
+          color: #fff;
+        }
+        .tip {
+          float: left;
+          padding: 0 0.3rem;
+          line-height: 0.54rem;
+          color: rgba(170, 184, 198, 1);
+          margin: 0 0.3rem 0.2rem 0;
+          border-radius: 0.06rem;
+          border: 1px solid rgba(170, 184, 198, 1);
+          &.active {
+            color: rgba(255, 255, 255, 1);
+            background: #3296fa;
+            border: 1px solid #3296fa;
+          }
+          &.date-tip1 {
+            width: 4.7rem;
+            height: 0.54rem;
+          }
+          &.date-tip2 {
+            width: 5.23rem;
+            height: 0.54rem;
+          }
+        }
+        .tip1 {
+          padding: 0 0.5rem;
+        }
+        .il-check-box {
+          &.checkbox2 {
+            margin-left: 0.68rem;
+          }
+          p {
+            margin: 0;
+            margin-bottom: 0.13rem;
+            span {
+              vertical-align: middle;
+              line-height: 0.42rem;
+              height: 0.42rem;
+              display: inline-block;
+            }
+            &::before {
+              content: "";
+              display: inline-block;
+              width: 0.36rem;
+              height: 0.36rem;
+              border-radius: 0.08rem;
+              border: 1px solid #aab8c6;
+              vertical-align: middle;
+              color: #aab8c6;
+              margin-right: 0.1rem;
+              box-sizing: border-box;
+            }
+            &.check {
+              &::before {
+                background: url("../../../assets/images/check.png") no-repeat
+                  50%;
+                background-size: 100% auto;
+                border: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+    .btn-box {
+      width: 100%;
+      height: 1.2rem;
+      margin-top: 0.15rem;
+      padding: 0.1rem 0.32rem 0 0.32rem;
+      border-top: solid 1px #e0e0e0;
+      @include flexbox;
+      @include justify-content(space-between);
+      button {
+        width: 2.4rem;
+        height: 0.8rem;
+        font-size: 0.32rem;
+        display: block;
+      }
+      button:first-child {
+        color: rgba(50, 150, 250, 1);
+        border-radius: 3px;
+        border: 1px solid rgba(50, 150, 250, 1);
+      }
+      button:last-child {
+        border: 0;
+        background: #3296fa;
+        color: #fff;
+      }
+    }
   }
 }
 </style>

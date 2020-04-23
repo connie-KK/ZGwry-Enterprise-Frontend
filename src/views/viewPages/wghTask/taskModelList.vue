@@ -18,7 +18,7 @@
           @click="clickItem(item)"
         >
           <p>{{ item.title }}</p>
-          <span @click="userItem(item)">使用此模板</span>
+          <!-- <span @click="userItem(item)">使用此模板</span> -->
         </li>
       </ul>
     </div>
@@ -62,7 +62,7 @@ export default {
       this.isShowSearchBox = e;
     },
     clickItem (item) {
-      // console.log(item)
+      this.$router.push(`/taskModelDetail/${item.id}`)
     },
     userItem (item) {
       this.$store.state.taskParams.template = item.id
@@ -77,7 +77,6 @@ export default {
 #taskModelList {
   .main-content {
     background: #fff;
-    height: 100%;
     p {
       padding: 0;
       margin: 0;

@@ -6,7 +6,7 @@
       :showBorder="isShowBorder"
       :customBack="goBack"
     >{{moduleName}}</header-bar>
-    <div :class="['main-content', editState? '':'main-content1']">
+    <div :class="['main-content', editState? '':'main-content1']" ref="mainList">
       <div :class="['list',item.class]" v-for="(item,index) in dataList" :key="index">
         <span>{{item.label}}</span>
         <div v-if="item.type==='text'" class="right">
@@ -26,7 +26,8 @@
           ></textarea>
         </div>
         <div class="right" v-if="item.type==='switch'">
-          <mt-switch v-model="item.value"></mt-switch>
+          <mt-switch v-model="switchValue" v-if="editState"></mt-switch>
+          <aep-switch v-model="switchValue" v-if="!editState"></aep-switch>
         </div>
         <div v-if="item.type==='textarea'" class="textarea">
           <textarea
@@ -38,17 +39,18 @@
         </div>
         <div class="right" v-if="item.type==='rightArrow'" @click="toPages(index)">
           <span>{{item.value}}</span>
-          <span class="right-icon">
+          <span class="right-icon" v-if="editState">
             <icon name="right" scale="1"></icon>
           </span>
         </div>
         <div class="right" v-if="item.type==='img'">
-          <span class="img" @click="toImg" v-if="editState"></span>
+          <span class="img" @click="toImg(item)" v-if="editState"></span>
         </div>
         <div class="img-list" v-if="item.type==='img'">
           <upload-box
             ref="upload"
-            :data="imglist"
+            :fileId="'img'+index"
+            :data="item.value"
             :autoShow="false"
             @upload="uploadData"
             @deleteItem="deleteItem"
@@ -80,12 +82,18 @@
 </template>
 
 <script>
+{
+  const key = "84af24a85c0ce6dbaa1dfca048fda1ae";
+  let script = document.createElement("script");
+  script.src = "https://webapi.amap.com/maps?v=1.4.15&key=" + key;
+  document.head.appendChild(script);
+}
 import moment from "moment";
 import uploadBox from "@/components/uploadBox";
 import ImagePreview from "vant/lib/image-preview";
 import "vant/lib/image-preview/style";
 import cookie from "js-cookie";
-import { Switch, Indicator, Popup, Picker, Toast } from "mint-ui";
+import { Switch, Popup, Picker, Toast } from "mint-ui";
 export default {
   name: "EventContent",
   components: {
@@ -96,85 +104,17 @@ export default {
   },
   data() {
     return {
+      enterpristIndex: 2,
+      typeIndex: 3,
+      eventImgType: 1,
+      handledImgType: 2,
+      eventImgIndex: 4,
+      handledImgIndex: 7,
       editState: "",
       moduleName: "",
       isShowBorder: false,
       routeId: 0,
       sheetVisible: false,
-      dataList1: [
-        {
-          label: "标题",
-          key: "title",
-          type: "text",
-          value: ""
-        },
-        {
-          label: "时间",
-          key: "date",
-          type: "text",
-          value: "",
-          class: "top-margin"
-        },
-        { label: "网格员", key: "role", type: "text", value: "" },
-        {
-          label: "地址",
-          key: "addr",
-          type: "text",
-          value: ""
-        },
-        {
-          label: "经纬度",
-          key: "lat",
-          type: "text",
-          value: "",
-          class: "top-margin"
-        },
-        {
-          label: "相关企业",
-          key: "enterprise",
-          type: "text",
-          value: ""
-        },
-        {
-          label: "事件类型",
-          key: "type",
-          type: "text",
-          value: ""
-        },
-        {
-          label: "图片",
-          key: "attaches",
-          type: "img",
-          value: []
-        },
-        {
-          label: "详细描述",
-          key: "contents",
-          type: "textarea",
-          value: ""
-        },
-        {
-          label: "事件已自行处理",
-          key: "results",
-          type: "text",
-          value: "",
-          class: "top-margin"
-        },
-        {
-          label: "相关任务",
-          key: "followup",
-          type: "text",
-          value: "",
-          class: "top-margin",
-          items: [
-            // {
-            //   label: "在厂房周围检测水质在厂房周围检测水质在厂房周围检测水质",
-            //   value: "已完成",
-            //   type: "rightArrow"
-            // }
-          ]
-        }
-      ],
       newDataList: [
         {
           label: "标题",
@@ -184,39 +124,16 @@ export default {
           placeholder: "点击输入事件标题"
         },
         {
-          label: "时间",
-          key: "date",
-          type: "text",
-          value: moment().format("YYYY-MM-DD HH:mm:ss"),
-          class: "top-margin",
-          readonly: true
-        },
-        {
-          label: "网格员",
-          key: "role",
-          type: "text",
-          value: "",
-          placeholder: "请输入网格员",
-          readonly: true
-        },
-        {
           label: "地址",
           key: "addr",
-          type: "textMore",
-          value: ""
-        },
-        {
-          label: "经纬度",
-          key: "location",
           type: "rightArrow",
-          value: "",
-          class: "top-margin"
+          value: ""
         },
         {
           label: "相关企业",
           key: "enterprise",
           type: "rightArrow",
-          value: ""
+          value: "请选择相关企业"
         },
         {
           label: "事件类型",
@@ -228,6 +145,7 @@ export default {
           label: "图片",
           key: "imgList",
           type: "img",
+          imgType: 1, //事件内容 的图片
           value: []
         },
         {
@@ -239,7 +157,7 @@ export default {
         },
         {
           label: "事件已自行处理",
-          key: "results",
+          key: "handled",
           type: "switch",
           value: false,
           class: "top-margin"
@@ -268,45 +186,82 @@ export default {
         { valueKey: "结果退回", value: 5 },
         { valueKey: "完成", value: 6 }
       ],
-      enterPriseList: [],
       imglist: [],
       fileId: 0,
-      isPreviewImg: false,
       selectedFileId: 0,
       entPageIndex: 0,
       imgBaseUrl: "/ent/Grid/GetImage/",
       moduleId360: "",
-      initt: "none"
+      // initt: "dingding",
+      initt: null,
+      switchValue: false, //事件是否属实
+      resImage: {
+        label: "图片",
+        key: "imgList",
+        type: "img",
+        imgType: 2, //自行处理的 图片
+        value: []
+      },
+      resContent: {
+        label: "详细描述",
+        key: "results",
+        type: "textarea",
+        value: "",
+        placeholder: "请输入事件处理情况"
+      },
+      imgType: "", //上传图片类型
+      incidentDetail: {}
     };
   },
+  computed: {
+    enterpriseList() {
+      const list = this.$store.state.enterpriseList;
+      if (Array.isArray(list) && list.length) {
+        return list;
+      } else {
+        this.getEnterpriseList();
+      }
+    }
+  },
   watch: {
-    enterPriseList: {
-      handler() {
-        let obj = this.dataList[5];
-        if (Array.isArray(this.enterPriseList)) {
-          this.enterPriseList.forEach(eItem => {
-            if (eItem.id == obj.value) {
-              obj.value = eItem.name;
-            }
+    switchValue() {
+      //根据事件是否已自行处理，控制是否显示resImage,resContent
+      this.dataList[6].value = this.switchValue;
+      if (this.switchValue) {
+        this.dataList.push(this.resImage);
+        this.dataList.push(this.resContent);
+        //防止编辑时，新增加的内容不在可视区
+        if (this.editState) {
+          this.$nextTick(() => {
+            let mainList = this.$refs.mainList;
+            mainList.scrollTo({
+              top: mainList.scrollHeight,
+              behavior: "smooth"
+            });
           });
         }
-        this.$set(this.dataList, 5, obj);
-      },
-      deep: true
+      } else {
+        if (this.dataList.length === 9) {
+          this.dataList.pop();
+          this.dataList.pop();
+        }
+      }
     }
   },
   created() {
     this.routeChange();
-    this.getEnterpriseList();
     this.getmodsList();
   },
   methods: {
     routeChange() {
       this.routeId = this.$route.params.id;
       if (this.routeId < 0) {
+        //添加事件
         this.editState = true;
         this.moduleName = "事件上报";
-        let sotreDataList = JSON.parse(
+        //防止用户输入数据到一半，跳转其他页面（地址，企业列表页等）
+        //获取之前输入数据
+        const sotreDataList = JSON.parse(
           JSON.stringify(this.$store.state.newDatalist)
         );
         if (sotreDataList.length) {
@@ -322,7 +277,7 @@ export default {
       } else {
         this.editState = false;
         this.moduleName = "事件内容";
-        this.dataList = this.dataList1;
+        this.dataList = this.newDataList;
         this.getIncidentDetail();
       }
     },
@@ -344,30 +299,24 @@ export default {
       };
       this.$api.getRolePermission(payload).then(res => {
         if (res && res.incidentType && Array.isArray(res.incidentType)) {
-          let tempArr = [{ value: 0, valueKey: "请选择类型" }];
+          let tempArr = [{ value: 0, valueKey: "请选择事件类型" }];
           res.incidentType.forEach(item => {
             tempArr.push({ valueKey: item.name, value: item.type });
           });
           this.$set(this.typeList[0], "values", tempArr);
-          const tempObj = this.dataList[6];
-          tempArr.forEach(typeItem => {
-            if (tempObj.value == typeItem.value) {
-              tempObj.value = typeItem.valueKey;
-            }
-          });
-          this.$set(this.dataList, 6, tempObj);
+          this.setSelectedType();
         }
       });
     },
-    getSelectedEnteprise() {
-      const tempObj = JSON.parse(
-        JSON.stringify(this.$store.state.selectedEnterprise)
-      );
-      if (tempObj.value && tempObj.valueKey) {
-        let obj = this.dataList[5];
-        obj.value = tempObj.value;
-        obj.valueKey = tempObj.valueKey;
-        this.$set(this.dataList, 5, obj);
+    setSelectedType() {
+      const tempObj = this.dataList[this.typeIndex];
+      if (tempObj.value) {
+        this.typeList[0].values.forEach(typeItem => {
+          if (tempObj.value === typeItem.value) {
+            tempObj.value = typeItem.valueKey;
+          }
+        });
+        this.$set(this.dataList, this.typeIndex, tempObj);
       }
     },
     getIncidentDetail() {
@@ -376,82 +325,37 @@ export default {
       };
       this.$api.getIncidentDetail(payload).then(res => {
         if (res) {
-          Object.keys(res).forEach(resKey => {
-            this.dataList.forEach(item => {
-              if (resKey === item.key) {
-                if (resKey === "results") {
-                  item.value = res[resKey] === "True" ? "是" : "否";
-                } else if (resKey === "date") {
-                  item.value = moment(res[resKey]).format(
-                    "YYYY-MM-DD HH:mm:ss"
-                  );
-                } else if (resKey === "lat") {
-                  const lng = res.lng.toFixed(6);
-                  const lat = res.lat.toFixed(6);
-                  item.value = `${lng} E,${lat} N`;
-                } else if (resKey === "attaches") {
-                  res.attaches.forEach(item => {
-                      item.url = this.imgBaseUrl + item.id;
-                      this.imglist.push(item);
-                  });
-                } else if (
-                  resKey === "enterprise" &&
-                  this.enterPriseList.length
-                ) {
-                  if (Array.isArray(this.enterPriseList)) {
-                    this.enterPriseList.forEach(eItem => {
-                      if (eItem.value == res[resKey]) {
-                        item.value = eItem.valueKey;
-                      }
-                    });
-                  } else {
-                    item.value = res[resKey];
-                  }
-                }
-                // else if (resKey === "type") {
-                //   this.typeList[0].values.forEach(tItem => {
-                //     if (tItem.value == res[resKey]) {
-                //       item.value = tItem.valueKey;
-                //     }
-                //   });
-                // }
-                else if (resKey === "followup") {
-                  if (
-                    res[resKey] &&
-                    Array.isArray(res[resKey]) &&
-                    res[resKey].length
-                  ) {
-                    // const taskTemp = res[resKey][0].tasks;
-                    // taskTemp.forEach(taskItem => {
-                    //   this.stateList.forEach(stateItem => {
-                    //     if (taskItem.state === stateItem.value) {
-                    //       taskItem.stateName = stateItem.valueKey;
-                    //     }
-                    //   });
-                    // });
-                    let tasksList = [];
-                    res[resKey].forEach(followupItem => {
-                      followupItem.tasks.forEach(taskItem => {
-                        this.stateList.forEach(stateItem => {
-                          if (taskItem.state === stateItem.value) {
-                            taskItem.stateName = stateItem.valueKey;
-                          }
-                        });
-                        tasksList.push(taskItem);
-                      });
-                    });
-
-                    item.items = tasksList;
-                  }
-                } else {
-                  item.value = res[resKey];
-                }
-              }
-            });
-          });
+          this.switchValue = res.isSelf;
+          this.incidentDetail = res;
+          setTimeout(() => {
+            this.setListData(res);
+          }, 0);
           this.userId = res.staff;
           this.getStaffInfo();
         }
+      });
+    },
+    setListData(res) {
+      Object.keys(res).forEach(resKey => {
+        if (resKey === "attaches") {
+          this.setImgItem(res.attaches);
+        }
+        this.dataList.forEach(item => {
+          if (resKey === item.key) {
+            if (resKey === "enterprise") {
+              item.value = res[resKey];
+              this.setSelectedEnteprise();
+            } else if (resKey === "type") {
+              if (this.typeList[0].values.length) {
+                this.setSelectedType();
+              } else {
+                item.value = res[resKey];
+              }
+            } else {
+              item.value = res[resKey];
+            }
+          }
+        });
       });
     },
     getUserId() {
@@ -459,20 +363,6 @@ export default {
         if (res && res.id) {
           this.userId = res.id;
           this.getStaffInfo();
-        }
-      });
-    },
-    getStaffInfo() {
-      const payload = {
-        id: this.userId
-      };
-      this.$api.getStaffInfo(payload).then(res => {
-        if (res && res.grid) {
-          this.staffId = res.id;
-          this.grid = res.grid;
-          let tempObj = this.dataList[2];
-          tempObj.value = res.name;
-          this.$set(this.dataList, 2, tempObj);
         }
       });
     },
@@ -484,27 +374,65 @@ export default {
       };
       this.$api.getEnterpriseList(payload).then(res => {
         if (res) {
-          this.enterPriseList = res.items;
+          this.$store.commit("set_enterpriseList", res.items);
+          this.setSelectedEnteprise();
+        }
+      });
+    },
+    setSelectedEnteprise() {
+      let obj = this.dataList[this.enterpristIndex];
+      if (Array.isArray(this.enterpriseList)) {
+        this.enterpriseList.forEach(eItem => {
+          if (eItem.id == obj.value) {
+            obj.value = eItem.name;
+          }
+        });
+      }
+      this.$set(this.dataList, this.enterpristIndex, obj);
+    },
+    getSelectedEnteprise() {
+      const tempObj = JSON.parse(
+        JSON.stringify(this.$store.state.selectedEnterprise)
+      );
+      if (tempObj.value && tempObj.valueKey) {
+        let obj = this.dataList[this.enterpristIndex];
+        obj.value = tempObj.value;
+        obj.valueKey = tempObj.valueKey;
+        this.$set(this.dataList, this.enterpristIndex, obj);
+      }
+    },
+    getStaffInfo() {
+      const payload = {
+        id: this.userId
+      };
+      this.$api.getStaffInfo(payload).then(res => {
+        if (res && res.grid) {
+          this.staffId = res.id;
+          this.grid = res.grid;
         }
       });
     },
     toPages(index) {
-      const data = this.dataList[index];
-      if (data.key === "location") {
-        this.$store.commit(
-          "set_newDatalist",
-          JSON.parse(JSON.stringify(this.dataList))
-        );
-        this.$router.push(`/eventMap/${this.routeId}`);
-      } else if (data.key === "type") {
-        this.slots = this.typeList;
-        this.popupVisible = true;
-      } else if (data.key === "enterprise") {
-        this.$store.commit(
-          "set_newDatalist",
-          JSON.parse(JSON.stringify(this.dataList))
-        );
-        this.$router.push("/enterpriseList");
+      if (this.editState) {
+        const data = this.dataList[index];
+        if (data.key === "addr") {
+          this.$store.commit(
+            "set_newDatalist",
+            JSON.parse(JSON.stringify(this.dataList))
+          );
+          this.$router.push(`/eventMap/${this.routeId}`);
+        } else if (data.key === "type") {
+          this.slots = this.typeList;
+          this.popupVisible = true;
+        } else if (data.key === "enterprise") {
+          this.$store.commit(
+            "set_newDatalist",
+            JSON.parse(JSON.stringify(this.dataList))
+          );
+          this.$router.push("/enterpriseList");
+        }
+      } else {
+        return;
       }
     },
     selectValue(picker) {
@@ -512,12 +440,12 @@ export default {
       if (selectedVal instanceof Array && selectedVal.length === 1) {
         let obj, index;
         if (this.slots[0].key === "type") {
-          index = 6;
+          index = this.typeIndex;
+          obj = this.dataList[index];
+          obj.value = selectedVal[0].valueKey;
+          obj.valueKey = selectedVal[0].value;
+          this.$set(this.dataList, index, obj);
         }
-        obj = this.dataList[index];
-        obj.value = selectedVal[0].valueKey;
-        obj.valueKey = selectedVal[0].value;
-        this.$set(this.dataList, index, obj);
       }
     },
     goBack() {
@@ -533,44 +461,40 @@ export default {
       //没有输入标题，无法提交
       const title = this.dataList[0].value;
       if (!title) {
-        Toast({
-          message: "请输入事件标题",
-          iconClass: "iconfont icon-error",
-          position: "top",
-          duration: 3000
-        });
+        this.toast("请输入事件标题");
         return;
       }
-      let id = this.createGuid();
       let payload = {
-        id: id,
+        id: this.$uuid(),
         rowState: "add",
         grid: this.grid,
         staff: this.staffId,
-        state: 1 //未发布
+        state: 1, //未发布
+        lat: this.latLng[0],
+        lng: this.latLng[1],
+        date: this.incidentDetail.date
+          ? this.incidentDetail.date
+          : moment().format()
       };
       this.dataList.forEach(item => {
-        if (item.key === "location") {
-          payload["lat"] = this.latLng[0];
-          payload["lng"] = this.latLng[1];
-        } else if (item.key === "imgList") {
+        if (item.key === "imgList") {
           let tempArr = [];
           this.imglist.forEach(item => {
             tempArr.push({
               id: item.id,
               rowState: "add",
               lat: this.latLng[0],
-              lng: this.latLng[1]
+              lng: this.latLng[1],
+              type: item.type
             });
           });
           payload["attachments"] = tempArr;
-        } else if (item.type === "rightArrow") {
+        } else if (item.type === "rightArrow" && item.key !== "addr") {
           payload[item.key] = item.valueKey;
-        } else if (item.key === "role") {
-        } else if (item.key === "results") {
+        } else if (item.key === "handled") {
           if (item.value) {
             //事件已自行处理
-            payload.handledate = moment().format();
+            payload.handleDate = moment().format();
             payload.state = 3;
           }
         } else {
@@ -580,15 +504,19 @@ export default {
       this.$api.updateincident(payload).then(res => {
         if (res === "OK") {
           this.resetData();
-          this.$router.push("/eventList");
+          const eventListPageType = this.$store.state.eventListPageType;
+          this.$router.push(`/eventList/${eventListPageType}`);
         } else {
-          Toast({
-            message: res,
-            iconClass: "iconfont icon-error",
-            position: "top",
-            duration: 3000
-          });
+          this.toast(res);
         }
+      });
+    },
+    toast(msg) {
+      Toast({
+        message: msg,
+        iconClass: "iconfont icon-error",
+        position: "top",
+        duration: 3000
       });
     },
     resetData() {
@@ -613,18 +541,14 @@ export default {
     },
     //通过IP获取详细地址
     getAddress() {
-      const tempItem = this.dataList[4];
-      tempItem.value = `${this.latLng[1]} E,${this.latLng[0]} N`;
-      this.$set(this.dataList, 4, tempItem);
-
       let geocoder = new AMap.Geocoder();
       const lngLat = this.latLng.reverse();
       geocoder.getAddress(lngLat, (status, result) => {
         if (status === "complete" && result.regeocode) {
           const tempData = result.regeocode.addressComponent;
-          const tempItem = this.dataList[3];
+          const tempItem = this.dataList[1];
           tempItem.value = `${tempData.province}${tempData.city}${tempData.district}${tempData.township}${tempData.street}${tempData.streetNumber}`;
-          this.$set(this.dataList, 3, tempItem);
+          this.$set(this.dataList, 1, tempItem);
         } else {
           console.error("根据经纬度查询地址失败");
         }
@@ -642,15 +566,11 @@ export default {
             //解析定位结果
             if (result.addressComponent) {
               const tempData = result.addressComponent;
-              const tempItem = this.dataList[3];
+              const tempItem = this.dataList[1];
               tempItem.value = `${tempData.province}${tempData.city}${tempData.district}${tempData.township}${tempData.street}${tempData.streetNumber}`;
-              this.$set(this.dataList, 3, tempItem);
+              this.$set(this.dataList, 1, tempItem);
             }
             if (result.position) {
-              const tempItem = this.dataList[4];
-              const location = `${result.position.lng} E,${result.position.lat} N`;
-              tempItem.value = location;
-              this.$set(this.dataList, 4, tempItem);
               this.latLng = [result.position.lat, result.position.lng];
               this.$store.commit(
                 "set_eventLatLng",
@@ -664,54 +584,85 @@ export default {
         });
       });
     },
-    toImg() {
+    toImg(item) {
+      if (item && item.imgType) {
+        this.imgType = item.imgType;
+      }
       this.$refs.upload[0].addItem();
     },
     async uploadData(e) {
       if (this.initt === "dingding") {
         let imgarr = [];
         for (let i = 0; i < e.length; i++) {
-          let x = await window.dingtalk.uploadFile({
-            url: "https://zsxt.azuratech.com:8002/api/GBM/UploadAttachment",
-            filePath: e[i],
-            fileName: "image",
-            fileType: "image",
-            header: {
-              "Content-Type": "multipart/form",
-              Authorization: `Bearer ${cookie.get("AzuraCookie")}`
+          try {
+            let x = await window.dingtalk.uploadFile({
+              url: "https://zsxt.azuratech.com:8002/api/GBM/UploadAttachment",
+              filePath: e[i],
+              fileName: "image",
+              fileType: "image",
+              header: {
+                "Content-Type": "multipart/form",
+                "content-type": "multipart/form",
+                Authorization: `Bearer ${cookie.get("AzuraCookie")}`
+              }
+            });
+            if (x.data && x.data.includes("id")) {
+              let img = JSON.parse(x.data);
+              imgarr.push(img[0]);
             }
-          });
-          if (x.data && x.data.includes("id")) {
-            let img = JSON.parse(x.data);
-            imgarr.push(img[0]);
+          } catch (e) {
+            alert(JSON.stringify(e))
           }
         }
-        imgarr.forEach(item => {
-          if (
-            item.url.includes("Content") &&
-            !item.url.includes(this.$360url)
-          ) {
-            item.url = this.$360url + item.url;
-          }
-        });
-        this.imglist.push(...imgarr);
+        this.setImgItem(imgarr);
       } else {
         let data = new FormData();
         for (let i = 0; i < e.length; i++) {
           data.append("file" + i, e[i]);
         }
         this.$api.uploadAttachment(data).then(res => {
-          res.forEach(item => {
-            if (
-              item.url.includes("Content") &&
-              !item.url.includes(this.$360url)
-            ) {
-              // item.url = this.$360url + item.url;
-            }
-          });
-          this.imglist.push(...res);
+          this.setImgItem(res);
         });
       }
+    },
+    setImgItem(imgarr) {
+      imgarr.forEach(item => {
+        if (
+          this.imgType &&
+          item.url &&
+          item.url.includes("Content") &&
+          !item.url.includes(this.$360url)
+        ) {
+          item.url = this.$360url + item.url;
+          item.type = this.imgType;
+        } else {
+          item.url = this.imgBaseUrl + item.id;
+          let tempArr, index;
+          if (item.type === this.handledImgType) {
+            index = this.handledImgIndex;
+          } else {
+            index = this.eventImgIndex;
+          }
+          if (index) {
+            tempArr = this.dataList[index];
+            tempArr.value.push(item);
+          }
+        }
+      });
+      let tempArr, index;
+      if (this.imgType) {
+        //新上传图片，还未与事件绑定
+        if (this.imgType === this.eventImgType) {
+          index = this.eventImgIndex;
+        } else if (this.imgType === this.handledImgType) {
+          index = this.handledImgIndex;
+        }
+        tempArr = this.dataList[index];
+        tempArr.value.push(...imgarr);
+        this.$set(this.dataList, index, tempArr);
+      }
+
+      this.imglist.push(...imgarr);
     },
     deleteItem(e) {
       this.imglist.forEach((item, index) => {
@@ -719,81 +670,27 @@ export default {
           this.imglist.splice(index, 1);
         }
       });
+      let tempArr, index;
+      if (e.type === this.eventImgType) {
+        index = this.eventImgIndex;
+      } else if (e.type === this.handledImgType) {
+        index = this.handledImgIndex;
+      }
+      tempArr = this.dataList[index];
+      tempArr.value = this.imglist.filter(item => {
+        return item.type === e.type;
+      });
+      this.$set(this.dataList, index, tempArr);
     },
     openImg(index) {
       let imgs = [];
       this.imglist.forEach(item => {
         imgs.push(item.url);
       });
-      console.log(ImagePreview);
       ImagePreview({
         images: imgs,
         startPosition: index,
         closeable: true
-      });
-    },
-    readLocalFile() {
-      let localFile = document.getElementById("uploadFile");
-      this.uploadImg(localFile);
-    },
-    uploadImg: function(e) {
-      Indicator.open("上传中...");
-      let formData = new window.FormData();
-      let files = e.files;
-      for (let x = 0; x < files.length; x++) {
-        formData.append("files", files[x]);
-      }
-      this.$api
-        .upload(formData)
-        .then(res => {
-          Indicator.close();
-          if (Array.isArray(res)) {
-            let obj = JSON.parse(JSON.stringify(this.dataList[7]));
-            res.forEach(item => {
-              obj.value.push({
-                name: item.fname,
-                url: item.id,
-                id: item.id,
-                key: this.fileId++
-              });
-            });
-            this.$set(this.dataList, 7, obj);
-            this.imglist = this.dataList[7].value;
-          }
-        })
-        .catch(err => {
-          Indicator.close();
-          Toast({
-            message: err,
-            iconClass: "iconfont icon-error",
-            position: "top",
-            duration: 2000
-          });
-        });
-    },
-    deleteImg(e) {
-      let obj = JSON.parse(JSON.stringify(this.dataList[7]));
-      obj.value = obj.value.filter(item => {
-        return item.key !== e.key;
-      });
-      this.$set(this.dataList, 7, obj);
-      this.imglist = this.dataList[7].value;
-    },
-    previewImg(idx) {
-      this.selectedFileId = idx;
-      this.isPreviewImg = true;
-    },
-    closeImg() {
-      this.isPreviewImg = false;
-    },
-    handleChange(e) {
-      this.selectedFileId = e;
-    },
-    createGuid() {
-      return "xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-        let r = (Math.random() * 16) | 0,
-          v = c == "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
       });
     }
   }
@@ -820,14 +717,14 @@ export default {
     }
     > span:first-child {
       line-height: 0.84rem;
-      width: calc(100% - 4.5rem);
+      width: calc(100% - 4.2rem);
       color: rgba(48, 48, 48, 1);
       font-size: 0.34rem;
       vertical-align: middle;
     }
     > div.right {
       float: right;
-      width: 4.5rem;
+      width: 4.2rem;
       color: rgb(157, 157, 157);
       height: 0.84rem;
       text-align: right;
@@ -892,26 +789,6 @@ export default {
       @include flex-wrap(wrap);
       > div {
         display: inline-block;
-      }
-      .imgBox {
-        width: 1.2rem;
-        height: 1.2rem;
-        margin: 0.2rem 0.56rem 0 0;
-        img {
-          width: 1.2rem;
-          height: 1.2rem;
-          object-fit: cover;
-        }
-      }
-      .icon {
-        width: 0.3rem;
-        height: 0.3rem;
-        background: url("../../../assets/images/delete.png") no-repeat left
-          center;
-        background-size: 0.3rem 0.3rem;
-        position: relative;
-        top: -1.3rem;
-        left: 1rem;
       }
     }
     .mint-switch-core {

@@ -595,7 +595,12 @@ export default new Vuex.Store({
     },
     followup: [],
     gridLevel: '', //当前登录人员对应网格等级
-    userInfo: null
+    moduleId360: '',
+    eventTypeList: [], //事件类型列表
+    userInfo: null,
+    eventListPageType: 1, //控制事件列表页是否显示代办
+    recordCircule: [],
+    waitState: false //是否待办
   },
   mutations: {
     set_loading: (state, data) => {
@@ -661,6 +666,12 @@ export default new Vuex.Store({
     set_gridLevel: (state, data) => {
       state.gridLevel = data
     },
+    set_moduleId360: (state, data) => {
+      state.moduleId360 = data
+    },
+    set_eventTypeList: (state, data) => {
+      state.eventTypeList = data
+    },
     set_toTaskEvent: (state, data) => {
       state.toTaskEvent = data
     },
@@ -672,6 +683,15 @@ export default new Vuex.Store({
     },
     set_toTaskEventTitle: (state, data) => {
       state.toTaskEventTitle = data
+    },
+    set_eventListPageType: (state, data) => {
+      state.eventListPageType = data
+    },
+    set_recordCircule: (state, data) => {
+      state.recordCircule = data
+    },
+    set_waitState: (state, data) => {
+      state.waitState = data
     }
   },
   actions: {}

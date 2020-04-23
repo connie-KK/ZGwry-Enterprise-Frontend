@@ -76,6 +76,7 @@
 
 <script>
 import { Switch, Popup, Picker, Toast } from 'mint-ui'
+import store from 'store'
 export default {
   name: 'pollution',
   components: {
@@ -120,7 +121,7 @@ export default {
   },
   computed: {
     outName () {
-      if (this.outList.length && this.autoParams.outputid) {
+      if (this.outList.length && this.autoParams.outputid && this.autoParams.outputid) {
         return this.outList.filter(item => {
           return this.autoParams.outputid === item.id
         })[0].name
@@ -183,8 +184,8 @@ export default {
   },
   created () {
     this.id = this.$route.params.id
+    this.selectTab = Number(store.get("pageType").split("-")[1])
     if (this.id.includes('add')) {
-      this.selectTab = Number(this.id.split('add')[1])
       this.autoParams.category = this.selectTab
       this.getZGOutputList()
     }else{
@@ -228,7 +229,7 @@ export default {
         .then(res => {
           res.state = res.state ? true : false
           this.autoParams = res
-          this.autoParams.outputid = this.autoParams.output.id
+          this.autoParams.outputid = res.output.id
           this.selectTab = this.autoParams.category
           this.autoParams.iselectricitymeter = !!this.autoParams
             .iselectricitymeter

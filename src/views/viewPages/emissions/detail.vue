@@ -364,7 +364,7 @@ export default {
               item.key === "isidentificationmark" ||
               item.key === "isstored"
             ) {
-              item.value = res[item.key] ? true : false;
+              item.value = !!res[item.key] ? true : false;
             } else if (item.key.includes("standard")) {
               item.value = res["standard"] ? res["standard"].name : "";
               item.keyValue = res["standard"].id;

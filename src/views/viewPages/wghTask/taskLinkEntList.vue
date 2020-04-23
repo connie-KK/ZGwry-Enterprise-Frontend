@@ -20,7 +20,10 @@
           :key="item.id"
           @click="clickItem(item)"
         >
-          <p>{{ item.name }}</p>
+        <div> 
+           <p>{{ item.name }}</p>
+          <p>{{ item.address }}</p>
+        </div>
         </li>
       </ul>
     </div>
@@ -120,11 +123,25 @@ export default {
       background-size: auto 0.32rem;
       font-size: 0.34rem;
       border-bottom: 1px solid #e0e0e0;
+      @include flexbox;
+      @include align-items(center);
+      box-sizing: border-box;
+      div {
+        width: 100%;
+      }
       p {
         width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        line-height: normal;
+        &:nth-child(1) {
+          font-size: 0.34rem;
+        }
+          &:nth-child(2) {
+          font-size: 0.26rem;
+          color: #A0A0A2;
+        }
       }
     }
   }

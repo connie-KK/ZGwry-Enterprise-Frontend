@@ -5,285 +5,142 @@
       leftText="返回"
       :isShowSearchIcon="isShowSearchIcon"
       :showBorder="isShowBorder"
+      :serachFun="toSearchList"
+      :toggleSearchBox="toToggleSearchBox"
     >
       {{ moduleName }}
     </header-bar>
-    <div class="main-content">
-      <ul class="ul-box" :class="isEdit ? '' : 'notbk'">
-        <li @click="isEdit ? (popupVisible1 = true) : false">
-          <p>{{ depType }}</p>
-        </li>
-        <li @click="isEdit ? (popupVisible2 = true) : false" v-if="!isManyCell">
-          <p>{{ depStaff }}</p>
-        </li>
-        <li @click="isEdit ? (popupVisible3 = true) : false" v-if="!isManyCell">
-          <p>{{ staffName }}</p>
-        </li>
-      </ul>
-      <check-tree
+    <div :class="[isShowSearchBox ? 'main-content-with-search' : '', 'main-content']">
+      <mt-navbar v-model="tab" class="tab-tree">
+        <mt-tab-item id="wgy">网格员</mt-tab-item>
+        <mt-tab-item id="bmry">部门人员</mt-tab-item>
+      </mt-navbar>
+
+         <!-- 网格员 -->
+          <div class="all-check">
+        <span>选择人员</span>
+        <span class="is-open" @click="isClickExpand">全部展开</span>
+      </div>
+      <div class="tab0 tab-tree" v-if="tab === 'wgy'">
+       <check-tree
         class="tree-box"
-        v-if="isManyCell"
         :data="gridCell"
-        :checkData="checkGridCell"
+        :checkData="checkSingle"
         @checkChange="checkChange"
+        :expandAll="isExpandAll"
         :first="isFirst"
+        :chkStyle="treeStyle"
       ></check-tree>
+      </div>
+        <div class="tab1 tab-tree" v-if="tab === 'bmry'">
+       <check-tree
+        class="tree-box"
+        :data="depList"
+        :checkData="checkSingle"
+        @checkChange="checkChange"
+        :expandAll="isExpandAll"
+        :first="isFirst"
+        :chkStyle="treeStyle"
+      ></check-tree>
+      </div>
+       
+      <div class="add-btn">
+        <button @click="submit">确定</button>
+      </div>
     </div>
-    <mt-popup v-model="popupVisible1" position="bottom" class="popup-box">
-      <mt-picker
-        :slots="slotsType"
-        @change="onValuesChangeType"
-        valueKey="name"
-      ></mt-picker>
-    </mt-popup>
-    <mt-popup v-model="popupVisible2" position="bottom" class="popup-box">
-      <mt-picker
-        :slots="slotsDep"
-        @change="onValuesChangeDep"
-        valueKey="name"
-      ></mt-picker>
-    </mt-popup>
-    <mt-popup v-model="popupVisible3" position="bottom" class="popup-box">
-      <mt-picker
-        :slots="slotsPeople"
-        @change="onValuesChangePeople"
-        valueKey="name"
-      ></mt-picker>
-    </mt-popup>
   </div>
 </template>
 
 <script>
-import { Popup, Picker } from 'mint-ui'
+import { Popup, Picker, Navbar,  TabItem} from 'mint-ui'
 import checkTree from '@/components/checkTree'
+import store from 'store'
 export default {
   name: 'taskAssign',
   components: {
     'mt-popup': Popup,
     'mt-picker': Picker,
+    'mt-navbar':Navbar,
+    'mt-tab-item':TabItem,
     checkTree
   },
   data() {
     return {
-      isFirst: true,
+      isFirst: false,
       moduleName: '指派给',
       searchKey: '',
-      isShowSearchIcon: false,
-      isShowBorder: true,
+      isShowSearchIcon: true,
+      isShowBorder: false,
       list: [],
-      depList: [],
-      popupVisible1: false,
-      popupVisible2: false,
-      popupVisible3: false,
-      isManyCell: false,
-      typesList: [
-        { name: '网格', code: 1 },
-        { name: '部门', code: 2 },
-        { name: '多网格', code: 1 }
-      ]
+      depList: {},
+      // popupVisible1: false,
+      // popupVisible2: false,
+      // popupVisible3: false,
+      isCell: true,
+      // typesList: [
+      //   { name: '网格', code: 1 },
+      //   { name: '部门', code: 2 },
+      //   { name: '多网格', code: 1 }
+      // ]
+      isExpandAll:false,
+      tab:'wgy',
+      isShowSearchBox:false,
+      treeStyle:{chkStyle:'radio',radioType:'all'},
+      checkedList:[],
+      checkSingle:[]
     }
   },
   computed: {
+    gridCell() {
+      return this.$store.state.gridCell;
+    },
     isEdit() {
       return this.$store.state.isEdit
     },
-    gridCell() {
-      return this.$store.state.gridCell
-    },
-    checkGridCell() {
+    checkDep(){
       return this.$store.state.checkGridCell
     },
-    singleGridCell() {
-      if (!this.gridCell) {
-        return []
+    data() {
+      return {
+        isFirst: true,
+        moduleName: '指派给',
+        isShowSearchIcon: false,
+        isShowBorder: true,
+        listData: []
       }
-      let temp = [
-        {
-          name: this.gridCell.name,
-          id: this.gridCell.id,
-          staffs: this.gridCell.staffs
-        }
-      ]
-      this.gridCell.children.forEach(item => {
-        temp.push({
-          name: item.name,
-          id: item.id,
-          staffs: item.staffs
-        })
-        if (item.children && item.children.length) {
-          item.children.forEach(ite => {
-            temp.push({
-              name: ite.name,
-              id: ite.id,
-              staffs: ite.staffs
-            })
-            if (ite.children && ite.children.length) {
-              ite.children.forEach(it => {
-                temp.push({
-                  name: it.name,
-                  id: it.id,
-                  staffs: it.staffs
-                })
-              })
-            }
-          })
-        }
-      })
-      return temp
-    },
-    depType() {
-      if (this.isManyCell) {
-        return '多网格'
-      }
-      return this.typesList.filter(item => {
-        return this.$store.state.taskParams.depType === item.code
-      })[0].name
-    },
-    depStaff() {
-      if (this.slotsDep[0].values.length && !this.$store.state.taskParams.dep) {
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.$store.state.taskParams.dep = this.slotsDep[0].values[0].id
-      }
-      const dep = this.depList.filter(item => {
-        return item.id === this.$store.state.taskParams.dep
-      })
-      const dep2 = this.singleGridCell.filter(item => {
-        return item.id === this.$store.state.taskParams.dep
-      })
-      if (dep.length) {
-        return dep[0].name
-      }
-      if (dep2.length) {
-        return dep2[0].name
-      }
-      return '未指定'
-    },
-    staffName() {
-      let temp = '未指定'
-      this.depList.forEach(item => {
-        if (item.id === this.$store.state.taskParams.dep) {
-          item.users.forEach(user => {
-            if (user.id === this.$store.state.taskParams.depStaff) {
-              temp = user.name
-            }
-          })
-        }
-      })
-      this.singleGridCell.forEach(item => {
-        if (item.id === this.$store.state.taskParams.dep) {
-          item.staffs.forEach(user => {
-            if (user.id === this.$store.state.taskParams.depStaff) {
-              temp = user.name
-            }
-          })
-        }
-      })
-      return temp
-    },
-    slotsType() {
-      let myIndex = 0
-      this.typesList.forEach((item, index) => {
-        if (item.code === this.$store.state.taskParams.depType) {
-          myIndex = index
-        }
-      })
-      if (this.isManyCell) {
-        myIndex = 2
-      } else if (myIndex === 2) {
-        myIndex = 0
-      }
-      return [
-        {
-          flex: 1,
-          values: this.typesList,
-          className: 'slottypes',
-          textAlign: 'center',
-          defaultIndex: myIndex
-        }
-      ]
-    },
-    slotsDep() {
-      let myIndex = 0
-      let val
-      if (this.depType === '部门') {
-        val = this.depList
-        this.depList.forEach((item, index) => {
-          if (item.id === this.$store.state.taskParams.dep) {
-            myIndex = index
-          }
-        })
-      } else if (this.depType === '网格') {
-        val = this.singleGridCell
-        this.singleGridCell.forEach((item, index) => {
-          if (item.id === this.$store.state.taskParams.dep) {
-            myIndex = index
-          }
-        })
-      }
-      return [
-        {
-          flex: 1,
-          values: val,
-          textAlign: 'center',
-          defaultIndex: myIndex
-        }
-      ]
-    },
-    slotsPeople() {
-      let vals = [{ name: '未指定', id: '' }]
-      let myIndex = 0
-      if (this.depType === '部门') {
-        const users = this.depList.filter(item => {
-          return item.id === this.$store.state.taskParams.dep
-        })
-        if (users.length) {
-          vals = [...vals, ...users[0].users]
-        }
-        vals.forEach((item, index) => {
-          if (item.id === this.$store.state.taskParams.depStaff) {
-            myIndex = index
-          }
-        })
-      } else if (this.depType === '网格') {
-        const users = this.singleGridCell.filter(item => {
-          return item.id === this.$store.state.taskParams.dep
-        })
-        if (users.length) {
-          vals = [...vals, ...users[0].staffs]
-        }
-        vals.forEach((item, index) => {
-          if (item.id === this.$store.state.taskParams.depStaff) {
-            myIndex = index
-          }
-        })
-      }
-      const temp = [
-        {
-          flex: 1,
-          values: vals,
-          textAlign: 'center',
-          defaultIndex: myIndex
-        }
-      ]
-      return temp
-    },
-    rrIsManyCell() {
-      return this.$store.state.taskParams.isManyCell
     }
   },
-  watch: {
-    isManyCell() {
-      this.$store.state.taskParams.isManyCell = this.isManyCell
+  watch:{
+    tab(){
+      this.isFirst = false
+      if(this.tab === 'wgy'){
+        this.$store.state.taskParams.depType = 1
+      }else if(this.tab === 'bmry'){
+        this.$store.state.taskParams.depType = 2
+      }
+       this.$nextTick(()=>{
+      this.isFirst = true
+    })
     }
   },
-  mounted() {
+  created() {
     this.getAllDer()
-    this.isManyCell = this.rrIsManyCell
+     this.tab = 'wgy'
+     const temptab = this.$store.state.taskParams.depType
+     if(temptab === 1) {
+       this.tab = 'wgy' 
+     }
+     if(temptab === 2){
+       this.tab === 'bmry'
+     }
+  },
+  mounted(){
+    this.checkSingle = JSON.parse(JSON.stringify(this.$store.state.checkGridCell))
+    this.$nextTick(()=>{
+      this.isFirst = true
+    })
   },
   methods: {
-    checkChange(e) {
-      this.$store.state.checkGridCell = e
-    },
     getAllDer() {
       let res = JSON.parse(JSON.stringify(this.$store.state.allDep))
       let userIds = []
@@ -316,41 +173,45 @@ export default {
                 })
               })
             })
-            this.depList = deps
-            this.$nextTick(() => {
-              this.isFirst = false
+            //this.depList = deps
+            let templist = []
+            deps.forEach(item=>{
+              let temp = {
+                name:item.name,
+                id:item.id,
+                level:1,
+                staffs:item.users ? item.users : []
+              }
+              templist.push(temp)
             })
+            this.depList = {templist}
           }
         })
     },
-    onValuesChangeType(e) {
-      if (this.isFirst) {
-        return
-      }
-      this.$store.state.taskParams.depType = e.values[0].code
-      if (e.values[0].name === '多网格') {
-        this.isManyCell = true
-      } else {
-        this.isManyCell = false
-      }
+    toToggleSearchBox(e) {
+      this.isShowSearchBox = e;
     },
-    onValuesChangeDep(e) {
-      if (!e.values.length || !e.values[0] || this.isFirst) {
-        return
-      }
-      console.log(e.values[0].id)
-      this.$store.state.taskParams.dep = e.values[0].id
+    isClickExpand() {
+      this.isExpandAll = !this.isExpandAll;
     },
-    onValuesChangePeople(e) {
-      if (!e.values.length || !e.values[0] || this.isFirst) {
-        return
+    checkChange(e){
+      if(e[0]){
+        this.$store.state.taskParams.depStaff = e[0].id;
       }
-      this.$store.state.taskParams.depStaff = e.values[0].id
+      this.checkedList = e
+      this.$store.state.checkGridCell = e
+    },
+    toSearchList(){
+      
+    },
+    submit(){
+      this.$store.state.checkGridCell = this.checkedList
+      this.$store.state.taskParams.isManyCell = false
+       window.history.go(-1)
     }
   }
 }
 </script>
-
 <style lang="scss">
 #taskAssign {
   .main-content {
@@ -394,5 +255,82 @@ export default {
     padding-top: 0.4rem;
     padding-bottom: 0.4rem;
   }
+    .all-check {
+    height: 0.8rem;
+    line-height: 0.8rem;
+    padding: 0 0.32rem;
+    background-color: #f1f5f7;
+    font-size: 0.32rem;
+    span:nth-child(2) {
+      padding-left: 0.18rem;
+    }
+    .is-open {
+      float: right;
+      color: #3296fa;
+      cursor: pointer;
+    }
+    .is-open:hover {
+      color: #227eda;
+    }
+  }
+  .mint-navbar {
+      @include justify-content(space-around!important);
+       height: 0.96rem!important;
+      .mint-tab-item.is-selected {
+        margin-bottom: 0!important;
+      }
+    }
+  .tab-tree {
+    .mint-tab-item {
+    @include flex(none!important);
+    width: 35%!important;
+  }
+  }
+  .tab-tree {
+    height: calc(100% - 3.08rem);
+    overflow-y: auto;
+  }
+   .ztree {
+    font-size: 0.32rem!important;
+  }
+  .ztree li a {
+    height: 0.8rem!important;
+    line-height: 0.8rem!important;
+  }
+  .ztree .ico_docu {
+    width: 0.3rem !important;
+    height: 0.3rem !important;
+    background: url('../../../assets/images/assign.png') no-repeat center !important;
+    background-size: 70% !important;
+  }
+   .ztree .button.bottom_close:before,
+  .ztree .button.bottom_open:before,
+  .ztree .button.center_close:before,
+  .ztree .button.center_open:before,
+  .ztree .button.noline_close:before,
+  .ztree .button.noline_open:before,
+  .ztree .button.root_close:before,
+  .ztree .button.root_open:before,
+  .ztree .button.roots_close:before,
+  .ztree .button.roots_open:before,
+  .ztree .button.bottom_close:before,
+  .ztree .button.bottom_open:before,
+  .ztree .button.center_close:before,
+  .ztree .button.center_open:before,
+  .ztree .button.noline_close:before,
+  .ztree .button.noline_open:before,
+  .ztree .button.root_close:before,
+  .ztree .button.root_open:before,
+  .ztree .button.roots_close:before,
+  .ztree .button.roots_open:before {
+    border: none !important;
+    display: inline-block !important;
+    width: 0.22rem;
+    height: 0.22rem;
+    background: url('../../../assets/images/right1.png') no-repeat center !important;
+    background-size: 50% !important;
+  }
 }
 </style>
+
+

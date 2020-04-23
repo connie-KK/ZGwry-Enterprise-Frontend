@@ -7,7 +7,7 @@
       :showBorder="isShowBorder"
       :customBack="backFun"
     >
-      {{ id ? moduleName : '发布任务' }}
+      {{ id ? '任务内容' : '发布任务' }}
     </header-bar>
     <div class="main-content">
       <div class="box-item">
@@ -16,41 +16,36 @@
           type="text"
           placeholder="请输入标题"
           v-model="taskTitle"
+          :disabled="notEdit ? false : 'disabled'"
         />
       </div>
-      <div
-        class="box-item"
-        @click="notEdit && !isEvent ? popupType = true : false"
-      >
+      <div class="box-item" v-if="id">
+        <span class="item-title">状态</span>
+        <p class="checkbox2">{{ stateName }}</p>
+      </div>
+      <div class="box-item" @click="notEdit && !isEvent ? (popupType = true) : false">
         <span class="item-title">任务性质</span>
         <p :class="notEdit && !isEvent ? 'checkbox' : 'checkbox2'">{{ taskTypeName }}</p>
       </div>
-      <div class="box-item">
+      <div class="box-item" v-if="id">
         <span class="item-title">网格/部门</span>
-        <p class="checkbox2">{{ depName || '请先选择指派' }}</p>
+        <p class="checkbox2">{{ depName || '' }}</p>
       </div>
-      <div class="box-item">
+      <div class="box-item" v-if="id">
         <span class="item-title">时间</span>
         <p class="checkbox2">{{ taskDate }}</p>
       </div>
-      <div class="box-item">
+      <div class="box-item" v-if="id">
         <span class="item-title">发出人</span>
-        <p class="checkbox2">{{ staffName || '正在获取...' }}</p>
+        <p class="checkbox2">{{ staffName || '' }}</p>
       </div>
-      <div
-        class="box-item"
-        v-if="isEvent"
-        @click="notEdit ? $router.push('/taskLinkEventList') : false"
-      >
+      <div class="box-item" v-if="isEvent" @click="toEventDetail">
         <span class="item-title">事件</span>
-        <p :class="notEdit ? 'checkbox' : 'checkbox2'">
-          {{ incidentTitle || '请选择事件' }}
+        <p class="checkbox">
+          {{ incidentTitle }}
         </p>
       </div>
-      <div
-        class="box-item"
-        @click="notEdit ? $router.push('/taskModelList') : false"
-      >
+      <div class="box-item" @click="notEdit ? $router.push('/taskModelList') : false">
         <span class="item-title">模板类型</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">
           {{ templateName || (notEdit ? '请选择模板' : '无模板') }}
@@ -66,143 +61,114 @@
           :disabled="notEdit ? false : 'disabled'"
         ></textarea>
       </div>
-      <p class="gang"></p>
+      <!-- <p class="gang"></p>
       <div class="box-item">
         <span class="item-title">状态</span>
         <p class="checkbox2">{{ stateName }}</p>
-      </div>
+      </div> -->
       <p class="gang"></p>
       <div class="box-item">
         <span class="item-title">相关企业（{{ enters.length }}）</span>
-        <p
-          class="addbox"
-          @click="$router.push('/taskLinkEntList')"
-          v-if="!id"
-        >
+        <p class="addbox" @click="$router.push('/taskLinkEntList')" v-if="!id">
           添加企业
         </p>
         <ul class="item-ul">
-          <li
-            v-for="item in enters"
-            :key="item.id"
-          >
+          <li v-for="item in enters" :key="item.id">
             <span>{{ item.name }}</span>
-            <i
-              class="delete"
-              v-if="!id"
-              @click="deleteEnter(item.id)"
-            ></i>
-            <i
-              class="jump"
-              v-if="id"
-              @click="toEnterPage(item.id)"
-            ></i>
+            <i class="delete" v-if="!id" @click="deleteEnter(item.id)"></i>
+            <!-- <i class="jump" v-if="id" @click="toEnterPage(item.id)"></i> -->
           </li>
         </ul>
       </div>
       <p class="gang"></p>
       <div class="box-item">
         <span class="item-title">相关位置（{{ positions.length }}）</span>
-        <p
-          class="addbox"
-          @click="$router.push('/mapPosition')"
-          v-if="!id"
-        >
+        <p class="addbox" @click="$router.push('/mapPosition')" v-if="!id">
           添加位置
         </p>
         <ul class="item-ul item-ul2">
-          <li
-            v-for="(item, index) in positions"
-            :key="index + 'pop'"
-          >
+          <li v-for="(item, index) in positions" :key="index + 'pop'">
             <span>{{ item.title }}</span>
             <p>{{ item.lng }}E, {{ item.lat }} N</p>
-            <i
-              class="delete"
-              v-if="!id"
-              @click="deletePosition(index)"
-            ></i>
-            <i
-              class="jump"
-              v-if="!id"
-            ></i>
+            <i class="delete" v-if="!id" @click="deletePosition(index)"></i>
+            <!-- <i class="jump" v-if="id"></i> -->
           </li>
         </ul>
       </div>
       <p class="gang"></p>
-      <p class="item-box-top-title">指派</p>
-      <div
-        class="box-item"
-        @click="notEdit ? $refs.picker.open() : false"
-      >
+      <!-- <p class="item-box-top-title">指派</p> -->
+      <div class="box-item" @click="notEdit ? $refs.picker.open() : false">
         <span class="item-title">任务执行期限</span>
         <p :class="notEdit ? 'checkbox' : 'checkbox2'">{{ deadline }}</p>
       </div>
       <div class="box-item">
         <span class="item-title">执行周期</span>
         <span class="input-unit">天</span>
+        <span v-show="showDateTips" class="date-tips">填写执行周期</span>
         <input
           type="number"
-          placeholder="填写执行周期"
+          @focus="showDateTips = false"
+          @blur="isShowDateTips"
           v-model="$store.state.taskParams.period"
           :disabled="notEdit ? false : 'disabled'"
         />
       </div>
-      <div
-        class="box-item"
-        @click="$router.push('/taskAssign')"
-      >
+      <div class="box-item">
+        <span class="item-title">多网格指派</span>
+        <div class="right">
+          <mt-switch v-model="switchValue"  :disabled="isSwitch"></mt-switch>
+        </div>
+      </div>
+      <div class="box-item" @click="assignUser">
         <span class="item-title">指派给</span>
-        <p class="checkbox">{{ partStaffName || '未指定' }}</p>
+        <p class="checkbox more-cell" :title="partStaffName">
+          {{ partStaffName || '未指定' }}
+        </p>
       </div>
       <p class="gang"></p>
       <div v-if="id">
-        <p class="item-box-top-title">执行情况</p>
-        <div
+        <!-- <p class="item-box-top-title">执行情况</p> -->
+        <!-- <div
           class="box-item"
           v-if="taskState === 4"
           @click="$router.push('/taskResult/X-' + id)"
         >
           <span class="item-title">执行结果</span>
           <p class="checkbox">&nbsp;</p>
-        </div>
+        </div> -->
         <p class="m-title">执行记录（{{ reListX.length }}）</p>
-        <ul
-          class="totask-list"
-          v-if="reListX.length"
-        >
-          <li
-            v-for="iit in reListX"
-            :key="iit.id"
-            @click="$router.push('/taskResult/' + iit.id)"
-          >
+        <ul class="totask-list" v-if="reListX.length">
+          <li v-for="iit in reListX" :key="iit.id" @click="toRecordDetail(iit)">
             <p>{{ iit.date1 }}</p>
             <span v-if="iit.enterpriseName">{{ iit.enterpriseName }}</span>
-            <span>{{ iit.parentName || '' }} {{ iit.gridName || '' }}
-              {{ getStaffName(iit.staff) || '' }}</span>
+            <span
+              >{{ iit.parentName || '' }} {{ iit.gridName || '' }}
+              {{ getStaffName(iit.staff) || '' }}</span
+            >
           </li>
         </ul>
       </div>
-      <div
-        class="add-btn"
-        v-if="notEdit"
-      >
+      <p class="gang" v-if="id"></p>
+      <div v-if="id">
+        <p class="m-title">任务流转记录（{{ taskrecords.length }}）</p>
+        <ul class="totask-list" v-if="taskrecords.length">
+          <li @click="toTaskTransfer">
+            <p class="record">{{ taskrecords[0].date }} {{taskrecords[0].staffname}} {{taskrecords[0].describe}}</p>
+          </li>
+        </ul>
+      </div>
+      <p class="gang" v-if="id && isRecordFinish"></p>
+      <div class="add-btn" v-if="notEdit">
         <button @click="submit">确定</button>
       </div>
-      <div
-        class="add-btn"
-        v-if="taskState === 4"
-      >
-        <button @click="submitFinish">任务完结</button>
+      <div class="btn-box" v-if="taskState === 4 && isRecordFinish && followupType !== 'add'">
+        <button class="popup-btn reset" @click="addRecord">添加执行记录</button>
+        <button class="popup-btn sure" @click="submitFinish">任务执行完毕</button>
       </div>
     </div>
 
     <!-- control -->
-    <mt-popup
-      position="bottom"
-      v-model="popupType"
-      class="popup-box"
-    >
+    <mt-popup position="bottom" v-model="popupType" class="popup-box">
       <mt-picker
         :slots="slotsTypes"
         valueKey="name"
@@ -230,9 +196,11 @@ import {
   DatetimePicker,
   Picker,
   MessageBox,
-  Toast
-} from 'mint-ui'
-import moment from 'moment'
+  Toast,
+  Switch
+} from 'mint-ui';
+import moment from 'moment';
+import store from 'store';
 export default {
   name: 'tasklist',
   components: {
@@ -240,9 +208,10 @@ export default {
     'mt-tab-item': TabItem,
     'mt-popup': Popup,
     'mt-datetime-picker': DatetimePicker,
-    'mt-picker': Picker
+    'mt-picker': Picker,
+    'mt-switch': Switch
   },
-  data () {
+  data() {
     return {
       id: '',
       moduleName: '',
@@ -251,16 +220,16 @@ export default {
       popupType: false,
       isEvent: false,
       stateOptions: [
-        { code: 0, name: '未下发' },
-        { code: 1, name: '未审核' },
-        { code: 3, name: '已撤销' },
-        { code: 4, name: '执行中' },
-        { code: 5, name: '退回' },
-        { code: 6, name: '任务完结' },
-        { code: 7, name: '加载中' }
+        {code: 0, name: '未下发'},
+        {code: 1, name: '未审核'},
+        {code: 3, name: '已撤销'},
+        {code: 4, name: '执行中'},
+        {code: 5, name: '退回'},
+        {code: 6, name: '任务完结'},
+        {code: 7, name: '加载中'}
       ],
       enters: [],
-      pickerValue: '',
+      pickerValue: moment().format('YYYY-MM-DD 00:00:00'),
       partStaffName: '',
       contentText: '',
       taskTitle: '',
@@ -269,16 +238,18 @@ export default {
       reListEnters: [],
       taskHandelStaffs: [],
       notEdit: true,
-      followupType: ''
-    }
+      followupType: '',
+      switchValue: false,
+      showDateTips: true,
+      taskrecords: [],
+      isSwitch:false
+    };
   },
   computed: {
-    gridLevel () {
-      return this.$store.state.userInfo
-        ? this.$store.state.userInfo.gridLevel
-        : 0
+    gridLevel() {
+      return this.$store.state.userInfo ? this.$store.state.userInfo.gridLevel : 0;
     },
-    taskTypes () {
+    taskTypes() {
       const atct = {
         2: {
           code: 2,
@@ -291,255 +262,323 @@ export default {
         6: {
           code: 6,
           name: '信访办理'
-        },
-        7: {
-          code: 7,
-          name: '任务交办'
         }
-      }
-      let temp = []
-      if (this.gridLevel == 1) {
-        temp = [atct[7]]
-      }
-      if (this.gridLevel == 2) {
-        temp = [atct[5], atct[6], atct[7]]
-      }
-      if (this.gridLevel == 3) {
-        temp = [atct[5], atct[6]]
-      }
+        // 7: {
+        //   code: 7,
+        //   name: '任务交办'
+        // }
+      };
+      let temp = [];
+      // if (this.gridLevel == 1) {
+      //   temp = [atct[7]];
+      // }
+      // if (this.gridLevel == 2) {
+      // temp = [atct[5], atct[6], atct[7]];
+      // }
+      // if (this.gridLevel == 3) {
+      //   temp = [atct[5], atct[6]];
+      // }
       // if (!this.$store.state.taskParams.type.id) {
       //   this.$store.state.taskParams.type = temp.length ? temp[0].code : 0
       // }
-      return temp
+      temp = [atct[5], atct[6]];
+      return temp;
     },
-    reListX () {
-      let temp = []
+    reListX() {
+      let temp = [];
       this.reList.forEach(item => {
-        item.date1 = moment(item.date).format('YYYY-MM-DD HH:mm')
+        item.date1 = moment(item.date).format('YYYY-MM-DD HH:mm');
         if (item.enterprise) {
           this.reListEnters.forEach(cc => {
             if (cc.id === item.enterprise) {
-              item.enterpriseName = cc.name
+              item.enterpriseName = cc.name;
             }
-          })
+          });
         }
-        temp.push(item)
-      })
-      return temp
+        temp.push(item);
+      });
+      return temp;
     },
-    slotsTypes () {
+    slotsTypes() {
       return [
         {
           values: this.taskTypes,
           className: 'slottypes',
           textAlign: 'center'
         }
-      ]
+      ];
     },
-    incidentTitle () {
-      return this.$store.state.taskParams.incidentTitle
+    incidentTitle() {
+      return this.$store.state.taskParams.incidentTitle;
     },
-    templateName () {
-      return this.$store.state.taskParams.templateName
+    templateName() {
+      return this.$store.state.taskParams.templateName;
     },
-    staffName () {
-      return this.$store.state.taskParams.staffName
+    staffName() {
+      return this.$store.state.taskParams.staffName;
     },
-    staffId () {
-      return this.$store.state.taskParams.staff
+    staffId() {
+      return this.$store.state.taskParams.staff;
     },
-    taskDate () {
-      return this.$store.state.taskParams.date
+    taskDate() {
+      return this.$store.state.taskParams.date;
     },
-    taskTypeName () {
+    taskTypeName() {
+      let temp = '';
       if (!this.$store.state.taskParams.type) {
-        return ''
+        return '';
       }
       const atct = {
-        1: { code: 1, name: '日常任务' },
-        2: { code: 2, name: '事件处理任务' },
-        3: { code: 3, name: '双随机任务' },
-        4: { code: 4, name: '重污染空气' },
-        5: { code: 5, name: '日常巡查' },
-        6: { code: 6, name: '信访办理' },
-        7: { code: 7, name: '任务交办' }
+        1: {code: 1, name: '日常任务'},
+        2: {code: 2, name: '事件处理任务'},
+        3: {code: 3, name: '双随机任务'},
+        4: {code: 4, name: '重污染空气'},
+        5: {code: 5, name: '日常巡查'},
+        6: {code: 6, name: '信访办理'},
+        7: {code: 7, name: '任务交办'}
+      };
+      if (this.$store.state.taskParams.type === 1) {
+        temp = '日常巡查';
+      } else {
+        temp = atct[this.$store.state.taskParams.type].name;
       }
-      return atct[this.$store.state.taskParams.type].name
+      return temp;
     },
-    stateName () {
+    stateName() {
       return this.stateOptions.filter(item => {
-        return this.$store.state.taskParams.state === item.code
-      })[0].name
+        return this.$store.state.taskParams.state === item.code;
+      })[0].name;
     },
-    taskState () {
-      return this.$store.state.taskParams.state
+    taskState() {
+      return this.$store.state.taskParams.state;
     },
-    taskenterprises () {
-      return this.$store.state.taskParams.taskenterprises
+    taskenterprises() {
+      return this.$store.state.taskParams.taskenterprises;
     },
-    deadline () {
-      return moment(this.$store.state.taskParams.deadline).format('YYYY-MM-DD')
+    deadline() {
+      return moment(this.$store.state.taskParams.deadline).format('YYYY-MM-DD');
     },
-    positions () {
-      return this.$store.state.taskParams.taskcoords
+    positions() {
+      return this.$store.state.taskParams.taskcoords;
     },
-    mydep () {
-      return this.$store.state.taskParams.dep
+    mydep() {
+      return this.$store.state.taskParams.dep;
     },
-    depName () {
+    depName() {
       if (this.isManyCell) {
-        return '多网格'
+        return '多网格';
       }
-      let temp = ''
+      let temp = '';
       this.$store.state.allDep.forEach(depf => {
         depf.subDepts.forEach(dep => {
           if (dep.id === this.mydep) {
-            temp = dep.name
+            temp = dep.name;
           }
-        })
-      })
-      let gridCell = this.$store.state.gridCell
+        });
+      });
+      let gridCell = this.$store.state.gridCell;
       if (gridCell) {
         if (gridCell.id === this.mydep) {
-          temp = gridCell.name
+          temp = gridCell.name;
         } else {
           gridCell.children.forEach(cell => {
             if (cell.id === this.mydep) {
-              temp = cell.name
+              temp = cell.name;
             } else {
               cell.children.forEach(cxcell => {
                 if (cxcell.id === this.mydep) {
-                  temp = cxcell.name
+                  temp = cxcell.name;
                 }
-              })
+              });
             }
-          })
+          });
         }
       }
-      return temp
+      return temp;
     },
-    partStaffId () {
-      return this.$store.state.taskParams.depStaff
+    partStaffId() {
+      return this.$store.state.taskParams.depStaff;
     },
-    isManyCell () {
-      return this.$store.state.taskParams.isManyCell
+    isManyCell() {
+      return this.$store.state.taskParams.isManyCell;
     },
-    templateId () {
-      return this.$store.state.taskParams.template
+    templateId() {
+      return this.$store.state.taskParams.template;
     },
-    isNewTaskHandelChange () {
-      return this.$store.state.isNewTaskHandelChange
+    isNewTaskHandelChange() {
+      return this.$store.state.isNewTaskHandelChange;
+    },
+    isRecordFinish() {
+      let isFinish = false;
+      if (this.id !== '0' && this.id !== '1' && this.id !== '') {
+        const checkCell = this.$store.state.checkGridCell;
+        const grid = this.$store.state.userInfo.id;
+        if (checkCell.length > 0) {
+          checkCell.forEach(item => {
+            if (item.id === grid) {
+              isFinish = true;
+            }
+          });
+        }
+      }
+      return isFinish;
     }
   },
   watch: {
-    taskTypeName () {
+    taskTypeName() {
       if (this.$store.state.taskParams.type === 2) {
-        this.isEvent = true
+        this.isEvent = true;
       } else {
-        this.isEvent = false
+        this.isEvent = false;
       }
     },
-    isNewTaskHandelChange () {
-      this.getTaskHandleList()
+    isNewTaskHandelChange() {
+      this.getTaskHandleList();
     },
-    isManyCell () {
+    isManyCell() {
       if (this.isManyCell) {
-        this.partStaffName = '多网格'
+        this.partStaffName = '多网格';
       }
     },
-    taskenterprises () {
-      let enterApis = []
+    taskenterprises() {
+      let enterApis = [];
       this.taskenterprises.forEach(id => {
         enterApis.push(
           this.$api.getEnterpriseByid({
             id: id
           })
-        )
-      })
+        );
+      });
       Promise.all(enterApis).then(res => {
-        this.$store.state.taskEnter = res
-        this.enters = res
-      })
+        this.$store.state.taskEnter = res;
+        this.enters = res;
+      });
     },
-    deadline () {
-      this.pickerValue = this.deadline
+    deadline() {
+      this.pickerValue = this.deadline;
     },
-    partStaffId () {
-      if (this.partStaffId) {
-        this.$api
-          .getUserByArrUserID({
-            items: [this.partStaffId]
-          })
-          .then(res => {
-            if (res.length) {
-              this.partStaffName = res[0].username
-            }
-          })
+    partStaffId() {
+      let tempids = [];
+      if (this.partStaffId && !this.switchValue) {
+        tempids.push(this.partStaffId);
       }
+      if (this.switchValue) {
+        this.$store.state.checkGridCell.forEach(item => {
+          tempids.push(item.id);
+        });
+      }
+      if (tempids.length === 0) {
+        return;
+      }
+      this.$api
+        .getUserByArrUserID({
+          items: tempids
+        })
+        .then(res => {
+          if (res) {
+            if (res.length === 1) {
+              this.partStaffName = res[0].username;
+            } else {
+              let names = '';
+              res.forEach(n => {
+                if (names !== '') {
+                  names = names + ',' + n.username;
+                } else {
+                  names = n.username;
+                }
+              });
+              this.partStaffName = names;
+            }
+          }
+        });
     },
-    staffId () {
+    staffId() {
       this.$api
         .getUserByArrUserID({
           items: [this.staffId]
         })
         .then(res => {
-          this.$store.state.taskParams.staffName = res[0].username
-        })
+          this.$store.state.taskParams.staffName = res[0].username;
+        });
     },
-    templateId () {
+    templateId() {
       if (this.templateId && this.modelList.length) {
-        this.$store.state.taskParams.templateName = this.modelList.filter(
-          item => {
-            return item.id === this.templateId
-          }
-        )[0].title
+        this.$store.state.taskParams.templateName = this.modelList.filter(item => {
+          return item.id === this.templateId;
+        })[0].title;
+      }
+    },
+    switchValue() {
+      if (this.id === '') {
+        if (this.switchValue) {
+          this.partStaffName = '多网格';
+          this.$store.state.checkGridCell = [];
+        } else {
+          this.partStaffName = '未指定';
+          this.$store.state.checkGridCell = [];
+        }
       }
     }
   },
-  mounted () {
-    this.id = this.$route.params.id
-    this.setFirst()
+  mounted() {
+    this.id = this.$route.params.id;
+    this.setFirst();
     if (this.id === '0') {
-      this.id = ''
+      this.id = '';
     } else if (this.id === '1') {
-      this.$store.state.taskParams.type = 2
-      this.$store.state.taskParams.incident = this.$store.state.toTaskEvent
-      this.$store.state.taskParams.incidentTitle = this.$store.state.toTaskEventTitle
-      this.id = ''
-      this.followupType = this.$store.state.followupType
+      this.$store.state.taskParams.type = 2;
+      this.isEvent = true;
+      this.$store.state.taskParams.incident = this.$store.state.toTaskEvent;
+      this.$store.state.taskParams.incidentTitle = this.$store.state.toTaskEventTitle;
+      this.id = '';
+      this.followupType = this.$store.state.followupType;
+    } else {
+      //从事件页跳转，查看任务，如果followupType是add,此时任务还没创建，只保存在本地
+      this.followupType = this.$store.state.followupType;
+      if (this.followupType === 'add') {
+        this.$store.state.isEdit = true;
+        this.$store.state.taskParams.incidentTitle = this.$store.state.toTaskEventTitle;
+        this.$store.state.taskParams.type = 2;
+        this.isEvent = true;
+        const task = this.$store.state.followupTask;
+        this.$nextTick(() => {
+          this.handleTaskDetail(task, 'assignments');
+        })
+      } else {
+        this.isSwitch = true
+        if (this.id) {
+          this.getModel().then(() => {
+            this.getTaskDetail();
+          });
+          this.notEdit = false;
+          this.$store.state.isEdit = false;
+        }
+      }
     }
-    this.getAllDep()
-    this.getModel()
-    this.setDate()
+    this.getUser();
+    this.getAllDep();
+    this.getModel();
     if (!this.id) {
-      this.getUser()
-      this.$store.state.isEdit = true
-    }
-    if (this.id) {
-      this.getModel().then(() => {
-        this.getTaskDetail()
-      })
-      this.notEdit = false
-      this.$store.state.isEdit = false
+      this.$store.state.isEdit = true;
     }
   },
   methods: {
-    backFun () {
-      this.$router.go(-1)
+    backFun() {
+      this.$router.go(-1);
     },
-    setFirst () {
-      this.$store.state.allDep = []
-      this.$store.state.gridCell = null
-      this.$store.state.checkGridCell = []
-      this.$store.state.taskEnter = []
-      this.$store.state.userAssInfoList = []
+    setFirst() {
+      this.$store.state.allDep = [];
+      this.$store.state.gridCell = null;
+      this.$store.state.checkGridCell = [];
+      this.$store.state.taskEnter = [];
+      this.$store.state.userAssInfoList = [];
       this.$store.state.taskParams = {
         template: null,
         templateName: '',
         staff: '',
         staffName: '',
-        date: '',
-        deadline: '',
+        date: moment().format('YYYY-MM-DD HH:mm:00'),
+        deadline: moment().format('YYYY-MM-DD 00:00:00'),
         type: 1,
         state: 0,
         taskenterprises: [],
@@ -551,65 +590,77 @@ export default {
         period: '',
         incident: '',
         incidentTitle: ''
+      };
+    },
+    handleTaskDetail(res, key) {
+      this.showDateTips = false;
+      this.moduleName = res.title;
+      let ass = res[key];
+      this.contentText = res.contents;
+      this.taskTitle = res.title;
+      this.$store.state.taskParams = {
+        template: res.template,
+        templateName: '',
+        staff: res.staff,
+        staffName: '',
+        date: res.date,
+        deadline: res.deadline,
+        type: res.type,
+        state: res.state,
+        taskenterprises: res.taskenterprises,
+        taskcoords: res.taskcoords,
+        depType: ass.length ? (ass[0].type <= 1 ? 1 : 2) : 1,
+        dep: ass.length ? ass[0].dept || ass[0].grid : '',
+        depStaff: ass.length ? ass[0].staff : '',
+        isManyCell: ass.length > 1 ? true : false,
+        period: res.period,
+        incidentTitle: res.incidentTitle,
+        incident: res.followup
+      };
+      if (res[key].length) {
+        let tempass = [];
+        res[key].forEach(taskass => {
+          tempass.push({
+            depType: taskass.staff ? 'user' : 'dep',
+            dep: taskass.grid ? taskass.grid : taskass.dept,
+            id: taskass.staff,
+            type: taskass.staff ? 'user' : 'dep',
+          });
+        });
+        this.$store.state.checkGridCell = JSON.parse(JSON.stringify(tempass));
+        console.log(this.$store.state.checkGridCell);
+      }
+      this.switchValue = res[key].length > 1 ? true : false;
+      this.$store.state.userAssInfoList = res[key];
+      if (this.followupType !== 'add') {
+        this.getTaskHandleList();
+      }
+      //任务流转
+      if(this.followupType !== 'add') {
+          this.taskCircule(res);
       }
     },
-    getTaskDetail () {
+    getTaskDetail() {
       this.$api
         .getTaskDetail({
           id: this.id
         })
         .then(res => {
-          this.getTaskUser(res.staff)
-          this.moduleName = res.title
-          let ass = res.taskassignments2
-          this.contentText = res.contents
-          this.taskTitle = res.title
-          this.$store.state.taskParams = {
-            template: res.template,
-            templateName: '',
-            staff: res.staff,
-            staffName: '',
-            date: res.date,
-            deadline: res.deadline,
-            type: res.type,
-            state: res.state,
-            taskenterprises: res.taskenterprises,
-            taskcoords: res.taskcoords,
-            depType: ass.length ? (ass[0].type <= 1 ? 1 : 2) : 1,
-            dep: ass.length ? ass[0].dept || ass[0].grid : '',
-            depStaff: ass.length ? ass[0].staff : '',
-            isManyCell: ass.length > 1 ? true : false,
-            period: res.period,
-            incidentTitle: res.incidentTitle,
-            incident: res.followup
+          if (res) {
+            this.handleTaskDetail(res, 'taskassignments2');
           }
-          if (res.taskassignments2.length > 1) {
-            let tempass = []
-            res.taskassignments2.forEach(taskass => {
-              tempass.push({
-                depType: taskass.staff ? 'user' : 'dep',
-                dep: taskass.grid,
-                id: taskass.staff
-              })
-            })
-            this.$store.state.checkGridCell = JSON.parse(
-              JSON.stringify(tempass)
-            )
-          }
-          this.$store.state.userAssInfoList = res.taskassignments2
-          this.getTaskHandleList()
-        })
+        });
     },
-    getStaffName (staff) {
-      let temp = ''
+    getStaffName(staff) {
+      let temp = '';
       this.taskHandelStaffs.forEach(item => {
         if (item.id === staff) {
-          temp = item.username
+          temp = item.username;
         }
-      })
-      return temp
+      });
+      return temp;
     },
-    getTaskHandleList () {
+    getTaskHandleList() {
       this.$api
         .getTaskHandleList({
           task: this.id,
@@ -617,34 +668,34 @@ export default {
         })
         .then(res => {
           // console.log(res)
-          let po = []
-          let staffs = []
+          let po = [];
+          let staffs = [];
           res.forEach(item => {
             if (item.staff) {
-              staffs.push(item.staff)
+              staffs.push(item.staff);
             }
             if (item.enterprise) {
               po.push(
                 this.$api.getEnterpriseByid({
                   id: item.enterprise
                 })
-              )
+              );
             }
-          })
+          });
           Promise.all(po).then(res => {
-            this.reListEnters = res
-          })
+            this.reListEnters = res;
+          });
           this.$api
             .getUserByArrUserID({
               items: staffs
             })
             .then(res => {
-              this.taskHandelStaffs = res
-            })
-          this.reList = res
-        })
+              this.taskHandelStaffs = res;
+            });
+          this.reList = res;
+        });
     },
-    getModel () {
+    getModel() {
       return new Promise(resove => {
         this.$api
           .getTemplateByKey({
@@ -652,110 +703,107 @@ export default {
             pageSize: 10
           })
           .then(res => {
-            if (res && Array.isArray(res)) this.modelList = res
-            resove(true)
-          })
-      })
+            if (res && Array.isArray(res)) this.modelList = res;
+            resove(true);
+          });
+      });
     },
-    getAllDep () {
+    getAllDep() {
       this.$api.getDepartmentAll().then(res => {
-        this.$store.state.allDep = res
-      })
+        this.$store.state.allDep = res;
+      });
     },
-    getStaffInfo (id) {
+    getStaffInfo(id) {
       this.$api
         .getStaffInfo({
           id
         })
         .then(res => {
           if (res && res.id) {
-            this.$store.state.userInfo = res
+            this.$store.state.userInfo = res;
           }
           if (res) {
-            this.getGridCellTree(res.grid)
+            this.getGridCellTree(res.grid);
           }
-        })
+        });
     },
-    getGridCellTree (grid) {
+    getGridCellTree(grid) {
       this.$api
         .getGridCellTree({
           grid
         })
         .then(res => {
-          this.$store.state.gridCell = res
-        })
+          this.$store.state.gridCell = res;
+        });
     },
-    getUser () {
+    getUser() {
       this.$api.getUser().then(res => {
         if (res) {
-          this.$store.state.taskParams.staff = res.id
-          this.$store.state.taskParams.staffName = res.userid
-          this.getStaffInfo(res.id)
+          this.$store.state.taskParams.staff = res.id;
+          this.$store.state.taskParams.staffName = res.username;
+          this.getStaffInfo(res.id);
         }
-      })
+      });
     },
-    getTaskUser (id) {
-      this.getStaffInfo(id)
+    getTaskUser(id) {
+      this.getStaffInfo(id);
     },
-    setDate () {
-      this.$store.state.taskParams.date = moment().format('YYYY-MM-DD HH:mm:00')
-      this.$store.state.taskParams.deadline = moment().format(
-        'YYYY-MM-DD 00:00:00'
-      )
-    },
-    onValuesChangeType (e) {
+    onValuesChangeType(e) {
       if (!this.notEdit) {
-        return
+        return;
       }
       if (e.values[0] && e.values[0].code === 2) {
-        this.isEvent = true
+        this.isEvent = true;
       } else {
-        this.$store.state.taskParams.incident = ''
+        this.$store.state.taskParams.incident = '';
       }
       if (e.values[0]) {
-        this.$store.state.taskParams.type = e.values[0].code
+        this.$store.state.taskParams.type = e.values[0].code;
       }
     },
-    deleteEnter (id) {
+    deleteEnter(id) {
       MessageBox.confirm('确认删除此企业?').then(action => {
         if (action === 'confirm') {
           this.taskenterprises.forEach((item, index) => {
             if (item === id) {
-              this.$store.state.taskParams.taskenterprises.splice(index, 1)
+              this.$store.state.taskParams.taskenterprises.splice(index, 1);
             }
-          })
+          });
         }
-      })
+      });
     },
-    deletePosition (index) {
+    deletePosition(index) {
       MessageBox.confirm('确认删除此位置?').then(action => {
         if (action === 'confirm') {
-          this.$store.state.taskParams.taskcoords.splice(index, 1)
+          this.$store.state.taskParams.taskcoords.splice(index, 1);
         }
-      })
+      });
     },
-    handleConfirm (e) {
-      this.$store.state.taskParams.deadline = moment(e).format(
-        'YYYY-MM-DD 00:00:00'
-      )
+    handleConfirm(e) {
+      this.$store.state.taskParams.deadline = moment(e).format('YYYY-MM-DD 00:00:00');
     },
-    submitBefore (data) {
+    submitBefore(data) {
+      let tempdata = this.$store.state.taskParams;
       if (!data.title) {
-        return '请输入标题！'
+        return '请输入标题！';
       }
-      if (!data.assignments[0].grid && !data.assignments[0].dept) {
-        return '请选择网格/部门！'
+      if (
+        (!data.assignments[0].grid && tempdata.depType === 1) ||
+        (!data.assignments[0].dept && tempdata.depType === 2)
+      ) {
+        console.log(data.assignments[0]);
+        return '请选择网格/部门！';
       }
       if (!data.period) {
-        return '请输入执行周期！'
+        return '请输入执行周期！';
       }
-      return false
+      return false;
     },
-    submit () {
-      let temp = JSON.parse(JSON.stringify(this.$store.state.taskParams))
-      const id = this.$uuid()
+    submit() {
+      let temp = JSON.parse(JSON.stringify(this.$store.state.taskParams));
+      const id = (!this.id || this.id === '0' || this.id === '1') ? this.$uuid() : this.id;
       let params = {
-        id,
+        id: id,
         rowState: 'add',
         incident: temp.incident || null, // 事件
         staff: temp.staff,
@@ -774,96 +822,218 @@ export default {
         assignments: [],
         coords: temp.taskcoords,
         enterprises: temp.taskenterprises
-      }
-      let assignments = []
+      };
+      let assignments = [];
       // console.log(this.$store.state.checkGridCell)
-      if (temp.isManyCell) {
-        this.$store.state.checkGridCell.forEach(item => {
-          assignments.push({
-            id: this.$uuid(),
-            rowState: 'add',
-            dept: temp.depType === 2 ? item.dep : null,
-            staff: item.id || null,
-            grid: temp.depType === 1 ? temp.dep : null,
-            type:
-              temp.depType === 1
-                ? item.type === 'dep'
-                  ? 1
-                  : 0
-                : item.type === 'dep'
-                  ? 3
-                  : 2
-          })
-        })
-      } else {
+      // if (temp.isManyCell) {
+      this.$store.state.checkGridCell.forEach(item => {
         assignments.push({
           id: this.$uuid(),
           rowState: 'add',
-          dept: temp.depType === 2 ? temp.dep : null,
-          staff: temp.depStaff || null,
-          grid: temp.depType === 1 ? temp.dep : null,
+          dept: temp.depType === 2 ? item.dep : null,
+          staff: item.id || null,
+          grid: temp.depType === 1 ? item.dep : null,
           type:
-            temp.depType === 1 ? (temp.depStaff ? 0 : 1) : temp.depStaff ? 2 : 3
-        })
-      }
-      let coords = []
+            temp.depType === 1
+              ? item.all 
+                ? 1
+                : 0
+              : item.all 
+              ? 3
+              : 2
+        });
+      });
+      // } else {
+      // assignments.push({
+      //   id: this.$uuid(),
+      //   rowState: 'add',
+      //   dept: temp.depType === 2 ? temp.dep : null,
+      //   staff: temp.depStaff || null,
+      //   grid: temp.depType === 1 ? temp.dep : null,
+      //   type: temp.depType === 1 ? (temp.depStaff ? 0 : 1) : temp.depStaff ? 2 : 3
+      // });
+      // }
+      let coords = [];
       temp.taskcoords.forEach(item => {
-        let te = JSON.parse(JSON.stringify(item))
-        te.id = this.$uuid()
-        te.remarks = te.remark
-        te.rowState = 'add'
-        coords.push(te)
-      })
-      let enterprises = []
+        let te = JSON.parse(JSON.stringify(item));
+        te.id = this.$uuid();
+        te.remarks = te.remark;
+        te.rowState = 'add';
+        coords.push(te);
+      });
+      let enterprises = [];
       temp.taskenterprises.forEach(item => {
         enterprises.push({
           id: this.$uuid(),
           rowState: 'add',
           enterprise: item
-        })
-      })
+        });
+      });
       // add
-      params.assignments = assignments
-      params.coords = coords
-      params.enterprises = enterprises
+      params.assignments = assignments;
+      params.coords = coords;
+      params.enterprises = enterprises;
       // console.log(params)
-      let text = this.submitBefore(params)
+      let text = this.submitBefore(params);
       if (text) {
-        Toast(text)
-        return false
+        Toast(text);
+        return false;
       }
-      if (this.followupType === "add") {
-        this.$store.commit("set_followupTask", params)
-        this.$store.state.isAddTaskState = Math.random()
-        this.$router.go(-1)
-        return
+      if (this.followupType === 'add') {
+        params.taskenterprises = temp.taskenterprises;
+        params.taskcoords = coords;
+        this.$store.commit('set_followupTask', params);
+        this.$store.state.isAddTaskState = Math.random();
+        this.$router.go(-1);
+        return;
       }
       this.$api.updatetask(params).then(res => {
-        this.$store.state.isAddTaskState = Math.random()
-        this.$router.go(-1)
-      })
+        this.$store.state.isAddTaskState = Math.random();
+        this.$router.go(-1);
+      });
     },
-    toEnterPage (id) {
-      window.location.href = `https://zsxtl.azuratech.com:8003/dashboard/#/enterInfo/${id}`
+    toEnterPage(id) {
+      window.location.href = `https://zsxtl.azuratech.com:8003/dashboard/#/enterInfo/${id}`;
     },
-    submitFinish () {
-      this.$api.updateTaskStateToComplete({
-        id: this.id
-      }).then(res => {
-        if (res === 'OK') {
-          Toast('任务已完满执行')
-          this.setFirst()
-          this.getAllDep()
-          this.getModel()
-          this.setDate()
-          this.getTaskDetail()
-          this.notEdit = false
-          this.$store.state.isEdit = false
-        }
+    submitFinish() {
+      this.$api
+        .updateTaskStateToComplete({
+          id: this.id
+        })
+        .then(res => {
+          if (res === 'OK') {
+            Toast('任务已完满执行');
+            this.setFirst();
+            this.getAllDep();
+            this.getModel();
+            this.getTaskDetail();
+            this.notEdit = false;
+            this.$store.state.isEdit = false;
+          }
+        });
+    },
+    assignUser() {
+      if(!this.notEdit){
+        this.$router.push('/taskAssignRecord')
+      }else{
+         if (this.switchValue) {
+        this.$router.push('/taskMoreAssign');
+      } else {
+        this.$router.push('/taskAssign');
+      }
+      }
+    },
+    isShowDateTips() {
+      if (this.$store.state.taskParams.period == '') {
+        this.showDateTips = true;
+      }
+    },
+    toEventDetail() {
+      const eventid = this.$store.state.taskParams.incident;
+      if (eventid && eventid !== '') {
+        this.$api.getIncidentDetail({id: eventid}).then(res => {
+          if (res) {
+            if (res.state === 3 && res.followup.length === 0) {
+              //事件已自行处理
+              this.$router.push(`/eventContent/${res.id}`);
+            } else {
+              const gridLevel = this.$store.state.userInfo.gridLevel;
+              if (gridLevel === 3) {
+                //三级网格员，跳转事件内容页面
+                this.$router.push(`/eventContent/${res.id}`);
+              } else if (gridLevel === 1) {
+                this.$router.push(`/eventDetailLevel1/${res.id}`);
+              } else if (gridLevel === 2) {
+                this.$router.push(`/eventDetail/${res.id}`);
+              }
+            }
+          }
+        });
+      }
+    },
+    toRecordDetail(item) {
+      store.set('taskState', 'detail');
+      this.$router.push('/taskResult/' + item.id);
+    },
+    addRecord() {
+      store.set('taskState', 'add');
+      this.$router.push(`/taskResult/${this.id}`);
+    },
+    taskCircule(res){
+      this.taskrecords = [];
+      if (res.approveTime && res.approvedBy) {
+        this.taskrecords.push({
+          date: moment(res.approveTime).format('MM-DD HH:mm'),
+          staffid: res.approvedBy,
+          status: 'sp',
+          describe:'进行了审批'
+        });
+      } 
+       if (res.handledate && res.handleBy) {
+        this.taskrecords.push({
+          date: moment(res.handledate).format('MM-DD HH:mm'),
+          staffid: res.handleBy,
+          status: 'wj',
+          describe:'完结任务'
+        });
+      } 
+      if (res.taskassignments2.length > 0) {
+        let tempassign = [];
+        res.taskassignments2.forEach(item => {
+          let ass = false;
+          if (item.appointor && item.time) {
+            tempassign.forEach(t => {
+              if (t.appointor === item.appointor && t.time === item.time) {
+                ass = true;
+              }
+            });
+            if (ass) {
+              tempassign.push({
+                date: moment(item.time).format('MM-DD HH:mm'),
+                staffid: item.appointor,
+                status: 'xf',
+                describe:'进行了任务下发'
+              });
+            }
+          }
+        });
+      } 
+      if (res.staff && res.date) {
+        this.taskrecords.push({
+          date: moment(res.date).format('MM-DD HH:mm'),
+          staffid: res.staff,
+          status: 'cj',
+          describe:'创建此任务'
+        });
+      }
+        let staffIds = this.taskrecords.map(staff =>{
+          return staff.staffid
       })
+       this.$api
+        .getUserByArrUserID({
+          items: staffIds
+        })
+        .then(res => {
+          if(res){
+            this.taskrecords.forEach(user => {
+              let staffItem = res.filter(r => {
+                return r.id === user.staffid
+              })
+              user.staffname = staffItem[0].username
+            })
+          }
+        })
+        this.taskrecords.sort((a,b)=>{
+          return moment(a.date)-moment(b.date)
+        })
+        this.$store.commit('set_recordCircule', this.taskrecords)
+        console.log(this.taskrecords)
+    },
+    toTaskTransfer(){
+      this.$router.push('/taskTransfer')
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -886,6 +1056,7 @@ export default {
     font-size: 0.3rem;
   }
   .box-item {
+    position: relative;
     min-height: 1.12rem;
     font-size: 0.34rem;
     line-height: 1.12rem;
@@ -903,13 +1074,26 @@ export default {
       border: 0;
       text-align: right;
       font-size: 0.3rem;
-      color: #9e9e9e;
+      color: #9e9e9e !important;
     }
     .input-unit {
       float: right;
       font-size: 0.3rem;
       color: #9e9e9e;
       margin-left: 0.1rem;
+    }
+    .date-tips {
+      position: absolute;
+      background-color: hsla(210, 100%, 96%, 1);
+      font-size: 0.3rem;
+      color: #8c95a0;
+      height: 0.52rem;
+      /* float: right; */
+      line-height: 0.52rem;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 0 0.08rem;
     }
     textarea {
       border: 0;
@@ -926,14 +1110,20 @@ export default {
       text-align: right;
       font-size: 0.3rem;
       color: #9e9e9e;
-      background: url("../../../assets/images/right.png") no-repeat right center;
+      background: url('../../../assets/images/right.png') no-repeat right center;
       background-size: auto 0.32rem;
     }
     .checkbox2 {
       float: right;
       text-align: right;
       font-size: 0.3rem;
-      color: #9e9e9e;
+      color: #9e9e9e !important;
+    }
+    .more-cell {
+      width: 70%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .addbox {
       float: right;
@@ -945,7 +1135,7 @@ export default {
       position: relative;
       margin-top: 0.2rem;
       &::before {
-        content: "+";
+        content: '+';
         border: 0.02rem solid #3296fa;
         border-radius: 50%;
         line-height: 0.3rem;
@@ -971,8 +1161,11 @@ export default {
         margin-bottom: 0.16rem;
         position: relative;
         i.delete {
+          // background: #f8f8f8 url("../../../assets/images/right.png") no-repeat
+          // right center;
+          // background-size: auto 0.32rem;
           &::before {
-            content: "-";
+            content: '-';
             border: 0.02rem solid #3296fa;
             border-radius: 50%;
             line-height: 0.3rem;
@@ -989,8 +1182,8 @@ export default {
           }
         }
         i.jump {
-          background: #f8f8f8 url("../../../assets/images/right.png") no-repeat
-            right center;
+          background: #f8f8f8 url('../../../assets/images/right.png') no-repeat right
+            center;
           background-size: auto 0.32rem;
           right: 0.4rem;
           position: absolute;
@@ -1023,6 +1216,62 @@ export default {
         }
       }
     }
+    .right {
+      float: right;
+      width: 4.5rem;
+      color: rgb(157, 157, 157);
+      min-height: 1.12rem;
+      text-align: right;
+      font-size: 0.3rem;
+      @include flexbox;
+      @include justify-content(flex-end);
+      @include align-items(center);
+      .mint-switch-core {
+        width: 1rem;
+        height: 0.5rem;
+        &::before {
+          width: 100%;
+          height: 100%;
+          background-color: #969696;
+        }
+        &::after {
+          width: 50%;
+          height: 100%;
+        }
+      }
+      .mint-switch-input:checked + .mint-switch-core::after {
+        transform: translateX(100%);
+      }
+      span {
+        color: rgb(157, 157, 157);
+        font-size: 0.3rem;
+        text-align: right;
+      }
+      input,
+      textarea {
+        width: 100%;
+        border: 0;
+        color: rgb(157, 157, 157);
+        font-size: 0.3rem;
+        text-align: right;
+        resize: none;
+        font-family: PingFangSC-Regular, PingFang SC;
+      }
+      input::placeholder,
+      textarea::placeholder {
+        color: rgb(157, 157, 157);
+        font-size: 0.3rem;
+        font-family: PingFangSC-Regular, PingFang SC;
+      }
+      .img {
+        display: inline-block;
+        width: 0.37rem;
+        height: 0.31rem;
+        background: url('../../../assets/images/image.png') no-repeat left center;
+        background-size: 0.37rem 0.31rem;
+        margin-right: 0.16rem;
+      }
+    }
   }
   .main-content .item-box-top-title {
     background: #f1f5f7;
@@ -1034,24 +1283,6 @@ export default {
   .gang {
     background: #f8f8f8;
     height: 0.4rem;
-  }
-  .add-btn {
-    background: #fff;
-    border-top: 1px solid #e0e0e0;
-    bottom: 0;
-    width: 100%;
-    height: 1.32rem;
-    button {
-      border: 0;
-      margin: 0.16rem auto;
-      display: block;
-      width: 6.86rem;
-      height: 0.96rem;
-      color: #fff;
-      border-radius: 0.04rem;
-      font-size: 0.34rem;
-      background: #3296fa;
-    }
   }
   .popup-box {
     width: 100%;
@@ -1069,7 +1300,7 @@ export default {
     background: #fff;
     padding-bottom: 0.3rem;
     li {
-      background: #f8f8f8 url("../../../assets/images/right.png") no-repeat
+      background: #f8f8f8 url('../../../assets/images/right.png') no-repeat
         calc(100% - 0.25rem) center;
       background-size: auto 0.32rem;
       margin: 0 0.24rem 0.17rem 0.4rem;
@@ -1084,6 +1315,32 @@ export default {
         font-size: 0.26rem;
         color: #888;
       }
+      .record {
+        padding: 0.29rem 0;
+      }
+    }
+  }
+  .btn-box {
+    height: 1.28rem;
+    font-size: 0.34rem;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.32rem;
+    align-items: center;
+    button {
+      width: 3.28rem;
+      height: 0.96rem;
+      display: block;
+    }
+    .sure {
+      background: #3296fa;
+      color: #fff;
+      border: 0;
+    }
+    .reset {
+      background: #fff;
+      color: #3296fa;
+      border: 0.01rem solid #3296fa;
     }
   }
 }

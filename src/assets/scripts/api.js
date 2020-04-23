@@ -347,7 +347,13 @@ const interfaces = [
     type: 'get',
     serviceName: 'serviceMyserv'
   },
-
+  {
+    //任务模板详情
+    fun: 'GetTemplateDetail',
+    interface: '/api/GBM/GetTemplateDetail',
+    type: 'post',
+    serviceName: 'serviceEnt'
+  },
 
   //env
   //获取空气站列表最新质量及PM2.5
@@ -746,6 +752,20 @@ const interfaces = [
     //获取当前登录用户所在部门下已完成的事件列表
     fun: 'getHandleEventLists',
     interface: '/api/gbm/GetHandledIncidentsByKey',
+    type: 'post',
+    serviceName: 'serviceEnt'
+  },
+  {
+    //获取当前登录用户所在部门下已完成的事件数量
+    fun: 'getHandledIncidentsCount',
+    interface: '/api/gbm/GetHandledIncidentsCount',
+    type: 'post',
+    serviceName: 'serviceEnt'
+  },
+  {
+    //获取当前登录用户所在部门下已完成的事件数量
+    fun: 'getPendingIncidents',
+    interface: '/api/gbm/GetPendingIncidents',
     type: 'post',
     serviceName: 'serviceEnt'
   },

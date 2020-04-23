@@ -128,6 +128,26 @@ export default new Router({
       component: () => import('@/views/viewPages/wghTask/taskAssessC.vue')
     },
     {
+      path: '/taskTransfer',
+      name: 'taskTransfer',
+      component: () => import('@/views/viewPages/wghTask/taskTransfer.vue')
+    },
+    {
+      path: '/taskMoreAssign',
+      name: 'taskMoreAssign',
+      component: () => import('@/views/viewPages/wghTask/taskMoreAssign.vue')
+    },
+    {
+      path: '/taskAssignRecord',
+      name: 'taskAssignRecord',
+      component: () => import('@/views/viewPages/wghTask/taskAssignRecord.vue')
+    },
+    {
+      path: '/taskModelDetail/:id',
+      name: 'taskModelDetail',
+      component: () => import('@/views/viewPages/wghTask/taskModelDetail.vue')
+    },
+    {
       path: '/mapPosition',
       name: 'mapPosition',
       component: () => import('@/views/viewPages/wghTask/mapPosition.vue')
@@ -161,16 +181,6 @@ export default new Router({
       path: '/enterpriseList',
       name: 'enterpriseList',
       component: () => import('@/views/viewPages/wghEvent/enterpriseList.vue')
-    },
-    {
-      path: '/msgList',
-      name: 'msgList',
-      component: () => import('@/views/viewPages/wghEvent/msgList.vue')
-    },
-    {
-      path: '/msgDetail/:id',
-      name: 'msgDetail',
-      component: () => import('@/views/viewPages/wghEvent/msgDetail.vue')
     },
     {
       path: '/documents',

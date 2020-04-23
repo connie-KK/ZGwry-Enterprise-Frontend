@@ -105,7 +105,7 @@ export default {
     backFun () {
       const isHBGJ = cookie.get('ISHBGJ')
       if (isHBGJ == 1) {
-        this.$router.go(-1)
+        this.$router.push('/home')
       } else {
         this.$api.backHome()
       }

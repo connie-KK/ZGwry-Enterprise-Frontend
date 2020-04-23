@@ -305,10 +305,26 @@ input[type="submit"],
   top: $header-height;
   right: 0;
   left: 0;
-  // background:rgba(255,255,255,1);
+  height: calc(100% - #{$header-height});
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .main-content-with-search {
   top: $header-withSearch-height;
+  height: calc(100% - #{$header-withSearch-height});
+}
+.main-content-with-bottom{
+  position: absolute;
+  top: $header-height;
+  right: 0;
+  left: 0;
+  height: calc(100% - #{$header-height} - #{$bottom-height});
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.main-content-with-bottom-with-search {
+  top: $header-withSearch-height;
+  height: calc(100% - #{$header-withSearch-height} - #{$bottom-height});
 }
 
 // Utility classes
@@ -358,4 +374,25 @@ textarea {
 .checkbox,
 .checkbox2 {
   color: #333 !important;
+}
+//底部按钮
+.add-btn {
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1.32rem;
+  button {
+    border: 0;
+    padding:0;
+    margin: 0.16rem auto;
+    display: block;
+    width: 6.86rem;
+    height: 0.96rem;
+    color: #fff;
+    border-radius: 0.04rem;
+    font-size: 0.34rem;
+    background: #3296fa;
+  }
 }

@@ -152,7 +152,7 @@ export default {
                 {
                   name: '待办任务',
                   imgUrl: require('@/assets/images/b1.png'),
-                  url: '/taskList/3',
+                  url: '/taskList/2',
                   params: 'WGH'
                 },
                 {
@@ -175,7 +175,7 @@ export default {
                 {
                   name: '待办事件',
                   imgUrl: require('@/assets/images/b4.png'),
-                  url: '/eventList/-1',
+                  url: '/eventList/0',
                   params: 'WGH'
                 },
                 {
@@ -204,7 +204,7 @@ export default {
                 {
                   name: '待办任务',
                   imgUrl: require('@/assets/images/c1.png'),
-                  url: '/taskList/3',
+                  url: '/taskList/2',
                   params: 'HBGJ'
                 },
                 {

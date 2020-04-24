@@ -22,7 +22,8 @@ export default {
     return {
       transitionName: 'fade',
       timer: null,
-      timer2: null
+      timer2: null,
+      a: document
     }
   },
   computed: {
@@ -41,6 +42,9 @@ export default {
           this.$store.commit('set_loading', false)
         }, 10 * 1000)
       }
+    },
+    'a.cookie'(){
+      console.log(this.a.cookie)
     }
   },
   methods: {
@@ -50,6 +54,7 @@ export default {
       }, 1000)
     },
     autoOpen () {
+      debugger
       const keya = 'linkData'
       const keyb = 'LinkData'
       let routex = cookie.get(keya)

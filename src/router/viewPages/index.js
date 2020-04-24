@@ -192,9 +192,9 @@ export default new Router({
       name: 'documents',
       component: () => import('@/views/viewPages/documents/index.vue')
     },
-    // {
-    //   path: '*',
-    //   redirect: '/home'
-    // }
+    {
+      path: '*',
+      redirect: '/home'
+    }
   ]
 })

@@ -7,6 +7,7 @@ import router from '@/router/viewPages'
 import store from '@/store'
 import cookie from 'js-cookie'
 import Navigation from 'vue-navigation'
+import '@/permission' // permission control
 Vue.use(Navigation, {
   router,
   store

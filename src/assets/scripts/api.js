@@ -905,7 +905,7 @@ const interfaces = [
   {
     //获取各个类型未读消息的数量
     fun: 'getGridMessageCount',
-    interface: 'api/GBM/GetGridMessageCount',
+    interface: '/api/GBM/GetGridMessageCount',
     type: 'post',
     serviceName: 'serviceEnt'
   },
@@ -919,14 +919,14 @@ const interfaces = [
   {
     //获取各个类型消息列表
     fun: 'getGridMessageList',
-    interface: 'api/GBM/getGridMessageList',
+    interface: '/api/GBM/getGridMessageList',
     type: 'post',
     serviceName: 'serviceEnt'
   },
   {
     //标记消息已读
     fun: 'updateMessageState',
-    interface: 'api/GBM/UpdateMessageState',
+    interface: '/api/GBM/UpdateMessageState',
     type: 'post',
     serviceName: 'serviceEnt'
   }

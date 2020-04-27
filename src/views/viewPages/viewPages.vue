@@ -54,7 +54,6 @@ export default {
       }, 1000)
     },
     autoOpen () {
-      debugger
       const keya = 'linkData'
       const keyb = 'LinkData'
       let routex = cookie.get(keya)

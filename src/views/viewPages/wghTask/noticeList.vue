@@ -119,7 +119,7 @@
             subtype: 1,
             type: null,
             state: null,
-            form:2
+            form:null
           }
         ).then(res => {
           this.taskMsg = res;
@@ -130,7 +130,7 @@
               subtype: 2,
               type: null,
               state: null,
-              form: 2
+              form: null
             }
           ).then(res => {
             this.eventMsg = res;
@@ -147,7 +147,7 @@
             subtype: this.selected,
             type: this.childSelected != 0 ? this.childSelected : null,
             state: null,
-            form: 2
+            form: null
           }
         ).then(res => {
           this.num = '';

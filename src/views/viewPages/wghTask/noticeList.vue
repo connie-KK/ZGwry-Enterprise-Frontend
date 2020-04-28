@@ -1,6 +1,6 @@
 <template>
   <div id="noticeList" class="noticeList">
-    <header-bar leftIcon="back" leftText="返回" :isShowSearchIcon="isShowSearchIcon" :showBorder="isShowBorder">
+    <header-bar leftIcon="back" leftText="返回" :isShowSearchIcon="isShowSearchIcon" :showBorder="isShowBorder" :customBack="jump">
       {{ moduleName + num}}
       <template v-slot:right>
         <span class="texts" v-on:click="updateMessageAll()">全部已读</span>
@@ -108,6 +108,9 @@
     },
     mounted() { },
     methods: {
+      jump(){
+        this.$router.push('/enList')
+      },
       getAllMsg: function () {
         this.$api.getGridMessageList(
           {

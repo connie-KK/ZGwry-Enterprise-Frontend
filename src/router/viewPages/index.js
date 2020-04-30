@@ -12,7 +12,13 @@ Vue.use(Router)
 
 export default new Router({
   base: `${process.env.BASE_URL}/viewPages`,
-  routes: [{
+  routes: [
+    {
+      path: '/serveRecord',
+      name: 'serveRecord',
+      component: () => import('@/views/viewPages/envList/serveRecord.vue')
+    },
+    {
       path: '/homePage/:id',
       name: 'homePage',
       component: () => import('@/views/viewPages/homePage/index.vue')

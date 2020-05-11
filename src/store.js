@@ -600,7 +600,9 @@ export default new Vuex.Store({
     userInfo: null,
     eventListPageType: 1, //控制事件列表页是否显示代办
     recordCircule: [],
-    waitState: false //是否待办
+    waitState: false, //是否待办
+    taskFormList:[],   //任务模板表单
+    taskFormData:{}
   },
   mutations: {
     set_loading: (state, data) => {
@@ -692,6 +694,12 @@ export default new Vuex.Store({
     },
     set_waitState: (state, data) => {
       state.waitState = data
+    },
+    set_taskFormList: (state, data) => {
+      state.taskFormList = data
+    },
+    set_taskFormData: (state, data) => {
+      state.taskFormData = data
     }
   },
   actions: {}

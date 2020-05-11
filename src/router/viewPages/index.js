@@ -159,6 +159,16 @@ export default new Router({
       component: () => import('@/views/viewPages/wghTask/taskModelDetail.vue')
     },
     {
+      path: '/templateForm/:id',
+      name: 'templateForm',
+      component: () => import('@/views/viewPages/wghTask/templateForm.vue')
+    },
+    {
+      path: '/sign/:id',
+      name: 'sign',
+      component: () => import('@/views/viewPages/wghTask/sign.vue')
+    },
+    {
       path: '/mapPosition',
       name: 'mapPosition',
       component: () => import('@/views/viewPages/wghTask/mapPosition.vue')

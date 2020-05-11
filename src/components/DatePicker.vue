@@ -4,6 +4,7 @@
       class="selectbox"
       :value="mydate"
       readonly="readonly"
+      placeholder="请选择时间"
       @click="showPicker = true"
     />
     <van-popup

@@ -160,34 +160,12 @@ export default {
         height: 100%;
       }
     }
-    .leaflet-popup-content-wrapper {
-      height: 40px;
-      background: transparent;
-      border-radius: 3px;
-      color: rgba(255, 255, 255, 1);
-      font-size: 14px;
-      .leaflet-popup-content {
-        @include flexbox;
-        @include align-items(center);
-        @include justify-content(space-around);
-        @include flex-direction(column);
-        height: 100%;
-        margin: 0;
-      }
-    }
-    .leaflet-popup-tip-container,
-    .leaflet-popup-close-button {
-      display: none;
-    }
   }
   .mappopup {
     text-align: center;
     font-size: 0.2rem;
     padding: 0.07rem;
     text-shadow: 0px 1px 6px rgba(0, 0, 0, 0.7);
-  }
-  .leaflet-popup-content-wrapper {
-    padding: 0;
   }
   .center-position {
     position: fixed;

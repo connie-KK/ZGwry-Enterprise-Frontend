@@ -15,7 +15,7 @@
     "leaflet": "^1.5.1",
     "leaflet.chinatmsproviders": "^2.0.3",
     "mint-ui": "^2.2.13",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "store": "^2.0.12",
     "vant": "^2.5.3",
     "vue": "^2.6.10",
